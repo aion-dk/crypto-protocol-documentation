@@ -1,0 +1,91 @@
+\subsection{Continuous result extraction} \label{app: continuous result extraction}
+%{\Huge This feature should not be used}
+
+
+\subsubsection{General description}
+The feature of continuous result extraction is the ability for the \textit{Election Administrator} $\mathcal{E}$ to extract submitted votes, before the election is over, and treat the extracted votes with the steps described in the post-election phase (\Cref{sec: post-election phase}) which includes cleansing, mixing, and decryption. It will exclude the publication of the decrypted votes as they should not be publicized. This can be done throughout the election as many times as necessary. 
+
+
+\subsubsection{Multiple ballots combined}
+The term 'voting option' means the number of unique voting options regardless of election style. In a candidate election a voter can vote for only one of the x candidates and there are therefore x voting options. In a multiple choice election there are multiple unique combinations for example in an election where 3 out of 5 options can be selected there are 10 different voting options. In a ranked election (multiple choice where order matters) there are even more combinations. In the same example where 3 out of 5 options can be picked but the ordering of those picks matter there are 60 unique voting options.
+
+When combining multiple contents into a single ballot the number of voting options will multiply. 
+
+
+\subsubsection{Minimum size of extraction to preserve anonymity}
+The feature of continuous extraction brings a big problem with it in form of anonymity sets. If a extraction would take place with every vote submitted the vote would become distinguishable as there would only be one vote and the mixing phase (\Cref{sec: mixing phase}) would become obsolete. Therefore this section will discuss the different vulnerabilities/exploits that are greatly increased with continuous extraction and recommendations will be given to the minimum amount of voters per extraction depending on the number of voting options. 
+
+Every calculation in this subsection is done with the assumption of voters voting randomly as we can not take into account what an arbitrary distribution would be and as it would be very individually for every election. % For the following tables the term 'voting option' means the number of unique voting options regardless of election style. In a candidate election a voter can vote for only one of the x candidates and there are therefore x voting options. In a multiple choice election there are multiple unique combinations for example in an election where 3 out of 5 options can be selected there are 10 different voting options. In a ranked election (multiple choice where order matters) there are even more combinations. In the same example where 3 out of 5 options can be picked but the ordering of those picks matter there are 60 unique voting options.
+
+For every following table the case that write ins are allowed will also be considered. With write ins every vote can theoretically be be uniquely identified which can greatly alter the chance of the following calculations.
+
+% It is also assumed that in the calculation for these elections that the voter can only select one option.
+
+%If there are more voting options than voters there is also a chance that every vote is unique which can be exploited by a voter telling someone what he would vote beforehand and then when the batch is extracted there is only one vote with what the voter said he/she would vote. 
+
+\paragraph{Every voter votes the same} The issue of every voter picking the same option and thereby breaking anonymity. The probability of every voter voting the same is \[ \frac{1}{X}^N \] where X is the number of different voting options and N is the number of people voting. As this is vulnerability is critical and must never happen it is then recommended that the chance of every voter voting the same should be maximum one in a million.
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline
+Voting options & Minimum voters & Chance of all votes being identical \\ \hline
+2                   & 20     &      9.5e-7                               \\ \hline
+5                   & 9     &       5.2e-7                              \\ \hline
+10                  & 6      &        1e-6                           \\ \hline
+100                 & 3      &        1e-6                         \\ \hline
+1000                & 2      &        1e-6                   \\ \hline
+\end{tabular}
+\end{table}
+
+Write ins would not alter the chance outcomes of this table as a write in does not change what vote option is selected.
+
+\paragraph{Every voter votes unique}
+If there are more voting options than voters there is a chance that every vote is unique which partly ruins receipt-freeness as a voter can announce his vote beforehand and when batch extraction happens there is only one vote matching what the voter said he/she would vote.
+The probability of every voter voting uniquely is
+%\[ \frac{X*X-1*X-2*...*X-N+1}{X^N} , X \leq N \] 
+\[ \frac{X!}{(X-N)!*X^N} , X < N \]
+Where X is the number of different voting options and N is the number of people voting. If X $<$ N then probability is 0.
+
+For this vulnerability the recommendation is that the probability should be 1 percent or less as it at this rate would be too inconsistent to scale the abuse up. 
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline
+Voting options & Minimum voters & Chance of all votes being unique \\ \hline
+10                  & 9      & 0.4\%                             \\ \hline
+100                 & 30     & 0.8\%                             \\ \hline
+1000                & 95     & 1\%                             \\ \hline
+\end{tabular}
+\end{table}
+
+Write ins can be uniquely identified which would theoretically allow for infinite different variations which would certify this vulnerability.
+
+\paragraph{At least one vote being unique}
+If there are 100 people voting on 10 different options there is still a chance that one of the 100 voters is the only one picking a certain option. This is the same problem as with the previous issue that this can interfere with receipt-freeness. 
+\noindent The probability of at least one voter's vote being unique is \[ \frac{X-1}{X}^{N-1} \]
+For this vulnerability the recommendation is that the probability should be 5 percent or less.
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline
+Voting options & Minimum voters & Chance of at least one vote being unique \\ \hline
+2                   & 6           &  3.1\%                           \\ \hline
+5                   & 15          &  4.4\%                         \\ \hline
+10                  & 30          &  4.7\%                         \\ \hline
+100                 & 300         &  4.9\%                         \\ \hline
+1000                & 2996        &  4.9\%                         \\ \hline
+\end{tabular}
+\end{table}
+
+%sicillian attack is much more effective with a lower number of extracted votes
+Write ins can be uniquely identified which would theoretically allow for infinite different variations which would certify this vulnerability.
+
+
+\subsubsection{How it impacts our protocol}
+The continuous extraction feature adds more information to the bulletin board as every extraction is appended to the bulletin board. The feature also adds extra trust responsibility on the \textit{Election Administrator} $\mathcal{E}$ as decrypted votes are now in their possession. The \textit{Election Administrator} $\mathcal{E}$ needs to handle these decrypted votes very carefully as a premature publication of these votes would be devastating especially during a longer election where this knowledge could alter the later voters decision.
+
+
+\subsubsection{How it impacts our election properties}
+It violates the privacy and fairness principle as partial results are computed during the election. These are of course not publicly available but they are still processed and can therefore also potentially be leaked.
+The anonymity principle is threatened to be violated if the continuous extraction is not done carefully, as votes in small anonymity sets would be at risk of being distinguishable. The detailed description of these properties can be seen in \Cref{sec: requirements}.
+
+
+\subsubsection{Multiple voting anomaly}
+The continuous extraction feature is incompatible with the feature of multiple voting in the sense that after an extraction has taken place, voters with extracted votes are not allowed to cast a vote any longer.

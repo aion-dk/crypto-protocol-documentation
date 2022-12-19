@@ -1,0 +1,55 @@
+\subsection{Trust-dependent assumptions} 
+The threats against a system can be derived from the built-in trust-dependent assumptions. The following will list the processes in various phases that exhibit trust-dependent assumptions.
+
+
+\subsubsection{Pre-election phase} 
+
+\begin{enumerate}
+\item It is assumed that the IT administrator is installing genuine code in the hosting environment
+\item It is assumed that the IT administrator is creating the appropriate (trustworthy) users
+\item It is assumed that users are securely connected to the Election Admin Application
+\item It is assumed that the Election Administrator generates the eligible voters (pre-election mode)
+\item It is assumed that the Election Administrator registers the public keys of the Voter Authorizer and the Identity Provider(s)
+\item It is assumed that the Election Administrator uploads the eligible voter identities to the Voter Authorizer
+\item It is assumed that the Election Administrator uploads all the public keys of the identity providers. All via secure channels.
+\item It is assumed that the identity provider only generates identity tokens after successful authentication
+\item It is assumed that the Election Administrator is sending the correct personal information (used for generating access codes) to the Printing Authorities via secure channel
+\item It is assumed that the Printing Authorities will deliver the correct private key to voters via secure channel
+\item It is assumed that the Election Administrator assigns the correct trustees
+\item It is assumed that the Election System sends the trustee access token via secure channel
+\item It is assumed that the Trustees publishes their public keys to the system via secure channel (https)
+\item It is assumed that the Trustees create shares of private key (decryption key?) by sending secrets to each other encrypted by the public key of the others
+\item It is assumed that the Election System will spawn a new Bulletin Board with the information gathered from previous steps via a secure channel
+\item It is assumed that auditors will review published (on the Bulletin Board) changes to the election configuration
+\end{enumerate}
+
+
+\subsubsection{Election phase} 
+
+\textbf{Voting}
+
+\begin{enumerate}
+\item It is assumed that the voter retain the private key for the entire election (pre-election mode)
+\item It is assumed that a secure channel is used to transmit messages between Voting Application and Voter Authorizer (on-demand mode)
+\item It is assumed that Identity Providers only release identity tokens on successful authentication (following OpenID Connect Protocol)
+\item It is assumed that voters cast votes as intended (not coerced or part in deanonymization attack)
+\item It is assumed that received cryptograms are empty
+\item It is assumed that the Benaloh Challenge is conducted on a secondary device running an (uncompromised?) external verifier
+\item It is assumed that the Voter is either trusting the cryptogram or is performing the Benaloh challenge
+\item It is assumed that the Digital Ballot Box will only reveal the randomizer value to the External Verifier when the Voter decides to proceed with the Benaloh challenge.
+\item It is assumed that the External Verifier will unpack the cryptogram by decrypting the incoming randomizer values from the Voter and the Digital Ballot Box
+\item It is assumed that the Voter inputs the correct Verifier Tokens?
+\item It is assumed that the Digital Ballot Box does not brute force the randomizer value from the Voter (possible?)
+\end{enumerate}
+
+\textbf{Signature Verification}
+
+To be finished …
+
+\textbf{Ballot Extraction}
+
+To be finished …
+
+
+\subsubsection{Post-Election Phase} 
+To be finished …

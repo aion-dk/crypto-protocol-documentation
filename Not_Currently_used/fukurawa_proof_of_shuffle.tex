@@ -1,0 +1,647 @@
+\section{Fukurawa proof of shuffle}
+
+A \textit{cryptographic shuffle} is a process that, given as input a list of cryptograms, outputs another list of cryptograms such that each cryptogram from the input list is re-encrypted and permuted in a random new order, forming the output list. Formally, given a list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \), with \( e_i = (R_i, C_i) \) and \( i \in \{ 1, ..., n \} \), a list of randomizers \( \boldsymbol{r'} = (r'_1, ..., r'_n) \in \mathbb{Z}_q^n \) and a permutation \( \psi:\{ 1, ..., n \} \rightarrow \{ 1, ..., n \} \) from the set $\Psi_n$ of all permutations of $n$ elements, the shuffle algorithm outputs the list \( \boldsymbol{e'} = (e'_1, ..., e'_n) \leftarrow \mathbf{Shuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \) (algorithm \ref{alg: shuffle}) where each \( e'_i = (R'_i, C'_i) \leftarrow \mathbf{ReEnc}_Y (e_j, r'_i) \) for \( j = \psi(i) \). 
+
+% \begin{figure}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+    \caption{\( \mathbf{Shuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The input list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \)}
+    \myinput{The list of randomizers \( \boldsymbol{r'} = (r'_1, ..., r'_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The permutation \( \psi \in \Psi_n \)}
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$ }{
+        % \( j \gets \psi(i) \) \\
+        \( e'_i \gets \mathbf{ReEnc}_Y(e_{\psi(i)}, r'_i) \) \tcp*{algorithm \ref{alg: reEnc}}
+        }
+    \( \boldsymbol{e'} \gets (e'_1, ..., e'_n) \) \\
+    \Return{\( \boldsymbol{e'} \)} \tcp*{\( \boldsymbol{e'} \in \mathbb{E}^n \)}
+\end{algorithm}
+% \end{figure}
+
+The really interesting aspect of a shuffle is how to prove in zero knowledge that the shuffling calculations were done correctly and that no content of the cryptograms has been changed. Our proof of shuffle is based on an algorithm presented by Jun Furukawa in \cite{Furukawa01} (later updated in \cite{Furukawa03, Furukawa04}). We adapted all calculations to elliptic curve point operations. The proof consists of two parts:
+\begin{enumerate}
+    \item proving that no content of the cryptograms has been changed, i.e. same randomizer $r'_i$ and permutation $\psi$ have been used to re-encrypt both parts of the cryptogram tuples
+    \[ e'_i = (R'_i, C'_i) = (R_{\psi(i)} + [r'_i]G, C_{\psi(i)} + [r'_i]Y) \]
+    \item proving that $\psi$ is indeed a permutation, which is equivalent to proving that the matrix \( \boldsymbol{A}_\psi \) is a permutation matrix, where
+\[
+\boldsymbol{A}_\psi = \begin{pmatrix}
+    A_{1, 1} & \dots & A_{1, n} \\
+    \vdots & \ddots & \vdots \\
+    A_{n, 1} & \dots & A_{n, n}
+\end{pmatrix} \in \{0, 1\}^{n \cdot n}
+\text{ , where }
+A_{i,j}= 
+\begin{cases}
+    1, & \text{if } \psi(i) = j \\
+    0, & \text{otherwise}
+\end{cases}
+\]
+\end{enumerate}
+
+
+The shuffle proof \( PK = ( R', C', U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}, \boldsymbol{c}, z, \boldsymbol{s}, \lambda') \) is constructed by the protocol presented in figure \ref{fig: Prove shuffle}. In our proof construction, \( (R', C', U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \) represent the commitment, $\boldsymbol{c}$ represents the challenge and \( (z, \boldsymbol{s}, \lambda') \) is the response of the proof. The verifier accepts the proof in the end (is convinced that the contents of the cryptograms have not changed during the shuffling process) if the final verification step validates.
+
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[framed]
+        \matrix (m) [matrix of nodes, nodes = {draw = none, anchor = base west, align = left, text depth = 0pt} ]{
+            \textbf{Prover} & & \textbf{Verifier} \\ [2mm]
+            /*knows $\boldsymbol{e}, \boldsymbol{r'}, \psi$ */ & & /*knows $\boldsymbol{e}, \boldsymbol{e'}$ */ \\ [2mm]
+            \scriptsize /*pick random scalars*/ & & \\ [-1mm]
+            \( \sigma, \rho, \tau, \lambda, a, \in_\mathrm{R} \mathbb{Z}_q \) & & \\
+            \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n) \in_\mathrm{R} \mathbb{Z}_q^n \) & & \\
+            \( \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in_\mathrm{R} \mathbb{Z}_q^n \) & & \\ [2mm]
+            \scriptsize /*compute commitment (algorithm \ref{alg: shuffle commit})*/ & & \\ [-1mm]
+            \( \boldsymbol{K} \leftarrow \mathbf{ShuffleCommit}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi, \) & & \\
+            \( \sigma, \rho, \tau, \lambda, a, \boldsymbol{\alpha}, \boldsymbol{\lambda}) \) & & \\
+            % \( R' = [a]G + \sum_{i=1}^n [\alpha_i]R_i \) & & \\
+            % \( C' = [a]Y + \sum_{i=1}^n [\alpha_i]C_i \) & & \\ [2mm]
+            % \scriptsize /*compute scalars*/ & & \\ [-1mm]
+            % \( \dot{t}_i \gets 3 \cdot \alpha_j + \tau \cdot \lambda_i \pmod q \) & & \\
+            % \( \dot{v}_i \gets 3 \cdot \alpha_j^2 + \rho \cdot r'_i \pmod q \) & & \\
+            % \( \dot{w}_i \gets 2 \cdot \alpha_j + \sigma \cdot r'_i \pmod q \) & & \\
+            % \( \dot{v} \gets \tau \cdot \lambda + \rho \cdot a + \sum_{k=1}^n \alpha_k^3 \pmod q \) & & \\
+            % \( \dot{w} \gets \sigma \cdot a + \sum_{k=1}^n \alpha_k^2 \pmod q \) & & \\ [2mm]
+            % \scriptsize /*compute commitment to permutation $\psi$*/ & & \\ [-1mm]
+            % \( U \gets [\lambda]G \); \( T \gets [\tau]G \); \( V \gets [\rho]G \) & & \\
+            % \( \dot{V} \gets [\dot{v}]G \); \( W \gets [\sigma]G \); \( \dot{W} \gets [\dot{w}]G \) & & \\
+            % for each \( i \in T \) do: & & \\
+            % -- \( U_i \gets [\lambda_i]G \); \( \dot{T}_i \gets [\dot{t}_i]G \) & & \\
+            % -- \( \dot{V}_i \gets [\dot{v}_i]G \); \( \dot{W}_i \gets [\dot{w}_i]G \) & & \\ [2mm]
+            % \scriptsize /*set commitment*/ & & \\ [-1mm]
+            % \( \boldsymbol{U} \gets (U_1, ..., U_n) \) & & \\
+            % \( \boldsymbol{\dot{T}} \gets (\dot{T}_1, ..., \dot{T}_n) \) & & \\
+            % \( \boldsymbol{\dot{V}} \gets (\dot{V}_1, ..., \dot{V}_n) \) & & \\
+            % \( \boldsymbol{\dot{W}} \gets (\dot{W}_1, ..., \dot{W}_n) \) & & \\
+            % \( \boldsymbol{K} \gets (R', C', U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \) & & \\
+            & send $\boldsymbol{K}$ & \\ [1mm]
+            & & \scriptsize /*pick random challenge*/ \\ [-1mm]
+            & & \( \boldsymbol{c} = (c_1, ... , c_n) \in_\mathrm{R} \mathbb{Z}_q^n \) \\
+            & send $\boldsymbol{c}$ & \\
+            \scriptsize /*compute response (algorithm \ref{alg: shuffle response})*/ & & \\ [-1mm]
+            \( \boldsymbol{r} \gets \mathbf{ShuffleResp} (\boldsymbol{r'}, \psi, \lambda, a, \boldsymbol{\alpha}, \) & & \\
+            \( \boldsymbol{\lambda}, \boldsymbol{c}) \) & & \\
+            % \( \lambda' = \sum_{k=1}^n \lambda_k \cdot c_k^2 + \lambda \pmod q \) & & \\
+            % \( z = \sum_{k=1}^n r'_k \cdot c_k + a \pmod q \) & & \\
+            % for each \( i \gets 1 \) to $n$ by $1$ do: & & \\
+            % -- \( j = \psi(i) \) & & \\
+            % -- \( s_i = c_j + \alpha_i \pmod q \) & & \\
+            % set \( \boldsymbol{s} = (s_1, ..., s_n) \) & & \\
+            & send $\boldsymbol{r}$ & \\ [1mm]
+            & & \scriptsize /*verify proof (algorithm \ref{alg: shuffle verify})*/ \\ [-1mm]
+            & & \( PK \gets (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \) \\
+            & & \( \mathbf{ShuffleVer}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \) \\
+        };
+        
+        \draw[shorten <= -0.5cm] (m-1-1.south east)--(m-1-1.south west);
+        \draw[shorten <= -0.5cm] (m-1-3.south east)--(m-1-3.south west);
+        \draw[-latex] (m-10-2.south west)--(m-10-2.south east);
+        \draw[-latex] (m-13-2.south east)--(m-13-2.south west);
+        \draw[-latex] (m-17-2.south west)--(m-17-2.south east);
+    \end{tikzpicture}
+    \caption{Protocol for proving a shuffle}
+\end{figure}
+
+
+For notation convenience, when we express the shuffling of a list, we will use the permutation notation, as in \cite{Furukawa03}, instead of the permutation matrix. For example, given a list of elements \( (g_1, ..., g_n) \) and a permutation \( \psi \in_\mathrm{R} \Psi_n \), having its permutation matrix \( \boldsymbol{A}_\psi = (A_{1,1}, ..., A_{n,n}) \in \{ 0, 1 \}^{n \cdot n} \), we express a shuffled element like \( g'_i = g_{\psi(i)} \), instead of \( g'_i = \sum_{j=1}^n g_j \cdot A_{i,j} \).
+
+
+
+
+
+% \begin{algorithm}[H]
+% \floatname{algorithm}{ProveShuffle}
+% \renewcommand{\thealgorithm}{}
+% \caption{Protocol for generating a Furukawa proof of shuffle}
+% \begin{algorithmic}[1]
+% \STATE Prover : Picks random scalars \( \sigma, \rho, \tau, a, \alpha_i, \lambda, \lambda_i \in_R \mathbb{Z}_q \), where \( i \in \{ 1, ..., n \} \).
+% \STATE Prover : Computes as commitment to the outputted list of cryptograms: \( R' = [a]G + \sum_{i=1}^n [\alpha_i]R_i \) and \( C' = [a]Y + \sum_{i=1}^n [\alpha_i]C_i \).
+% \STATE Prover : Computes scalars :
+% \begin{equation}
+%     \begin{split}
+%         \dot{t}_i & = 3 \cdot \alpha_j + \tau \cdot \lambda_i \\
+%         \dot{v}_i & = 3 \cdot \alpha_j^2 + \rho \cdot r'_i \\
+%         \dot{w}_i & = 2 \cdot \alpha_j + \sigma \cdot r'_i \\
+%         \dot{v} & = \tau \cdot \lambda + \rho \cdot a + \sum_{k=1}^n \alpha_k^3 \\
+%         \dot{w} & = \sigma \cdot a + \sum_{k=1}^n \alpha_k^2 \\
+%     \end{split}
+% \end{equation}
+% where \( j = \psi(i) \)
+
+% \STATE Prover : Computes commitment to the permutation: \( U = [\lambda]G \), \( U_i = [\lambda_i]G \), \( T = [\tau]G \), \( \dot{T}_i = [\dot{t}_i]G \), \( V = [\rho]G \), \( \dot{V}_i = [\dot{v}_i]G \), \( \dot{V} = [\dot{v}]G \), \( W = [\sigma]G \), \( \dot{W}_i = [\dot{w}_i]G \), \( \dot{W} = [\dot{w}]G \) for each \( i \in \{ 1, ..., n \} \).
+% \STATE Prover : Sends to the verifier as commitment of the proof values: $R'$, $C'$, $U$, \( \boldsymbol{U} = (U_1, ..., U_n) \), $T$, \( \boldsymbol{\Dot{T}} = (\dot{T}_1, ..., \dot{T}_n) \), $V$, \( \boldsymbol{\dot{V}} = (\dot{V}_1, ... \dot{V}_n) \), $\dot{V}$, $W$, \( \boldsymbol{\dot{W}} = (\dot{W}_1, ..., \dot{W}_n), \dot{W} \).
+% \STATE Verifier : Upon receival of the commitment, the verifier sends a challenge in form of a list of random scalars \( c_i \in_R \mathbb{Z}_q \), with \( i \in \{ 1, ..., n \} \).
+% \STATE Prover : Finally, the prover computes scalars \( \lambda' = \sum_{k=1}^n \lambda_k \cdot c_k^2 + \lambda \pmod q \), \( z = \sum_{k=1}^n r'_k \cdot c_k + a \pmod q \) and \( s_i = c_j + \alpha_i \pmod q \), where \( i \in \{ 1, ..., n \} \) and \( j = \psi(i) \).
+% \STATE Prover : Sends to the verifiers as response of the proof the values: $\lambda'$, $z$ and \( \boldsymbol{s} = (s_1, ..., s_n) \).
+% \end{algorithmic}
+% \end{algorithm} 
+
+
+
+For convenience, the entire protocol has been split into multiple sub-algorithms (i.e. $\mathbf{ShuffleCommit}$, $\mathbf{ShuffleResp}$, $\mathbf{ShuffleVer}$) that help in constructing the proof. 
+% The variable names mappings between the protocol in \cite{Furukawa01} and our algorithms can be seen in appendix \ref{appendix: variable mapping}. 
+Changes in variable names, compared to \cite{Furukawa01} are stated in appendix \ref{appendix: variable mapping}.
+
+
+In section "Constructing the Main Protocol" of \cite{Furukawa01}, it is presented an extra security mechanism, needed in case the prover knows the randomizers used in the generation of the initial list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \). New basis \( \{ \tilde{G}, \tilde{G}_1, ..., \tilde{G}_n \} \) must be set independently chosen from $\boldsymbol{e}$. Next, it must be proven that the same randomizers $r'_i$ and permutation $\psi$ has been applied to the basis \( \{ \tilde{G}, \tilde{G}_1, ..., \tilde{G}_n \} \) and to both tuples in each cryptogram $e_i$.
+\[ (\tilde{G}'_i, R'_i, C'_i) = (\tilde{G}_{\psi(i)} + [r'_i]\tilde{G}, R_{\psi(i)} + [r'_i]G, C_{\psi(i)} + [r'_i]Y) \]
+
+We can skip the computation of $\tilde{G}$, $\tilde{G}_i$ and $\tilde{G}'_i$, while our shuffle proof still has the same security properties as in \cite{Furukawa01}, on the assumption that the prover is not in the possession of the randomizers associated to each cryptogram of $\boldsymbol{e}$.
+
+% \begin{figure}
+\begin{algorithm}[hp]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ShuffleCommit}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi, \sigma, \rho, \tau, \lambda, a, \boldsymbol{\alpha}, \boldsymbol{\lambda}) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The input list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \)}
+    \myinput{\( e_i = (R_i, C_i) \), where \( i \in \{ 1, ..., n \} \)}
+    \myinput{The list of randomizers \( \boldsymbol{r'} = (r'_1, ..., r'_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The permutation \( \psi \in \Psi_n \) }
+    \myinput{Scalars \( \sigma, \rho, \tau, \lambda, a, \in \mathbb{Z}_q \) and \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in \mathbb{Z}_q^n \)}
+    % \myinput{Scalars \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in \mathbb{Z}_q^n \)}
+    \tcc{commitment to cryptogram list $\boldsymbol{e}$}
+    \( R' \gets [a]G + \sum_{i=1}^n [\alpha_i]R_i \) \\
+    \( C' \gets [a]Y + \sum_{i=1}^n [\alpha_i]C_i \) \\ [2mm]
+    \tcc{compute scalars} 
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
+        % \( j \gets \psi(i) \) \\
+        \( \dot{t}_i \gets \tau \cdot \lambda_i + 3 \cdot \alpha_{\psi(i)} \pmod q \) \\
+        \( \dot{v}_i \gets \rho \cdot r'_i + 3 \cdot \alpha_{\psi(i)}^2 \pmod q \) \\
+        \( \dot{w}_i \gets \sigma \cdot r'_i + 2 \cdot \alpha_{\psi(i)} \pmod q \) \\
+        }
+    \( \dot{v} \gets \tau \cdot \lambda + \rho \cdot a + \sum_{i=1}^n \alpha_i^3 \pmod q \) \\
+    \( \dot{w} \gets \sigma \cdot a + \sum_{i=1}^n \alpha_i^2 \pmod q \) \\ [2mm]
+    \tcc{compute commitment to permutation}
+    \( U \gets [\lambda]G \), \( T \gets [\tau]G \), \( V \gets [\rho]G \) \\
+    \( \dot{V} \gets [\dot{v}]G \), \( W \gets [\sigma]G \), \( \dot{W} \gets [\dot{w}]G \) \\
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
+        \( U_i \gets [\lambda_i]G \), \( \dot{T}_i \gets [\dot{t}_i]G \), \( \dot{V}_i \gets [\dot{v}_i]G \), \( \dot{W}_i \gets [\dot{w}_i]G \) \\
+        }
+    \( \boldsymbol{U} \gets (U_1, ..., U_n) \), \( \boldsymbol{\dot{T}} \gets (\dot{T}_1, ..., \dot{T}_n) \) \\
+    \( \boldsymbol{\dot{V}} \gets (\dot{V}_1, ..., \dot{V}_n) \), \( \boldsymbol{\dot{W}} \gets (\dot{W}_1, ..., \dot{W}_n) \) \\
+    \( \boldsymbol{K} \gets (R', C', U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \) \\
+    \Return{\( \boldsymbol{K} \)} \tcp*{\( \boldsymbol{K} \in E(\mathbb{F}_p)^{8 + 4 \cdot n} \)}
+\end{algorithm}
+% \end{figure}
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ShuffleResp} (\boldsymbol{r'}, \psi, \lambda, a, \boldsymbol{\alpha}, \boldsymbol{\lambda}, \boldsymbol{c}) \)}
+    \KwData{The list of randomizers \( \boldsymbol{r'} = (r'_1, ..., r'_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The permutation \( \psi \in \Psi_n \) }
+    \myinput{Scalars \( \lambda, a \in \mathbb{Z}_q \) and \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in \mathbb{Z}_q^n \)}
+    % \myinput{Scalars \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The list of challenges \( \boldsymbol{c} = (c_1, ..., c_n) \in \mathbb{Z}_q^n \)}
+    \( \lambda' \gets \sum_{i=1}^n \lambda_i \cdot c_i^2 + \lambda \pmod q \) \\
+    \( z \gets \sum_{i=1}^n r'_i \cdot c_i + a \pmod q \) \\
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
+        % \( j \gets \psi^{-1}(i) \) \\
+        \( s_i \gets \alpha_i + c_{\psi^{-1}(i)} \pmod q \) \\ }
+    \( \boldsymbol{s} \gets (s_1, ..., s_n) \) \;
+    % \( \boldsymbol{r} \gets (\lambda', z, \boldsymbol{s}) \) \;
+    \Return{\( (\lambda', z, \boldsymbol{s}) \)} \tcp*{\( (\lambda', z, \boldsymbol{s}) \in \mathbb{Z}_q^{2 + n} \)}
+\end{algorithm}
+% \end{figure}
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ShuffleVer}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The proof of shuffle \( PK = (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \)}
+    \myinput{\( \boldsymbol{K} = (R', C', U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \in E(\mathbb{F}_p)^{8 + 4 \cdot n} \)}
+    \myinput{\( \boldsymbol{U} = (U_1, ..., U_n), \boldsymbol{\dot{T}} = (\dot{T}_1, ..., \dot{T}_n) \in E(\mathbb{F}_p)^n \)}
+    \myinput{\( \boldsymbol{\dot{V}} = (\dot{V}_1, ..., \dot{V}_n), \boldsymbol{\dot{W}} = (\dot{W}_1, ..., \dot{W}_n) \in E(\mathbb{F}_p)^n \)}
+    \myinput{\( \boldsymbol{c} = (c_1, ..., c_n) \in \mathbb{Z}_q^n \)}
+    \myinput{\( \boldsymbol{r} = (\lambda', z, \boldsymbol{s}) \in \mathbb{Z}_q^{2 + n} \)}
+    \myinput{\( \boldsymbol{s} = (s_1, ..., s_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The input list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \)}
+    \myinput{\( e_i = (R_i, C_i) \), with \( i \in \{ 1, ..., n \} \)}
+    \myinput{The output list of cryptograms \( \boldsymbol{e'} = (e'_1, ..., e'_n) \in \mathbb{E}^n \)}
+    \myinput{\( e'_i = (R'_i, C'_i) \), with \( i \in \{ 1, ..., n \} \)}
+    \eIf{\( [\lambda']G = U + \sum_{i=1}^n [c_i^2]U_i \) \\
+        \KwAnd \( [\lambda']T + [z]V + [\sum_{i=1}^n s_i^3 - c_i^3]G = \dot{V} + \sum_{i=1}^n [c_i]\dot{V}_i + [c_i^2]\dot{T}_i \) \\
+        \KwAnd \( [z]W + [\sum_{i=1}^n s_i^2 - c_i^2]G = \dot{W} + \sum_{i=1}^n [c_i]\dot{W}_i \) \\
+        \KwAnd \( [z]G + \sum_{i=1}^n [s_i]R_i = R' + \sum_{i=1}^n [c_i]R'_i \) \\
+        \KwAnd \( [z]Y + \sum_{i=1}^n [s_i]C_i = C' + \sum_{i=1}^n [c_i]C'_i \) \\
+        }{
+        \( b \gets 1 \) \tcp*{proof is valid}
+        }{
+        \( b \gets 0 \) \tcp*{proof is invalid}
+        }
+    \Return{\( b \)} \tcp*{\( b \in \mathbb{B} \)}
+\end{algorithm}
+% \end{figure}
+
+% The verifier runs the algorithm \( b\leftarrow \mathbf{VerifyShuffle}_{G, Y} (PK, \boldsymbol{e}, \boldsymbol{e'}) \), with \( b \in \mathbb{B} \), in order to verify that proof of shuffle $PK$ is valid with respect to the input $\boldsymbol{e}$ and output $\boldsymbol{e'}$ lists of cryptograms. The algorithm checks the following equation and the proof is valid if all of the match:
+
+% \begin{equation}
+%     \begin{split}
+%         [z]G + \sum_{i=1}^n [s_i]R_i & = R' + \sum_{i=1}^n [c_i]R'_i \\
+%         [z]Y + \sum_{i=1}^n [s_i]C_i & = C' + \sum_{i=1}^n [c_i]C'_i \\
+%         [z]W + [\sum_{i=1}^n s_i^2 - c_i^2]G & = \dot{W} + \sum_{i=1}^n [c_i]\dot{W}_i \\
+%         [\lambda']T + [z]V + [\sum_{i=1}^n s_i^3 - c_i^3]G & = \dot{V} + \sum_{i=1}^n [c_i]\dot{V}_i + [c_i^2]\dot{T}_i \\
+%         [\lambda']G & = U + \sum_{i=1}^n [c_i^2]U_i \\
+%     \end{split}
+% \end{equation}
+
+\clearpage
+The proof of shuffle can be made non-interactive by having the list of challenges $\boldsymbol{c}$ calculated by a hash function that takes as input the initial list of cryptograms $\boldsymbol{e}$, the commitment of the proof $\boldsymbol{K}$ and the outputted list of cryptograms $\boldsymbol{e'}$, as presented in \cite{Furukawa03}. The algorithm for computing the challenges is described in algorithm \ref{alg: shuffle challenge}. 
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ShuffleChall} (\boldsymbol{e}, \boldsymbol{e'}, \boldsymbol{K}) \)}
+    \KwData{The input list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \)}
+    \myinput{The output list of cryptograms \( \boldsymbol{e'} = (e'_1, ..., e'_n) \in \mathbb{E}^n \)}
+    \myinput{The commitment of the proof \( \boldsymbol{K} \in E(\mathbb{F}_p)^{8 + 4 \cdot n} \)}
+    \( h \gets \mathcal{H} (e_1 || ... || e_n || \boldsymbol{K} || e'_1 || ... || e'_n) \) \\
+    \For{\( i \gets 1\) \KwTo $n$ \KwBy $1$}{
+        \( c_i \gets \mathcal{H} (i || h) \)}
+    \( \boldsymbol{c} = (c_1, ..., c_n) \) \\
+    \Return{\( \boldsymbol{c} \)} \tcp*{\( c \in \mathbb{Z}_q^n \)}
+\end{algorithm}
+% \end{figure}
+
+%Now the entire proof of shuffle \( PK \leftarrow \mathbf{ProveShuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \) (algorithm \ref{alg: prove NEWshuffle}) can be generated by the prover alone by running the algorithm \ref{alg: prove NEWshuffle}. To verify a non-interactive $PK$, any public verifier has to run the algorithm \( b \leftarrow \mathbf{VerifyShuffle}_Y \) \( (PK, \boldsymbol{e}, \boldsymbol{e'}) \) (algorithm \ref{alg: verify shuffle}), where \( b \in \mathbb{B} \) represents whether the proof is valid or not.
+
+\clearpage
+% \begin{figure}
+\begin{algorithm}[h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ProveShuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The input list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \)}
+    \myinput{The list of randomizers \( \boldsymbol{r'} = (r'_1, ..., r'_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The permutation \( \psi \in \Psi_n \) }
+    \( \sigma, \rho, \tau, \lambda, a, \in_\mathrm{R} \mathbb{Z}_q \) \\
+    \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in_\mathrm{R} \mathbb{Z}_q^n \) \\
+    
+    % \tcc{compute permutation matrix} 
+    % \For{\( i,j \gets 1 \) \KwTo $n$ \KwBy $1$}{
+    %     \eIf{ \( j = \psi(i) \)
+    %     }{
+    %     \( A_{i,j} \gets 1 \)
+    %     }{
+    %     \( A_{i,j} \gets 0 \)
+    %     }
+    % }
+    % \( \boldsymbol{A}_\psi \gets (A_{1,1}, ..., A_{n,n}) \) \\
+    
+    \( \boldsymbol{K} \gets \mathbf{ShuffleCommit}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi, \sigma, \rho, \tau, \lambda, a, \boldsymbol{\alpha}, \boldsymbol{\lambda}) \) \tcp*{commitment}
+    \tcp*{(alg. \ref{alg: shuffle commit})}
+    \( \boldsymbol{c} \gets \mathbf{ShuffleChall} (\boldsymbol{e}, \boldsymbol{e'}, \boldsymbol{K}) \) \tcp*{challenge(alg. \ref{alg: shuffle challenge})}
+    \( \boldsymbol{r} \gets \mathbf{ShuffleResp} (\boldsymbol{r'}, \psi, \lambda, a, \boldsymbol{\alpha}, \boldsymbol{\lambda}, \boldsymbol{c}) \) \tcp*{response(alg. \ref{alg: shuffle response})}
+    \( PK \gets (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \) \\
+    \Return{\( PK \)} \tcp*{\( PK \in E(\mathbb{F}_p)^{8 + 4 \cdot n} \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{2+n} \)}
+\end{algorithm}
+% \end{figure}
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{VerifyShuffle}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The proof of shuffle \( PK = (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \in E(\mathbb{F}_p)^{8 + 4 \cdot n} \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{2 + n} \)}
+    \myinput{The input list of cryptograms \( \boldsymbol{e} = (e_1, ..., e_n) \in \mathbb{E}^n \)}
+    \myinput{The output list of cryptograms \( \boldsymbol{e'} = (e'_1, ..., e'_n) \in \mathbb{E}^n \)}
+    \eIf{\( \boldsymbol{c} = \mathbf{ShuffleChall} (\boldsymbol{e}, \boldsymbol{e'}, \boldsymbol{K}) \) \tcp*{algorithm \ref{alg: shuffle challenge}}
+        \KwAnd \( \mathbf{ShuffleVer}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \) \tcp*{algorithm \ref{alg: shuffle verify}}
+        }{
+        \( b \gets 1 \) \tcp*{proof is valid}
+        }{
+        \( b \gets 0 \) \tcp*{proof is invalid}
+        }
+    \Return{\( b \)} \tcp*{\( b \in \mathbb{B} \)}
+\end{algorithm}
+% \end{figure}
+
+% \[
+% c_i = \mathcal{H}(i || \boldsymbol{e} || R' || C' || U || \boldsymbol{U} || T || \boldsymbol{\dot{T}} || V || \boldsymbol{\dot{V}} || \dot{V} || W || \boldsymbol{\dot{W}} || \dot{W} || \boldsymbol{e'})
+% \]
+% for each \( i \in \{ 1, ..., n \} \). In a non-interactive proof, the verifier has to check the correctness of the challenge as well.
+
+
+% Removed the entire chapter about parallel shuffling
+\iffalse
+\clearpage
+\subsubsection{Proof of parallel shuffling}
+In a parallel shuffle the collection of cryptograms is stored in a matrix format: 
+\[
+\boldsymbol{e} = \begin{pmatrix}
+    e_{1, 1} & \dots & e_{1, m} \\
+    \vdots & \ddots & \vdots \\
+    e_{n, 1} & \dots & e_{n, m}
+\end{pmatrix} \in \mathbb{E}^{n \cdot m}.
+\]
+
+The shuffling algorithm takes as input a matrix of cryptograms \( \boldsymbol{e} \in \mathbb{E}^{n \cdot m} \), a matrix of randomizers \( \boldsymbol{r'} \in \mathbb{Z}_q^{n \cdot m} \) and a permutation \( \psi \in \Psi_n \) and outputs a new matrix of cryptograms \( \boldsymbol{e'} \in \mathbb{E}^{n \cdot m} \leftarrow \mathbf{ParallelShuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \) (algorithm \ref{alg: parallel shuffle}). The procedure will re-encrypt each cryptogram from the input matrix and will permute all rows of the matrix to form the output matrix \( e'_{i, j} = \mathbf{ReEnc}_Y (e_{\ell, j}, r'_{i, j}) \), where \( \ell = \psi(i) \), \( i \in \{ 1, ..., n \} \) and \( j \in \{ 1, ..., m \} \).
+
+% \begin{figure}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ParallelShuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The input matrix of cryptograms \( \boldsymbol{e} = (e_{1, 1}, ..., e_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \myinput{The matrix of randomizers \( \boldsymbol{r'} = (r'_{1, 1}, ..., r'_{n, m}) \in \mathbb{Z}_q^{n \cdot m} \)}
+    \myinput{The permutation \( \psi \in \Psi_n \)}
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$ }{
+        \For{\( j \gets 1 \) \KwTo $m$ \KwBy 1 }{
+            \( \ell \gets \psi(i) \) \\
+            \( e'_{i, j} \gets \mathbf{ReEnc}_Y (e_{\ell, j}, r'_{i, j}) \) \tcp*{algorithm \ref{alg: reEnc}}
+            }
+        }
+    \( \boldsymbol{e'} \gets (e'_{1, 1}, ..., e'_{n, m}) \) \\
+    \Return{\( \boldsymbol{e'} \)} \tcp*{\( \boldsymbol{e'} \in \mathbb{E}^{n \cdot m} \)}
+\end{algorithm}
+% \end{figure}
+
+The proof of parallel shuffle, in addition to the simple proof of shuffle, has to prove that the same permutation $\psi$ is applied to all collumns of the input matrix and that the order of the elements of each line in the matrix is preserved. The parallel shuffle proof \( PK = (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \) is constructed during the protocol described in figure \ref{fig: Prove parallel shuffle} where the prover tries to convince a verifier about the correctness of the shuffle. The protocol is built out of the updated versions of the sub-algorithms from section \ref{furukawa proof}, suited for parallel shuffling. The commitment has the following structure \( \boldsymbol{K} = (\boldsymbol{R'}, \boldsymbol{C'}, U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \in E(\mathbb{F}_p)^{6 + 2 \cdot m + 4 \cdot n} \), the challenge \( \boldsymbol{c} \in \mathbb{Z}_q^{n} \) and the response \( \boldsymbol{r} = (\lambda', \boldsymbol{z}, \boldsymbol{s}) \in \mathbb{Z}_q^{1 + m + n} \).
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[framed]
+        \matrix (m) [matrix of nodes, nodes = {draw = none, anchor = base west, align = left, text depth = 0pt} ]{
+            \textbf{Prover} & & \textbf{Verifier} \\ [2mm]
+            \scriptsize /*pick random scalars*/ & & \\ [-1mm]
+            \( \sigma, \rho, \tau, \lambda, \in_\mathrm{R} \mathbb{Z}_q \) & & \\
+            \( \boldsymbol{a} = (a_1, ..., a_m) \in_\mathrm{R} \mathbb{Z}_q^m \) & & \\
+            \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n) \in_\mathrm{R} \mathbb{Z}_q^n \) & & \\
+            \( \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in_\mathrm{R} \mathbb{Z}_q^n \) & & \\ [2mm]
+            \scriptsize /*compute commitment (algorithm \ref{alg: parallel shuffle commit})*/ & & \\ [-1mm]
+            \( \boldsymbol{K} \leftarrow \mathbf{ParShuffleCommit}_Y (\boldsymbol{e}, \sigma, \) & & \\
+            \( \rho, \tau, \lambda, \boldsymbol{a}, \boldsymbol{\alpha}, \boldsymbol{\lambda}) \) & & \\
+            & send $\boldsymbol{K}$ & \\ [1mm]
+            & & \scriptsize /*pick random challenge*/ \\ [-1mm]
+            & & \( \boldsymbol{c} = (c_1, ... , c_n) \in_\mathrm{R} \mathbb{Z}_q^n \) \\
+            & send $\boldsymbol{c}$ & \\
+            \scriptsize /*compute response (algorithm \ref{alg: parallel shuffle response})*/ & & \\ [-1mm]
+            \( \boldsymbol{r} \gets \mathbf{ParShuffleResp} (\boldsymbol{r'}, \psi, \lambda, \) & & \\
+            \( \boldsymbol{a}, \boldsymbol{\alpha}, \boldsymbol{\lambda}, \boldsymbol{c}) \) & & \\
+            & send $\boldsymbol{r}$ & \\ [1mm]
+            & & \scriptsize /*verify proof (algorithm \ref{alg: parallel shuffle verify})*/ \\ [-1mm]
+            & & \( PK \gets (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \) \\
+            & & \( \mathbf{ShuffleVer}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \) \\
+        };
+        
+        \draw[shorten <= -0.5cm] (m-1-1.south east)--(m-1-1.south west);
+        \draw[shorten <= -0.5cm] (m-1-3.south east)--(m-1-3.south west);
+        \draw[-latex] (m-10-2.south west)--(m-10-2.south east);
+        \draw[-latex] (m-13-2.south east)--(m-13-2.south west);
+        \draw[-latex] (m-17-2.south west)--(m-17-2.south east);
+    \end{tikzpicture}
+    \caption{Protocol for proving a parallel shuffle}
+\end{figure}
+
+
+% \begin{algorithm}[H]
+% \floatname{algorithm}{ProveParallelShuffle}
+% \renewcommand{\thealgorithm}{}
+% \caption{Protocol for generating a proof of parallel shuffle}
+% \begin{algorithmic}[1]
+% \STATE Prover : Picks random scalars \( \sigma, \rho, \tau, a_j, \alpha_i, \lambda, \lambda_i \in_R \mathbb{Z}_q \), where \( i \in \{ 1, ..., n \}  \) and \( j \in \{ 1, ..., m \} \).
+% \STATE Prover : Computes as commitment to the outputted matrix of cryptograms: \( R'_j = [a_j]G + \sum_{i=1}^n [\alpha_i]R_{i, j} \) and \( C'_j = [a_j]Y + \sum_{i=1}^n [\alpha_i]C_{i, j} \), for \( j \in \{ 1, ..., m \} \).
+% \STATE Prover : Computes scalars :
+% \begin{equation}
+%     \begin{split}
+%         \dot{t}_i & = 3 \cdot \alpha_\ell + \tau \cdot \lambda_i \\
+%         \dot{v}_i & = 3 \cdot \alpha_\ell^2 + \rho \cdot \sum_{j=1}^m r'_{i, j} \\
+%         \dot{w}_i & = 2 \cdot \alpha_\ell + \sigma \cdot \sum_{j=1}^m r'_{i, j} \\
+%         \dot{v} & = \tau \cdot \lambda + \rho \cdot \sum_{j=1}^m a_j + \sum_{k=1}^n \alpha_k^3\\
+%         \dot{w} & = \sigma \cdot \sum_{j=1}^m a_j + \sum_{k=1}^n \alpha_k^2 \\
+%     \end{split}
+% \end{equation}
+% where \( \ell = \psi(i) \)
+
+% \STATE Prover : Computes commitment to the permutation: \( U = [\lambda]G \), \( U_i = [\lambda_i]G \), \( T = [\tau]G \), \( \dot{T}_i = [\dot{t}_i]G \), \( V = [\rho]G \), \( \dot{V}_i = [\dot{v}_i]G \), \( \dot{V} = [\dot{v}]G \), \( W = [\sigma]G \), \( \dot{W}_i = [\dot{w}_i]G \), \( \dot{W} = [\dot{w}]G \) for each \( i \in \{ 1, ..., n \} \).
+% \STATE Prover : Sends to the verifier as commitment of the proof values: \( \boldsymbol{R'} = ( R'_1, ..., R'_m ) \), \( \boldsymbol{C'} = ( C'_1, ..., C'_m ) \), $U$, \( \boldsymbol{U} = (U_1, ..., U_n) \), $T$, \( \boldsymbol{\Dot{T}} = (\dot{T}_1, ..., \dot{T}_n) \), $V$, \( \boldsymbol{\dot{V}} = (\dot{V}_1, ... \dot{V}_n) \), $\dot{V}$, $W$, \( \boldsymbol{\dot{W}} = (\dot{W}_1, ..., \dot{W}_n), \dot{W} \).
+% \STATE Verifier : Upon receival of the commitment, the verifier sends a challenge in form of a list of random scalars \( c_i \in_R \mathbb{Z}_q \), with \( i \in \{ 1, ..., n \} \).
+% \STATE Prover : Finally, the prover computes scalars \( \lambda' = \sum_{k=1}^n \lambda_k \cdot c_k^2 + \lambda \pmod q \), \( z_j = \sum_{k=1}^n r_{k, j} \cdot c_k + a_j \pmod q \) and \( s_i = c_\ell + \alpha_i \pmod q \), where \( \ell = \psi(i) \), \( i \in \{ 1, ..., n \} \) and \( j \in \{ 1, ..., m \} \).
+% \STATE Prover : Sends to the verifiers as response of the proof the values: $\lambda'$, \( \boldsymbol{z} = (z_1, ..., z_m) \) and \( \boldsymbol{s} = (s_1, ..., s_n) \).
+% \end{algorithmic}
+% \end{algorithm} 
+
+% \begin{figure}
+\begin{algorithm}[hp]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ParShuffleCommit}_Y (\boldsymbol{e}, \sigma, \rho, \tau, \lambda, \boldsymbol{a}, \boldsymbol{\alpha}, \boldsymbol{\lambda}) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The input matrix of cryptograms \( \boldsymbol{e} = (e_{1, 1}, ..., e_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \myinput{\( e_{i, j} = (R_{i, j}, C_{i, j}) \), where \( i \in \{ 1, ..., n \}, j \in \{ 1, ..., m \} \)}
+    \myinput{Scalars \( \sigma, \rho, \tau, \lambda \in \mathbb{Z}_q \)}
+    \myinput{Scalars \( \boldsymbol{a} = (a_1, ..., a_m) \in \mathbb{Z}_q^m \)}
+    \myinput{Scalars \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in \mathbb{Z}_q^n \)}
+    \tcc{commitment to cryptogram matrix $\boldsymbol{e}$}
+    \For{\( j \gets 1 \) \KwTo $m$ \KwBy 1}{
+        \( R'_j \gets [a_j]G + \sum_{i=1}^n [\alpha_i]R_{i, j} \) \\
+        \( C'_j \gets [a_j]Y + \sum_{i=1}^n [\alpha_i]C_{i, j} \) \\
+        }
+    \tcc{compute scalars} 
+    \( \dot{t}_i \gets 3 \cdot \alpha_j + \tau \cdot \lambda_i \pmod q \) \\
+    \( \dot{v}_i \gets 3 \cdot \alpha_j^2 + \rho \cdot r'_i \pmod q \) \\
+    \( \dot{w}_i \gets 2 \cdot \alpha_j + \sigma \cdot r'_i \pmod q \) \\
+    \( \dot{v} \gets \tau \cdot \lambda + \rho \cdot \sum_{j=1}^m a_j + \sum_{i=1}^n \alpha_i^3 \pmod q \) \\
+    \( \dot{w} \gets \sigma \cdot \sum_{j=1}^m a_j + \sum_{i=1}^n \alpha_i^2 \pmod q \) \\ [2mm]
+    \tcc{compute commitment to permutation}
+    \( U \gets [\lambda]G \) \\
+    \( T \gets [\tau]G \) \\
+    \( V \gets [\rho]G \) \\
+    \( \dot{V} \gets [\dot{v}]G \) \\
+    \( W \gets [\sigma]G \) \\
+    \( \dot{W} \gets [\dot{w}]G \) \\
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
+        \( U_i \gets [\lambda_i]G \) \\
+        \( \dot{T}_i \gets [\dot{t}_i]G \) \\
+        \( \dot{V}_i \gets [\dot{v}_i]G \) \\
+        \( \dot{W}_i \gets [\dot{w}_i]G \) \\
+        }
+    \( \boldsymbol{R'} \gets (R'_1, ..., R'_m) \) \\
+    \( \boldsymbol{C'} \gets (C'_1, ..., C'_m) \) \\
+    \( \boldsymbol{U} \gets (U_1, ..., U_n) \) \\
+    \( \boldsymbol{\dot{T}} \gets (\dot{T}_1, ..., \dot{T}_n) \) \\
+    \( \boldsymbol{\dot{V}} \gets (\dot{V}_1, ..., \dot{V}_n) \) \\
+    \( \boldsymbol{\dot{W}} \gets (\dot{W}_1, ..., \dot{W}_n) \) \\
+    \( \boldsymbol{K} \gets (\boldsymbol{R'}, \boldsymbol{C'}, U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \) \\
+    \Return{\( \boldsymbol{K} \)} \tcp*{\( \boldsymbol{K} \in E(\mathbb{F}_p)^{6 + 2 \cdot m + 4 \cdot n} \)}
+\end{algorithm}
+% \end{figure}
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ParShuffleResp} (\boldsymbol{r'}, \psi, \lambda, \boldsymbol{a}, \boldsymbol{\alpha}, \boldsymbol{\lambda}, \boldsymbol{c}) \)}
+    \KwData{The matrix of randomizers \( \boldsymbol{r'} = (r'_{1, 1}, ..., r'_{n, m}) \in \mathbb{Z}_q^{n \cdot m} \)}
+    \myinput{The permutation \( \psi \in \Psi_n \)}
+    \myinput{Scalar \( \lambda \in \mathbb{Z}_q \)}
+    \myinput{Scalars \( \boldsymbol{a} = (a_1, ..., a_m) \in \mathbb{Z}_q^m \)}
+    \myinput{Scalars \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The list of challenges \( \boldsymbol{c} = (c_1, ..., c_n) \in \mathbb{Z}_q^n \)}
+    \( \lambda' \gets \sum_{i=1}^n \lambda_i \cdot c_i^2 + \lambda \pmod q \) \\
+    \For{\( j \gets 1 \) \KwTo $m$ \KwBy $1$}{
+        \( z_j = \sum_{i=1}^n r_{i, j} \cdot c_i + a_j \pmod q \) \\
+        }
+    \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
+        \( s_i \gets c_j + \alpha_i \pmod q \), where \( j \gets \psi(i) \) \\ }
+    \( \boldsymbol{z} \gets (z_1, ..., z_m) \); \( \boldsymbol{s} \gets (s_1, ..., s_n) \) \\
+    \( \boldsymbol{r} \gets (\lambda', \boldsymbol{z}, \boldsymbol{s}) \)
+    \Return{\( \boldsymbol{r} \)} \tcp*{\( \boldsymbol{r} \in \mathbb{Z}_q^{1 + m + n} \)}
+\end{algorithm}
+% \end{figure}
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ParShuffleVer}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The proof of shuffle \( PK = (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \)}
+    \myinput{\( \boldsymbol{K} = (\boldsymbol{R'}, \boldsymbol{C'}, U, \boldsymbol{U}, T, \boldsymbol{\dot{T}}, V, \boldsymbol{\dot{V}}, \dot{V}, W, \boldsymbol{\dot{W}}, \dot{W}) \in E(\mathbb{F}_p)^{6 + 2 \cdot m + 4 \cdot n} \)}
+    \myinput{\( \boldsymbol{R'} = (R'_1, ..., R'_m), \boldsymbol{C'} = (C'_1, ..., C'_m) \in E(\mathbb{F}_p)^m \)}
+    \myinput{\( \boldsymbol{U} = (U_1, ..., U_n), \boldsymbol{\dot{T}} = (\dot{T}_1, ..., \dot{T}_n) \in E(\mathbb{F}_p)^n \)}
+    \myinput{\( \boldsymbol{\dot{V}} = (\dot{V}_1, ..., \dot{V}_n), \boldsymbol{\dot{W}} = (\dot{W}_1, ..., \dot{W}_n) \in E(\mathbb{F}_p)^n \)}
+    \myinput{\( \boldsymbol{c} = (c_1, ..., c_n) \in \mathbb{Z}_q^n \)}
+    \myinput{\( \boldsymbol{r} = (\lambda', \boldsymbol{z}, \boldsymbol{s}) \in \mathbb{Z}_q^{1 + m + n} \)}
+    \myinput{\( \boldsymbol{z} = (z_1, ..., z_m) \in \mathbb{Z}_q^m \)}
+    \myinput{\( \boldsymbol{s} = (s_1, ..., s_n) \in \mathbb{Z}_q^n \)}
+    \myinput{The input matrix of cryptograms \( \boldsymbol{e} = (e_{1, 1}, ..., e_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \myinput{\( e_{i, j} = (R_{i, j}, C_{i, j}) \), with \( i \in \{ 1, ..., n \}, j \in \{ 1, ..., m \} \)}
+    \myinput{The output matrix of cryptograms \( \boldsymbol{e'} = (e'_{1, 1}, ..., e'_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \myinput{\( e'_{i, j} = (R'_{i, j}, C'_{i, j}) \), with \( i \in \{ 1, ..., n \}, j \in \{ 1, ..., m \} \)}
+    \eIf{\( [\lambda']G = U + \sum_{i=1}^n [c_i^2]U_i \) \\
+        \KwAnd \( [\lambda']T + [\sum_{j = 1}^m z_j]V + [\sum_{i=1}^n s_i^3 - c_i^3]G = \dot{V} + \sum_{i=1}^n [c_i]\dot{V}_i + [c_i^2]\dot{T}_i \) \\
+        \KwAnd \( [\sum_{j = 1}^m z_j]W + [\sum_{i=1}^n s_i^2 - c_i^2]G = \dot{W} + \sum_{i=1}^n [c_i]\dot{W}_i \) \\
+        \KwAnd \( [z_j]G + \sum_{i=1}^n [s_i]R_{i, j} = R'_j + \sum_{i=1}^n [c_i]R'_{i, j} \) \KwForEach \( j \in \{ 1, ..., m \} \) \\
+        \KwAnd \( [z_j]Y + \sum_{i=1}^n [s_i]C_{i, j} = C'_j + \sum_{i=1}^n [c_i]C'_{i, j} \) \KwForEach \( j \in \{ 1, ..., m \} \) \\
+        }{
+        \( b \gets 1 \) \tcp*{proof is valid}
+        }{
+        \( b \gets 0 \) \tcp*{proof is invalid}
+        }
+    \Return{\( b \)} \tcp*{\( b \in \mathbb{B} \)}
+\end{algorithm}
+% \end{figure}
+
+The prover, alone, can generate a non-interactive proof of parallel shuffle by calculating the challenge of the proof in a deterministic way based on the commitment of the proof. The proof \( PK \leftarrow \mathbf{ProveParallelShuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \) is generated as in algorithm \ref{alg: prove parallel shuffle}. The proof $PK$ is universally verifiable so any public auditor can validate the proof by running the verification algorithm \( b \leftarrow \mathbf{VerifyParallelShuffle}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \) (algorithm \ref{alg: verify parallel shuffle}), where \( b \in \mathbb{B} \) represents  whether the proof is valid or not.
+
+% \begin{figure}
+\begin{algorithm}[h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{ProveParallelShuffle}_Y (\boldsymbol{e}, \boldsymbol{r'}, \psi) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The input matrix of cryptograms \( \boldsymbol{e} = (e_{1, 1}, ..., e_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \myinput{The matrix of randomizers \( \boldsymbol{r'} = (r'_{1, 1}, ..., r'_{n, m}) \in \mathbb{Z}_q^{n \cdot m} \)}
+    \myinput{The permutation \( \psi \in \Psi_n \)}
+    \( \sigma, \rho, \tau, \lambda, \in_\mathrm{R} \mathbb{Z}_q \) \\
+    \( \boldsymbol{a} = (a_1, ..., a_m) \in_\mathrm{R} \mathbb{Z}_q^m \) \\
+    \( \boldsymbol{\alpha} = (\alpha_1, ..., \alpha_n), \boldsymbol{\lambda} = (\lambda_1, ..., \lambda_n) \in_\mathrm{R} \mathbb{Z}_q^n \) \\
+    \( \boldsymbol{K} \gets \mathbf{ParShuffleCommit}_Y (\boldsymbol{e}, \sigma, \rho, \tau, \lambda, \boldsymbol{a}, \boldsymbol{\alpha}, \boldsymbol{\lambda}) \) \tcp*{commit(alg. \ref{alg: parallel shuffle commit})}
+    \( \boldsymbol{c} \gets \mathbf{ShuffleChall} (\boldsymbol{e}, \boldsymbol{e'}, \boldsymbol{K}) \) \tcp*{challenge(alg. \ref{alg: shuffle challenge})}
+    \( \boldsymbol{r} \gets \mathbf{ParShuffleResp} (\boldsymbol{r'}, \psi, \lambda, \boldsymbol{a}, \boldsymbol{\alpha}, \boldsymbol{\lambda}, \boldsymbol{c}) \) \tcp*{response(alg. \ref{alg: parallel shuffle response})}
+    \( PK \gets (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \) \\
+    \Return{\( PK \)} \tcp*{\( PK \in E(\mathbb{F}_p)^{6 + 2 \cdot m + 4 \cdot n} \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{1 + m + n} \)}
+\end{algorithm}
+% \end{figure}
+
+% \begin{figure}
+\begin{algorithm}[!h]
+\DontPrintSemicolon
+    \caption{\( \mathbf{VerifyParallelShuffle}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \)}
+    \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
+    \myinput{The proof \( PK = (\boldsymbol{K}, \boldsymbol{c}, \boldsymbol{r}) \in E(\mathbb{F}_p)^{6 + 2 \cdot m + 4 \cdot n} \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{1 + m + n} \)}
+    \myinput{The input matrix of cryptograms \( \boldsymbol{e} = (e_{1, 1}, ..., e_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \myinput{The output matrix of cryptograms \( \boldsymbol{e'} = (e'_{1, 1}, ..., e'_{n, m}) \in \mathbb{E}^{n \cdot m} \)}
+    \eIf{\( \boldsymbol{c} = \mathbf{ShuffleChall} (\boldsymbol{e}, \boldsymbol{e'}, \boldsymbol{K}) \) \tcp*{algorithm \ref{alg: shuffle challenge}}
+        \KwAnd \( \mathbf{ParShuffleVer}_Y (PK, \boldsymbol{e}, \boldsymbol{e'}) \) \tcp*{algorithm \ref{alg: parallel shuffle verify}}
+        }{
+        \( b \gets 1 \) \tcp*{proof is valid}
+        }{
+        \( b \gets 0 \) \tcp*{proof is invalid}
+        }
+    \Return{\( b \)} \tcp*{\( b \in \mathbb{B} \)}
+\end{algorithm}
+% \end{figure}
+
+% The verification algorithm \( \mathbf{VerifyParallelShuffle}_{G, Y} (PK, \boldsymbol{e}, \boldsymbol{e'}) \) takes as input the proof of parallel shuffle $PK$ and the input $\boldsymbol{e}$ and output $\boldsymbol{e'}$ matrixes of cryptograms. The algorithm validates that the following equations hold:
+
+% \begin{equation}
+%     \begin{split}
+%         [z_j]G + \sum_{i=1}^n [s_i]R_{i, j} & = R'_j + \sum_{i=1}^n [c_i]R'_{i, j} \\
+%         [z_j]Y + \sum_{i=1}^n [s_i]C_{i, j} & = C'_j + \sum_{i=1}^n [c_i]C'_{i, j} \\
+%         [\sum_{k=1}^m z_k]W + [\sum_{i=1}^n s_i^2 - c_i^2]G & = \dot{W} + \sum_{i=1}^n [c_i]\dot{W}_i \\
+%         [\lambda']T + [\sum_{k=1}^m z_k]V + [\sum_{i=1}^n s_i^3 - c_i^3]G & = \dot{V} + \sum_{i=1}^n [c_i]\dot{V}_i + [c_i^2]\dot{T}_i \\
+%         [\lambda']G & = U + \sum_{i=1}^n [c_i^2]U_i \\
+%     \end{split}
+% \end{equation}
+% for each \( j \in \{ 1, ..., m \} \).
+\fi
+
+\subsection{Proof of Shuffle}
+The following table presents how the variable names are mapped between the main protocol of \cite{Furukawa01} and our protocol described in section \ref{furukawa proof}.
+
+\begin{center}
+    \begin{tabular}{ |c|c|p{6cm}| }
+     \hline
+     \textbf{Original paper} & \textbf{Our protocol} & \textbf{Comments} \\ 
+     \hline
+     $p$ & & $p$ is not visible in the algorithm as it is inferred in the elliptic curve operations \\  
+     \hline
+     $q$ & $q$ & the curve order \\
+     \hline
+     $g$ & $G$ & the curve generator \\
+     \hline
+     $y$ & $Y$ & the encryption key \\
+     \hline
+     $(g_i, m_i)$ & $e_i = (R_i, C_i)$ & the original list of cryptograms \\
+     \hline
+     $(g'_i, m'_i)$ & $e'_i = (R'_i, C'_i)$ & the mixed list of cryptograms \\
+     \hline
+     $\sigma$ & $\sigma$ & \\
+     \hline
+     $\rho$ & $\rho$ & \\
+     \hline
+     $\tau$ & $\tau$ & \\
+     \hline
+     $\alpha$ & $a$ & \\
+     \hline
+     $\alpha_i$ & $\alpha_i$ & \\
+     \hline
+     $\lambda$ & $\lambda$ & \\
+     \hline
+     $\lambda_i$ & $\lambda_i$ & \\
+     \hline
+     $t$ & $T$ & \\
+     \hline
+     $v$ & $V$ & \\
+     \hline
+     $w$ & $W$ & \\
+     \hline
+     $u$ & $U$ & \\
+     \hline
+     $u_i$ & $U_i$ & \\
+     \hline
+     $g'$ & $R'$ & \\
+     \hline
+     $m'$ & $C'$ & \\
+     \hline
+     $\dot{t}_i$ & $\dot{T}_i$ & \\
+     \hline
+     $\dot{v}_i$ & $\dot{V}_i$ & \\
+     \hline
+     $\dot{v}$ & $\dot{V}$ & \\
+     \hline
+     $\dot{w}_i$ & $\dot{W}_i$ & \\
+     \hline
+     $\dot{w}$ & $\dot{W}$ & \\
+     \hline
+     $c_i$ & $c_i$ & the challenges \\
+     \hline
+     $s$ & $z$ & \\
+     \hline
+     $s_i$ & $s_i$ & \\
+     \hline
+     $\lambda'$ & $\lambda'$ & \\
+     \hline
+    \end{tabular}
+\end{center}

@@ -1,0 +1,168 @@
+\newlength\mylen
+\newcommand\myinput[1]{%
+  \settowidth\mylen{\KwData{}}%
+  \setlength\hangindent{\mylen}%
+  \hspace*{\mylen}#1\\}
+
+\newcommand\KwMoreData[1]{%
+  \settowidth\mylen{\KwData{}}%
+  \setlength\hangindent{\mylen}%
+  \hspace*{\mylen}#1\\}
+  
+\SetKw{KwAnd}{and}
+\SetKw{KwBy}{by}
+\SetKw{KwForEach}{for each}
+\SetKw{Continue}{continue}
+
+\makeatletter
+\newdimen\multi@col@width
+\newdimen\multi@col@margin
+\newcount\multi@col@count
+\multi@col@width=0pt
+
+\tikzset{
+    title/.style={
+        text width=160,
+        minimum height=20,
+        align=center
+    },
+    block/.style={
+        text width=160,
+        align=left
+    },
+    arrow/.style={
+        text width=120,
+        align=center
+    },
+    banner/.style={
+        text width=160*2+7,
+        align=center
+    },
+    title_3/.style={title, text width=173},
+    block_3/.style={block, text width=173},
+    arrow_3_next/.style={arrow, text width=130},
+    arrow_3_skip/.style={arrow, text width=130+173},
+    banner_3/.style={banner, text width=173*3+14},
+    title_4/.style={title, text width=128},
+    block_4/.style={block, text width=128},
+    arrow_4_next/.style={arrow, text width=96},
+    arrow_4_skip_1/.style={arrow, text width=96+128},
+    arrow_4_skip_2/.style={arrow, text width=96+2*128},
+    banner_4/.style={banner, text width=128*4+21}
+}
+
+\tikzset{
+    new_block_3/.style={align=left, font=\small},
+    internal_3/.style={new_block_3, text width=173},
+    process_3/.style={new_block_3, text width={}, draw, dotted, rounded corners},
+    keep_left/.style={anchor=north west},
+    keep_middle/.style={anchor=north},
+    keep_right/.style={anchor=north east},
+    first/.style={yshift=-4},
+    new_arrow/.style={align=center, font=\small},
+    towards_right/.style={anchor=north west, append after command={
+                [->] (\tikzlastnode.south west)edge(\tikzlastnode.south east)[dashed]}
+    },
+    towards_left/.style={anchor=north east, append after command={
+                [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}
+    }
+}
+
+\tikzset{
+    between/.style 2 args={
+        insert path={
+            \pgfextra{
+                \path (#1);
+                \pgfgetlastxy{\xa}{\ya} 
+                \path (#2);
+                \pgfgetlastxy{\xb}{\yb}   
+                \pgfpointdiff{\pgfpoint{\xa}{\ya}}{\pgfpoint{\xb}{\yb}}
+                \pgf@xa=\pgf@x
+            }
+        },
+        minimum width=\pgf@xa
+    }
+}
+
+\tikzset{
+  multicol/.code={%
+    \global\multi@col@count=#1\relax
+    \global\let\orig@pgfmatrixendcode=\pgfmatrixendcode
+    \global\let\orig@pgfmatrixemptycode=\pgfmatrixemptycode
+    \def\pgfmatrixendcode##1{\orig@pgfmatrixendcode%
+      ##1%
+      \pgfutil@tempdima=\pgf@picmaxx
+      \global\multi@col@margin=\pgf@picminx
+      \advance\pgfutil@tempdima by -\pgf@picminx
+      \divide\pgfutil@tempdima by #1\relax
+      \global\multi@col@width=\pgfutil@tempdima
+      \pgf@picmaxx=.5\multi@col@width
+      \pgf@picminx=-.5\multi@col@width
+      \global\pgf@picmaxx=\pgf@picmaxx
+      \global\pgf@picminx=\pgf@picminx
+  \gdef\multi@adjust@position{%
+     \setbox\pgf@matrix@cell=\hbox\bgroup
+     \hfil\hskip-1.5\multi@col@margin
+     \hfil\hskip-.5\multi@col@width     
+% \gdef\multi@adjust@position{%
+%        \setbox\pgf@matrix@cell=\hbox\bgroup
+%        \hfil\hskip-\multi@col@margin
+%        \hfil\hskip-.5\multi@col@width
+        \box\pgf@matrix@cell
+        \egroup
+      }%
+      \gdef\multi@temp{\aftergroup\multi@adjust@position}%
+      \aftergroup\multi@temp
+    }
+    \gdef\pgfmatrixemptycode{%
+      \orig@pgfmatrixemptycode
+      \global\advance\multi@col@count by -1\relax
+      \global\pgf@picmaxx=.5\multi@col@width
+      \global\pgf@picminx=-.5\multi@col@width
+      \ifnum\multi@col@count=1\relax
+       \global\let\pgfmatrixemptycode=\orig@pgfmatrixemptycode
+      \fi
+    }
+  }
+}
+% Set path for graphics for the package 'graphicx'
+\graphicspath{ {./Pictures/} }
+
+% Settings for package 'fancyhdr'
+\usetikzlibrary{backgrounds, matrix, shapes, arrows, positioning, chains, calc}
+
+
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\fancyhf{}
+%\lhead{\includegraphics[height=0.3in]{av-logo-horizontalw200.png}}
+\lhead{\includegraphics[height=0.3in]{Pictures/1.corporate_logo_blue.png}}
+\cfoot{\thepage}
+%\renewcommand\maketitle{}
+
+% ENABLE SUBSUBSUB SECTION
+%\setcounter{secnumdepth}{5}
+%\setcounter{tocdepth}{5}
+%\newcommand\subsubsubsection{\@startsection{paragraph}{4}{\z@}{-2.5ex\@plus -1ex \@minus -.25ex}{1.25ex \@plus .25ex}{\normalfont\normalsize\bfseries}}
+%\newcommand\subsubsubsubsection{\@startsection{subparagraph}{5}{\z@}{-2.5ex\@plus -1ex \@minus -.25ex}{1.25ex \@plus .25ex}{\normalfont\normalsize\bfseries}}
+%
+
+%\fancypagestyle{lscape}{% 
+%\fancyhf{} % clear all header and footer fields 
+%\fancyfoot[LE]{%
+%\begin{textblock}{20}(1,5){\rotatebox{90}{\leftmark}}\end{textblock}
+%\begin{textblock}{1}(13,10.5){\rotatebox{90}{\thepage}}\end{textblock}}
+%\fancyfoot[LO] {%
+%\begin{textblock}{1}(13,10.5){\rotatebox{90}{\thepage}}\end{textblock}
+%\begin{textblock}{20}(1,13.25){\rotatebox{90}{\rightmark}}\end{textblock}}
+%\renewcommand{\headrulewidth}{0pt} 
+%\renewcommand{\footrulewidth}{0pt}}
+
+%%%%% DEFINING COLORS %%%%%%
+\definecolor{asparagus}{rgb}{0.53, 0.66, 0.42}
+\definecolor{applegreen}{rgb}{0.55, 0.71, 0.0}
+\definecolor{darkpastelgreen}{rgb}{0.01, 0.75, 0.24}
+
+
+\makeatother
+

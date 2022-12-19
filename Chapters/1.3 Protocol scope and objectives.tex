@@ -1,0 +1,34 @@
+\subsection{Protocol scope and objectives}
+Some of the core features of AVX are: voters vote remotely, votes are encrypted, the system uses threshold cryptography, votes are cryptographically shuffled to ensure anonymity, all essential processes are verifiable, auditing is done on throughout the system. The system cannot prevent, but detects fraud/unauthorized access.
+
+Multiple election types are supported which are referendum, candidates, ranked election, and multiple choice. Multiple result types are also supported. Additionally the system gives continuous turnout statistics
+
+The scope of this document is to describe the cryptographic algorithms involved in the protocols that make up an online election including election setup, voter registration, voting, tallying and auditing. The cryptographic algorithms are crucial in terms of the security and auditing features of the system, but there are many non-cryptographic processes necessary to conduct a safe election. Some of these are covered in the Threat Model in \cref{sec: threat model}.
+
+The elections covered in this document are online elections and referendums where voters cast their ballots through an application such as a web browser or a native app on an internet connected device such as a PC, laptop, table, smartphone, etc.
+
+The question types supported in the elections are single choice, multiple choice and ranked choice with the option of keyboard-supported write-in fields with length and charset limitations.
+
+The overall objective of the document is to describe and prove a system with the following objectives:
+
+\begin{itemize}
+    \item Vote \& go
+    \item Election types
+    \item Cast as intended
+    \item Confirming selected options
+    \item Support correcting mistakes
+    \item Support multiple voting
+    \item Individual verification
+    \item Full audit
+
+    \item Mobility
+
+    \item Eligibility
+    \item No revealing of partial results // fairness
+    \item Confidentiality
+    \item Anonymity
+    \item Integrity
+    \item Verifiability
+\end{itemize}
+
+All objectives are described in greater details in \cref{sec: requirements}.

@@ -1,0 +1,223 @@
+\subsection{Elliptic Curve}
+
+
+\subsubsection{Elliptic Curve over a Prime Field} \label{app: elliptic curve over a prime field}
+We define the elliptic curve $E$ over the prime field $\mathbb{F}_p$ as the set of points
+\[ E(\mathbb{F}_p) = \{(x, y) \in (\mathbb{F}_p)^2 \mid y^2 = x^3 + ax + b \pmod p \} \cup \{ \mathcal{O} \} \]
+where a tuple $(x, y)$ represent the coordinates of a point, $\mathcal{O}$ is the point at infinity and $a, b \in \mathbb{F}_p$.
+
+The elliptic curve $E(\mathbb{F}_p)$ follows a group structure with the following rules:
+\begin{itemize}
+    \item $\mathcal{O}$ is the identity element, thus $P + \mathcal{O} = \mathcal{O} + P = P$ for all $P \in E(\mathbb{F}_p)$.
+    \item The inverse operations is point negation, noted $-$. For all $P = (P_x, P_y) \in E(\mathbb{F}_p)$, we define $-P = (P_x, -P_y)$ such that $P + (- P) = \mathcal{O}$.
+    \item The binary operation is point addition, noted $+$. Let $P, Q \in E(\mathbb{F}_p)$. The line through $P$ and $Q$ intersects the elliptic curve in a third point $R = (R_x, R_y) \in E(\mathbb{F}_p)$. The point addition is defined as $P + Q = -R$. The coordinates of $R$ can be computed in the following way:
+    \begin{align*}
+        R_x & = \lambda^2 - P_x - Q_x \pmod p \\
+        R_y & = P_y + \lambda \cdot (R_x - P_x) \pmod p 
+    \end{align*}
+    where $\lambda$ is the steep of line $PQ$. The steep can be computed in the following way:
+    \[ \lambda = 
+    \begin{cases}
+        (P_y - Q_y) \cdot (P_x - Q_x)^{-1} \pmod p  & \text{, if } P \neq Q \\
+        (3 \cdot P_x^2 + a) \cdot (2 \cdot P_y)^{-1} \pmod{p} & \text{, if } P = Q
+    \end{cases}
+    \]
+\end{itemize}
+
+We define the total number of point on the $E(\mathbb{F}_p)$ as $N$ and it can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$ which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup we follow:
+\begin{enumerate}
+    \item Choose a random point $P \in E(\mathbb{F}_p)$.
+    \item Compute $G = [h]P$.
+    \item If $G = \mathcal{O}$, repeat the process. Otherwise, $G$ is a generator.
+\end{enumerate}
+
+In conclusion, we can define our cryptographic cyclic subgroup as:
+\[ \mathbb{P} = \{ P \in E(\mathbb{F}_p) \mid P = [k]G, k \in \mathbb{Z}_q \} \]
+where $G$ is the generator and $q$ is the order of the subgroup. We call the integer $k$ a \textit{scalar}.
+
+
+\subsubsection{Elliptic Curve Discrete Logarithm Problem} \label{app: elliptic curve discrete logarithm problem}
+The \textit{Elliptic Curve Discrete Logarithm Problem} is defined in \cite{Trappe05} the following way: Given the elliptic curve domain parameters $(p, a, b, G, q, h)$ and a point $P \in \mathbb{P}$, find the scalar $k \in \mathbb{Z}_p$ such that $P = [k]G$. For an elliptic curve to be cryptographically strong, the ECDLP has to be \textit{computationally infeasible}.
+
+
+\subsubsection{Supported Elliptic Curves}
+The following elliptic curves are supported by AVX:
+
+\textbf{Secp256k1(Bitcoin Curve)} 
+\par
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|} \hline
+    $p$ & \texttt{ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe fffffc2f} \\ \hline
+    $a$ & \texttt{\phantom{000000}00} \\ \hline
+    $b$ & \texttt{\phantom{000000}07} \\ \hline
+    $G$ & \texttt{\phantom{000000}02 79be667e f9dcbbac 55a06295 ce870b07 029bfcdb 2dce28d9 59f2815b 16f81798} \\ \hline
+    $q$ & \texttt{ffffffff ffffffff ffffffff fffffffe baaedce6 af48a03b bfd25e8c d0364141} \\ \hline
+    $h$ & \texttt{1} \\ \hline
+\end{tabularx}    
+
+\textbf{Secp256r1(NIST P-256)}
+\par
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|} \hline
+    $p$ & \texttt{ffffffff 00000001 00000000 00000000 00000000 ffffffff ffffffff ffffffff} \\ \hline
+    $a$ & \texttt{ffffffff 00000001 00000000 00000000 00000000 ffffffff ffffffff fffffffc} \\ \hline
+    $b$ & \texttt{5ac635d8 aa3a93e7 b3ebbd55 769886bc 651d06b0 cc53b0f6 3bce3c3e 27d2604b} \\ \hline
+    $G$ & \texttt{\phantom{000000}03 6b17d1f2 e12c4247 f8bce6e5 63a440f2 77037d81 2deb33a0 f4a13945 d898c296} \\ \hline
+    $q$ & \texttt{ffffffff 00000000 ffffffff ffffffff bce6faad a7179e84 f3b9cac2 fc632551} \\ \hline
+    $h$ & \texttt{1} \\ \hline
+\end{tabularx}
+
+\clearpage
+\textbf{Secp384r1(NIST P-384)}
+\par
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|} \hline
+    $p$ & \texttt{ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe ffffffff 00000000 00000000 ffffffff} \\ \hline
+    $a$ & \texttt{ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe ffffffff 00000000 00000000 fffffffc} \\ \hline
+    $b$ & \texttt{b3312fa7 e23ee7e4 988e056b e3f82d19 181d9c6e fe814112 0314088f 5013875a c656398d 8a2ed19d 2a85c8ed d3ec2aef} \\ \hline
+    $G$ & \texttt{\phantom{000000}03 aa87ca22 be8b0537 8eb1c71e f320ad74 6e1d3b62 8ba79b98 59f741e0 82542a38 5502f25d bf55296c 3a545e38 72760ab7} \\ \hline
+    $q$ & \texttt{ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff c7634d81 f4372ddf 581a0db2 48b0a77a ecec196a ccc52973} \\ \hline
+    $h$ & \texttt{1} \\ \hline
+\end{tabularx}
+
+\textbf{Secp521r1(NIST P-521)}
+\par
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|} \hline
+    $p$ & \texttt{\phantom{0000}01ff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff} \\ \hline
+    $a$ & \texttt{\phantom{0000}01ff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffc} \\ \hline
+    $b$ & \texttt{\phantom{000000}51 953eb961 8e1c9a1f 929a21a0 b68540ee a2da725b 99b315f3 b8b48991 8ef109e1 56193951 ec7e937b 1652c0bd 3bb1bf07 3573df88 3d2c34f1 ef451fd4 6b503f00} \\ \hline
+    $G$ & \texttt{\phantom{00}0200c6 858e06b7 0404e9cd 9e3ecb66 2395b442 9c648139 053fb521 f828af60 6b4d3dba a14b5e77 efe75928 fe1dc127 a2ffa8de 3348b3c1 856a429b f97e7e31 c2e5bd66} \\ \hline
+    $q$ & \texttt{\phantom{0000}01ff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffa 51868783 bf2f966b 7fcc0148 f709a5d0 3bb5c9b8 899c47ae bb6fb71e 91386409} \\ \hline
+    $h$ & \texttt{1} \\ \hline
+\end{tabularx}
+
+
+\subsubsection{Elliptic Curve Point Encoding}
+Each point on the curve is represented by its $x$ and $y$ coordinate. As presented in \cite{Trappe05}, the $y$ coordinate can be calculated based on the $x$ coordinate. Note that the elliptic curve equation might spawn no valid values for $y$ or two values for $y$. In case $y$ is not valid, it means $x$ is not a valid coordinate to generate a point, otherwise, the algorithm has to chooses one of the two value for $y$ and continues. Thus, one extra bit of information is required specifying which of the two values is to be used.
+
+An elliptic curve point can be represented as byte array in two ways: \textit{compressed form} or \textit{uncompressed form}. The compressed form contains the byte representation of only the $x$ coordinate to which is prepended a byte $f \in \{ 02, 03 \}$ as a flag to determine which value to choose for the $y$ coordinate. Formally, $y \gets \mathsf{RecoverY}(x, f)$ (\cref{alg: recover y}).
+
+The uncompressed form contains the byte representation of both $x$ and $y$ coordinates concatenated together, to which is prepended the byte 04.
+
+In our system, when an elliptic curve point has to be stored in the database, or when it needs to be transferred over the network, or when it is used as input to a hash function, it is represented as byte array in compressed form.
+
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+    \caption{\( \mathsf{RecoverY} (x, f) \)}
+    \label{alg: recover y}
+    \KwData{The field element \( x \in \mathbb{F}_p \)}
+    \myinput{The flag \( f \in \{ 02, 03 \} \)}
+    \( \{ y_1, y_2 \} \gets \sqrt{x^3 + a \cdot x + b} \pmod p \) \;
+    \If{\( \{ y_1, y_2 \} \notin \mathbb{Z} \)}{
+        \Return{failure}
+        }
+    \Switch{f}{
+            \Case{$02$}{\( y \gets y_1 \)}
+            \Case{$03$}{\( y \gets y_2 \)}
+        }
+    \Return{\( y \)} \tcp*{\( y \in \mathbb{F}_p \)}
+\end{algorithm}
+
+
+\subsubsection{Mapping a message on the Elliptic Curve} \label{app: mapping a message on the elliptic curve}
+An important use case of a cryptographic system is to be able to interpret an arbitrary message (a plain text, a number, an id or even a more complex construction). In elliptic curve context, that means mapping a message into an elliptic curve point in a deterministic way. Additionally, this point must be able to be interpreted back as the original message. This section considers the message as an arbitrary byte array and it is up to specific use cases to convert data to byte array (i.e. UTF-8 encoding of text, the byte representation of an integer, or even custom encoding of complex JSON object).
+
+Mapping a message $\boldsymbol{b} \in \mathbb{B}^*$ into an elliptic curve point is done by $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}). The byte array $\boldsymbol{b}$ is appended with an \textit{adjusting byte} $00$ and prepended (padded) with $00$ bytes such that it has a length of $\ell$, where $\ell$ is the byte size of the elliptic curve (i.e. $\ell \gets \mathsf{ByteLengthOf}(p)$, where $p$ is the prime of the elliptic curve). The resulting byte array is interpreted as a field element $x \in \mathbb{F}_p$. Then, the algorithm checks whether $x$ spawns a valid point $M = (x, y)$, where $y$ is computed according to the elliptic curve equation $y \gets \mathsf{RecoverY}(x, 02)$ (\cref{alg: recover y}). If valid, then $M$ is the encoding of $\boldsymbol{b}$. Otherwise, the algorithm increments $x$ (increments the \textit{adjusting byte}) and tries again, 255 times. If no valid points are found, the algorithm returns failure.
+
+By having one \textit{byte space} to find a valid point on the curve, we know from \cite{Trappe05} that the probability that all 256 $x$ coordinates generate invalid points is $1/2^{256}$, which we consider acceptable. Formally, $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}) converts an arbitrary message $\boldsymbol{b}$ of legal size (i.e. $|\boldsymbol{b}| \leq \ell - 2$, where $\ell$ is the byte size of the elliptic curve) into a valid point $M$ on the elliptic curve with negligible failure rate.
+
+Recovering the message $\boldsymbol{b}$ from an elliptic curve point $M$ can be done by calling $\boldsymbol{b} \gets \mathsf{Point2Bytes}(M)$ (\cref{alg: point to bytes}). The algorithm tries to extract the byte representation of the $x$ coordinate, disregarding the leading $00$ bytes and the \textit{adjusting byte} (the right most byte). In case this fails, the algorithm returns a failure, meaning that point $M$ does not encode a valid message.
+
+Having these two algorithms, mapping a message on the Elliptic Curve is a sound procedure as
+\[ \boldsymbol{b} = \mathsf{Point2Bytes}(\mathsf{Bytes2Point}(\boldsymbol{b})) \text{ , for all $\boldsymbol{b} \in \mathbb{B}^*$, with $|\boldsymbol{b}| \leq \ell - 2$.} \]
+
+Examples of $\ell$ values, depending on elliptic curves, are:
+\begin{itemize}
+    \item $\ell = 32$ for \textbf{Secp256r1 } and \textbf{Secp256k1},
+    \item $\ell = 48$ for \textbf{Secp384r1},
+    \item $\ell = 65$ for \textbf{Secp521r1}.
+\end{itemize}
+
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+    \caption{\( \mathsf{Bytes2Point} (\boldsymbol{b}) \)}
+    \label{alg: bytes to point}
+    \KwData{The byte array \( \boldsymbol{b} = \{b_1, ..., b_n\} \in \mathbb{B}^n \)}
+    \( \ell \gets \mathsf{ByteLengthOf}(p) \) \;
+    \If{\( n > \ell - 2 \)}{
+        \Return{failure}
+        }
+    \( m \gets \ell - n - 1\) \;
+    \( \boldsymbol{b}' \gets \{ \underbrace{00, ..., 00}_\text{$m$ times}, b_1, ..., b_n, 00 \} \) \;
+    \( x \gets \mathsf{Bytes2Field}(\boldsymbol{b}') \) \;
+    \For{\( i \gets 0 \) \KwTo $255$ \KwBy $1$}{
+        \( y \gets \mathsf{RecoverY}(x, 02) \) \tcp*{\( y^2 = x^3 + ax + b \)}
+        \If{$y$ is valid}{
+            \( M \gets (x, y) \) \;
+            \If{$M$ is valid}{
+                \Return{\( M \)} \tcp*{\( M \in \mathbb{P} \)}
+                }
+            }
+        \( x \gets x + 1 \) \;
+        }
+    \Return{failure}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+    \caption{\( \mathsf{Point2Bytes} (M) \)}
+    \label{alg: point to bytes}
+    \KwData{The point \( M = (x, y) \in \mathbb{P} = \mathbb{F}_p \times \mathbb{F}_p \)}
+    \( \ell \gets \mathsf{ByteLengthOf}(p) \) \;
+    \( \boldsymbol{b}' = \{ \underbrace{00, ..., 00}_\text{$m$ times}, b_1, ..., b_n, b_{n+1} \} \gets \mathsf{Field2Bytes}(x) \) \tcp*{\( \ell = m + n + 1 \)}
+    \If{\( m = 0 \)}{
+        \Return{failure}
+        }
+    \( \boldsymbol{b} \gets \{ b_1, ..., b_n \} \) \;
+    
+    \Return{\( \boldsymbol{b} \)} \tcp*{\( \boldsymbol{b} \in \mathbb{B}^* \)}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+    \caption{\( \mathsf{Bytes2Field} (\boldsymbol{b}) \)}
+    \label{alg: bytes to field}
+    \KwData{The byte array \( \boldsymbol{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n \)}
+    \( \ell \gets \mathsf{ByteLengthOf}(p) \) \;
+    \If{\( n \neq \ell \)}{
+        \Return{failure}
+        }
+    \( x \gets 0 \) \;
+    \For{\( i \gets n \) \KwTo $1$ \KwBy $1$}{
+        \( x \gets x * 256 + b_i \) \;
+        }
+    \If{\( x > p \)}{
+        \Return{failure}
+        }
+    \Return{\( x \)} \tcp*{\( x \in \mathbb{F}_p \)}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+    \caption{\( \mathsf{Field2Bytes} (x) \)}
+    \label{alg: field to bytes}
+    \KwData{The field element \( x \in \mathbb{F}_p \)}
+    \( \ell \gets \mathsf{ByteLengthOf}(p) \) \;
+    \For{\( i \gets \ell \) \KwTo $1$ \KwBy $1$}{
+        \( b_i \gets x \pmod{256} \) \;
+        \( x \gets x / 256 \) \;
+        }
+    \( \boldsymbol{b} \gets \{ b_1, ..., b_\ell \} \) \;
+    
+    \Return{\( \boldsymbol{b} \)} \tcp*{\( \boldsymbol{b} \in \mathbb{B}^\ell \)}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+    \caption{\( \mathsf{ByteLengthOf} (x) \)}
+    \label{alg: bytes length of}
+    \KwData{The number \( x \in \mathbb{Z} \)}
+    \( n \gets 0 \) \;
+    \While {\( x > 0 \)}{
+        \( x \gets x / 256 \) \;
+        \( n \gets n + 1 \) \;
+        }
+    \Return{\( n \)} \tcp*{\( n \in \mathbb{N} \)}
+\end{algorithm}

@@ -1,0 +1,906 @@
+\subsection{Election phase} \label{sec: election phase}
+
+\cref{alg: bytes to point}
+\cref{fig: argument of shuffle of cryptograms protocol}
+
+The election phase lasts from the election start date until the election end date. During this time, any \textit{Voter} $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ can cast a valid digital ballot by performing the following steps:
+\begin{enumerate}
+    \item The \textit{Voter} $\mathcal{V}_i$ asks the \textit{Digital Ballot Box} $\mathcal{D}$ for the latest election configuration items which presents the means of voter authentication and all contest options.
+    
+    \item The \textit{Voter} has to get authenticated in order to be in possession of a private signing key $x_i$ that has a corresponding eligible public key $Y_i$ on the \textit{Digital Ballot Box} $\mathcal{D}$. The authentication process varies depending on what voter registration mode is used (\textbf{pre-election} or \textbf{on-demand}). Both authentication processes are described in \Cref{sec: voter authentication procedure}.
+ 
+    \item \label{itm: pick vote} The \textit{Voter} $\mathcal{V}_i$ picks a vote option $m$ and the browser converts it into an elliptic curve point \( M \leftarrow \mathbf{String2Point}(m) \) (\cref{alg: bytes to point}). More details about the conversion algorithms can be found in \Cref{sec: mapping vote options on the elliptic curve}. Next, the browser collaborates with the \textit{Digital Ballot Box} $\mathcal{D}$ in the \textit{vote cryptogram generation process} in order to encrypt the \textit{Voter's} choice. This process is described in \Cref{sec: vote cryptogram generation process}. At the end of this step, the vote cryptogram $e$ is published to the bulletin board together with the two encryption commitments.
+    
+    \item At this point, the \textit{Voter} $\mathcal{V}_i$ has two options:
+    \begin{itemize}
+        \item If he has enough trust in the voting application, the \textit{Voter} $\mathcal{V}_i$ can mark the vote cryptogram $e$ as "cast" on the bulletin board. Then, the process continues on to \Cref{itm: cast vote}.
+        
+        \item Otherwise, the \textit{Voter} $\mathcal{V}_i$ has the option to challenge the vote cryptogram and verify that it actually contains the vote $m$, process described in \Cref{sec: challenging a vote cryptogram}. During this process, the vote cryptogram $e$is marked as "spoiled" on the bulletin board. After challenging the vote cryptogram, the \textit{Voter} has to regenerate a digital ballot (return to \Cref{itm: pick vote}). The process of challenging a vote cryptogram can be repeated as many times as needed until the \textit{Voter} gains enough trust in the voting application and can continue in the process to \Cref{itm: cast vote}.
+    \end{itemize}
+    
+    \item \label{itm: cast vote} The \textit{Voter} $\mathcal{V}_i$ marks the vote cryptogram as "cast" on the bulletin board by posting a \textit{cast request} item to the \textit{Digital Ballot Box} $\mathcal{D}$ as described in \Cref{sec: vote confirmation receipt}. The process is illustrated in \Cref{fig: protocol for casting a submitted ballot}.
+    
+    \item The last response from the \textit{Digital Ballot Box} $\mathcal{D}$ that the \textit{Voter} $\mathcal{V}_i$ receives which certifies the acceptance of the \textit{cast request} item on the bulletin board is regarded as a vote receipt. The \textit{Voter} should store this receipt, as it can be used at any time to verify that the vote is registered by the \textit{Digital Ballot Box} as described in \Cref{sec: vote is registered as cast}.
+\end{enumerate}
+
+
+\subsubsection{Voter Authentication Procedure} \label{sec: voter authentication procedure}
+A \textit{Voter} $\mathcal{V}_i$ being authenticated is defined as being in possession of a secret signing key \( x_i \) that corresponds to an eligible public key \( Y_i \) from the bulletin board. This is achieved differently depending on the voter authorization mode:
+
+\paragraph{\textit{Pre-election:}}
+\textit{Voter} $\mathcal{V}_i$ inputs in the browser all credentials received from the \textit{Printing Authorities} $x_{i, j}$, with \( j \in \{ 1, ..., n_\mathrm{p} \} \). The browser combines all credentials to form the \textit{Voter's} secret signing key \( x_i = \sum_{j=1}^{n_\mathrm{p}} x_{i, j} \pmod q \). The associated public key \( Y_i \) has been computed and included on the bulletin board in the pre-election phase.
+
+\paragraph{\textit{On-demand:}}
+The \textit{Voter} $\mathcal{V}_i$ follows the protocol in \Cref{fig: voter authentication protocol} to get authorized to vote and the protocol from \Cref{fig: protocol for registering a voter session} to crate a voter session. Specifically, the \textit{Voter} must fulfill the steps:
+\begin{enumerate}
+    \item the \textit{Voter Authorization Service} $\mathcal{A}$ requests all \textit{Identity Providers} $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ to request identity validation from the \textit{Voter} $\mathcal{V}_i$.
+    
+    \item On successful authentication, each \textit{Identity Provider} $\mathcal{I}_j$ generates an identity token $\sigma_{\mathrm{id}, j} \leftarrow \mathsf{Sign}(x_{\mathcal{I}_j}; \mathcal{V}_i)$ (\Cref{alg: sign}) and shares it with the \textit{Voter}.
+    
+    \item Then, the \textit{Voter} $\mathcal{V}_i$ generates a key pair \( (x_i, Y_i) \leftarrow \mathsf{KeyGen}() \) (\Cref{alg: key gen}) and forwards all identity tokens \( \{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\} \) and the public key $Y_i$ to the \textit{Voter Authorization Service} $\mathcal{A}$.
+    
+    \item If all identity tokens can be verified by \( \mathsf{SigVer} (Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i) \) (\Cref{alg: sig ver}) then the \textit{Voter Authorization Service} $\mathcal{A}$ checks that the $\mathcal{V}_i$ is a eligible voter identity, i.e. \( \mathcal{V}_i \in \boldsymbol{\mathcal{V}} \).
+    
+    \item If eligible then, the \textit{Voter Authorization Service} $\mathcal{A}$ generates an authorization token $\sigma_\mathrm{auth} \leftarrow \mathsf{Sign}(x_\mathcal{A}; vID || Y_i || \phi)$ (\Cref{alg: sign}), where $vID$ is an internally used id for the \textit{Voter} $\mathcal{V}_i$ and $\phi \leftarrow \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$ is a fingerprint to all the tokens that confirm the identity of the voter.
+    
+    \item The \textit{Voter Authorization Service} $\mathcal{A}$ returns the authorization token $\sigma_\mathrm{auth}$ to the \textit{Voter} $\mathcal{V}_i$.
+    
+    \item The \textit{Voter} $\mathcal{V}_i$ submits the token further to the \textit{Digital Ballot Box} $\mathcal{D}$, which verifies the token by $\mathsf{SigVer} (Y_\mathcal{A}, \sigma_\mathrm{auth}; vID || Y_i || \phi)$ (\Cref{alg: sig ver}) and, if valid, appends a \textit{voter session} item on the bulletin board according to the rules from \Cref{sec: bulletin board event types}. The content of the \textit{voter session} item is extracted from the authorization token $\sigma_\mathrm{auth}$.
+    
+    \item The \textit{voter session} item is returned to the \textit{Voter} as a confirmation to his authentication. The address of this item is further needed to generate the rest of the voting items on the bulletin board.
+\end{enumerate}
+
+The \textit{Voter Authorization Service} $\mathcal{A}$ stores a link between the voter identity $\mathcal{V}_i$, all related identity tokens and the authorization token. This is stored for the private auditing process in the post-election phase as described in \Cref{sec: private auditing process}. The link is stored by the \textit{Voter Authorization Service} $\mathcal{A}$ due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
+
+\clearpage
+\begin{landscape}
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            spaced/.style={yshift=-4},
+            % every node/.style={draw},
+            ]{
+        
+        % Actors
+        \node[title_3, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title_3, right=of v] (vas) {
+            \textbf{Voter Authorization Service $\mathcal{A}$}};
+        \node[title_3, right=of vas] (ip) {
+            \textbf{Identity Provider $\mathcal{I}_j$}};
+        
+        % internal knowledge
+        \node[block_3, below=of v] (v_ik) {
+            /* internal knowledge: \\
+            \phantom{/}* $Y_\mathcal{A}$, $\{Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}}\}$ */
+            };
+        \node[block_3, below=of vas] (vas_ik) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_\mathcal{A}$, $\boldsymbol{\mathcal{V}}$, $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$ */
+            };
+        \node[block_3, below=of ip] (ip_ik) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_{\mathcal{I}_j}$ */
+            };
+        
+        % All content
+        \node[arrow_3_skip, below=of v_ik.south, anchor=north west] (a_1) {
+            authenticate as $\mathcal{V}_i$
+            };
+        \node[block_3, anchor=north west] at (a_1.south -| ip.west) (ip_1) {
+            $\sigma_{\mathrm{id}, j} \gets \mathsf{Sign}(x_{\mathcal{I}_j}; \mathcal{V}_i)$
+            };
+        \node[arrow_3_skip, anchor=north west] at (ip_1.south -| v.south) (a_2) {
+            $\sigma_{\mathrm{id}, j}$
+            };
+        \node[block_3, anchor=north west, text width=140] at (a_2.south -| v.west) (v_1) {
+            verify that $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$
+            };
+        \node[banner_3, spaced, anchor=north west] at (v_1.south -| v.west) (b_1) {
+            \scriptsize when successfully authenticated with all $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ and received $\{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\}$
+            };
+        \node[block_3, spaced, anchor=north west] at (b_1.south -| v.west) (v_2) {
+            $(x_i, Y_i) \gets \mathsf{KeyGen}()$
+            };
+        \node[arrow_3_next, below=of v_2.south, anchor=north west] (a_3) {
+            $Y_i, \{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\}$
+            };
+        \node[block_3, anchor=north west, text width=310] at (a_3.south -| vas.west) (vas_1) {
+            verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [6pt]
+            generate $vID_i$ based on $\mathcal{V}_i$ \\
+            $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$ \\
+            $\sigma_{\mathrm{auth}, i} \gets \mathsf{Sign}(x_\mathcal{A}, vID_i || Y_i || \phi)$ \\ [6pt]
+            /* store internally the tuple: \\
+            \phantom{/}* $(\mathcal{V}_i, vID_i, \sigma_{\mathrm{auth}, i}, \{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\})$ */
+            };
+        \node[arrow_3_next, anchor=north west] at (vas_1.south -| v.south) (a_4) {
+            $vID_i, \sigma_{\mathrm{auth}, i}$
+            };
+        \node[block_3, anchor=north west, text width=190] at (a_4.south -| v.west) (v_3) {
+            $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$ \\
+            verify that $\mathsf{SigVer}(Y_\mathcal{A}, \sigma_{\mathrm{auth}, i}, vID_i || Y_i || \phi)$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(ip.south east);    
+        \draw[dashed] (v_ik.south west)--(ip_ik.south east);
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+        \draw[->] (a_1.south west)--(a_1.south east);
+        \draw[->] (a_2.south east)--(a_2.south west);
+        \draw[->] (a_3.south west)--(a_3.south east);
+        \draw[->] (a_4.south east)--(a_4.south west);
+        }
+    \end{tikzpicture}
+    \caption{Voter authentication protocol}
+    \label{fig: voter authentication protocol}
+\end{figure}
+\end{landscape}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (v) {
+            \textbf{Voter} $\mathcal{V}_i$};
+        \node[title, right=of v] (dbb) {
+            \textbf{Digital Ballot Box} $\mathcal{D}$};
+        
+        % internal knowledge
+        \node[block, below=of v] (v_ik) {
+            /* internal knowledge: \\
+            \phantom{/}* $(x_i, Y_i)$, $Y_\mathcal{D}$, $vID_i$, $\phi$, $\sigma_{\mathrm{auth}, i}$ */
+            };
+        \node[block, below=of dbb] (dbb_ik) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_\mathcal{D}$, $Y_\mathcal{A}$, $\boldsymbol{h} = \{h_1, ... h_{n_\mathrm{b}}\}$ */
+            };
+        \node[block, anchor=south west] at (dbb_ik.south -| v_ik.west) (v_ik_corner) {};
+        
+        %All content
+        \node[arrow, below=of v_ik.south, anchor=north west] (a_1) {
+            $vID_i, Y_i, \phi, \sigma_{\mathrm{auth}, i}$
+            };
+        \node[block, anchor=north east] at (a_1.south -| dbb.east) (dbb_1) {
+            verify that \\
+            $\mathsf{SigVer} (Y_\mathcal{A}, \sigma_{\mathrm{auth}, i}; vID_i || Y_i || \phi)$ \\
+            then: \\ [9pt]
+            $m \gets$ "voter session" \\
+            $c \gets (vID_i, Y_i, \phi, \sigma_{\mathrm{auth}, i})$ \\
+            $p \gets$ latest config item from $\boldsymbol{h}$ \\
+            $\sigma_\mathcal{D} \gets \mathsf{Sign}(x_\mathcal{D}, m || c || p)$ \\
+            $t \gets$ current timestamp \\
+            $h_{n_\mathrm{b} + 1} \gets \mathcal{H}(m || c || p || h_{n_\mathrm{b}} || t)$ \\
+            $\rho \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathcal{D} || h_{n_\mathrm{b} + 1})$ \\ [9pt]
+            /* store on the Bulletin Board \\
+            \phantom{/}* as a new item the tuple: \\
+            \phantom{/}* $(m, c, \mathcal{D}, \sigma_\mathcal{D}, t, p, h_{n_\mathrm{b} + 1})$ */
+            };
+        \node[arrow, anchor=north west] at (v.south |- dbb_1.south) (a_2) {
+            $p$, $\sigma_\mathcal{D}$, $t$, $h_{n_\mathrm{b}}$, $h_{n_\mathrm{b} + 1}$, $\rho$
+            };
+        \node[block, below=of a_2.south west] (v_1) {
+            $m \gets$ "voter session" \\
+            $c \gets (vID_i, Y_i, \phi, \sigma_{\mathrm{auth}, i})$ \\ [9pt]
+            verify that \\
+            $h_{n_\mathrm{b} + 1} = \mathcal{H}(m || c || p || h_{n_\mathrm{b}} || t)$, \\
+            $\mathsf{SigVer} (Y_\mathcal{D}, \sigma_\mathcal{D};  m || c || p)$ and \\
+            $\mathsf{SigVer} (Y_\mathcal{D}, \rho;  \sigma_\mathcal{D} || h_{n_\mathrm{b} + 1})$ \\
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (v_ik_corner.south west)--(dbb_ik.south east);
+        \draw[->] (a_1.south west)--(a_1.south east);
+        \draw[->] (a_2.south east)--(a_2.south west);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for registering a voter session}
+    \label{fig: protocol for registering a voter session}
+\end{figure}
+
+
+\color{orange}
+\subsubsection{Mapping Vote Options on the Elliptic Curve} \label{sec: mapping vote options on the elliptic curve}
+\color{black}
+An expressed vote (a vote in plain text) must be able to be converted, deterministically, into an elliptic curve point in order to be used in our cryptographic protocols. Additionally, a point from the elliptic curve must be able to be turned back to a plain text vote, if the point has been constructed from a plain text. Consequently, only a finite number of elliptic curve points can be mapped to a plain text that can be interpreted as valid votes. All the other points will be regarded as invalid votes. 
+
+The mapping procedure from a plain text $m$ to an elliptic curve point $M$ is called \( M \leftarrow \mathbf{String2Point}(m) \) and is described in the \cref{alg: bytes to point}. Recovering the text of the vote $m$ from an elliptic curve point $M$ can be done by calling \( m \leftarrow \mathbf{Point2String}(M) \) (\cref{alg: point to bytes}).
+
+Depending on the election type (referendum, simple election, multiple choice election, STV election), the text $m$ can be constructed in different ways. We recall from \Cref{app: mapping a message on the elliptic curve} that $m$ can be maximum 30 characters in length. 
+
+For convenience, we will describe the case of a simple election where the voters have to select one candidate only. Each candidate must have a distinct name which will be used as $m$ and it can be at most 30 characters in length. All names are turned into elliptic curve points using the $\textbf{String2Point}$ algorithm. When decoded back from an elliptic curve point, the candidate name will be visible in plain text.
+
+
+\subsubsection{Vote Cryptogram Generation Process} \label{sec: vote cryptogram generation process}
+During the vote cryptogram generation process, the \textit{Voter's} browser collaborates with the \textit{Digital Ballot Box} $\mathcal{D}$ for generating the cryptogram. This process results in the fact that the \textit{Voter} $\mathcal{V}_i$ will not be in possession of the randomizer value used in the cryptogram $e$. That is achieved by both the browser and the \textit{Digital Ballot Box} $\mathcal{D}$ building up the randomizer but none of them knowing its entire value. It is important for the \textit{Voter} $\mathcal{V}_i$ not to know this value so he cannot produce cryptographic evidence of the way he voted (as in \Cref{app: proving the content of a cryptogram}), thus enforcing \textit{receipt freeness}. The encryption commitment generation process is described in \Cref{fig: protocol for submitting encryption commitments} and the vote cryptogram generation process is described in \Cref{fig: protocol for submitting the encrypted ballot}.
+
+%The process starts with the \textit{Bulletin Board} $\mathcal{D}$ delivering to the \textit{Voter} $\mathcal{V}_i$ an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_0 \gets \mathbf{Enc} (\mathcal{O}, r_0) \) (algorithm \ref{alg: enc}), where \( r_0 \in_\mathrm{R} \mathbb{Z}_q \). 
+
+The generation process begins by the two parties creating and submitting encryption commitments to be used for the ballots. The Voter $\mathcal{V}_i$ generates its encryption commitment $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ and together with $p$ (the hash address of the voter session created during voter authentication as seen in \Cref{fig: protocol for registering a voter session}) they are signed with the Voter's own private key $x_i$ and is sent to the Digital Ballot Box $\mathcal{D}$ which stores it on the Bulletin Board as an item. The Digital Ballot Box $\mathcal{D}$ then generates its own commitment $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ and stores that on the Bulletin Board as an item as well. The hash of these items are added to Digital Ballot Box's list $\boldsymbol{h}$ of all items on the Bulletin Board. The Digital Ballot Box $\mathcal{D}$ then sends these (tuples) to the Voter that verifies that the correct values were stored on the Bulletin Board. The details on this can be seen in \Cref{fig: protocol for submitting encryption commitments}.
+
+The \textit{Voter} $\mathcal{V}_i$ encrypts his vote $M$ with the randomizer \( r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q \) by generating the cryptogram \( e_v \gets \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_v) \) (\Cref{alg: enc}). The \textit{Voter} $\mathcal{V}_i$ generates the randomizer value $r_V$. Then, the voter generates an encryption commitment item who he/she writes to the Bulletin Board (described in \Cref{sec: writing on the bulletin board}). When receiving the commitment the \textit{Digital Ballot Box} $\mathcal{D}$ generates an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_d \gets \mathbf{Enc} (\mathcal{O}, r_d) \) (\Cref{alg: enc}), where \( r_d \in_\mathrm{R} \mathbb{Z}_q \). The \textit{Digital Ballot Box} $\mathcal{D}$ then generates a commitment to $r_d$ and appends its own and the voters commitment ($r_d$ \& $r_v$) to the bulletin board. The empty cryptogram is then sent back to the voter as well as the item for the voter and board commitment. The \textit{Voter} $\mathcal{V}_i$ finalizes the cryptogram by homomorphically adding his cryptogram to the empty cryptogram received from the server \( e = \mathbf{AddEnc}(e_d, e_v) \) (\Cref{alg: hom add}). The \textit{Voter} $\mathcal{V}_i$ also generates a proof of correct encryption \( PK \gets \mathbf{Prove}_G (r_v) \) (\Cref{alg: dl prove}). The finalized cryptogram is sent to the \textit{Digital Ballot Box} $\mathcal{D}$ and appended on the bulletin board together with the hidden verification track start item that references the cryptogram item. The \textit{Digital Ballot Box} $\mathcal{D}$ returns to the \textit{Voter} $\mathcal{V}_i$ both items.
+%the \textit{Bulletin Board} $\mathcal{D}$ delivering to the \textit{Voter} $\mathcal{V}_i$ an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_0 \gets \mathbf{Enc} (\mathcal{O}, r_0) \) (algorithm \ref{alg: enc}), where \( r_0 \in_\mathrm{R} \mathbb{Z}_q \). 
+
+%Next, $\mathcal{D}$ starts an \textit{interactive zkp of discrete logarithm equality}, as in figure \ref{fig:DLE_protocol}, in order to prove to $\mathcal{V}_j$ that $e_0$ is indeed an empty cryptogram. Formally, 
+%\[
+%PK_0 = PK[(r_0): R_0 = [r_0]G \wedge C_0 = [r_0]Y].
+%\]
+
+%The reason $PK_0$ needs to be an \textit{interactive proof} is that $PK_0$ does not need to be universally valid. Instead, only the \textit{Voter} $\mathcal{V}_i$ needs to be convinced that $e_0$ is an empty cryptogram.
+
+%Next, the \textit{Voter} $\mathcal{V}_i$ builds his vote cryptogram on top of the empty cryptogram that he just received. Formally, the \textit{Voter} $\mathcal{V}_i$ encrypts his vote $M$ with the randomizer \( r_1 \in_\mathrm{R} \mathbb{Z}_q \) by generating the cryptogram \( e_1 \gets \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_1) \) (algorithm \ref{alg: enc}), which he needs to homomorphically add to the empty cryptogram in order to generate his final vote cryptogram \( e = \mathbf{AddEnc}(e_0, e_1) \) (algorithm \ref{alg: add enc}). The \textit{Voter} $\mathcal{V}_i$ also generates a proof of correct encryption \( PK \gets \mathbf{Prove}_G (r_1) \) (algorithm \ref{alg: Prove dl}).
+
+Note that now, the cryptogram $e$ is actually \( \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_d + r_d) \). Both the \textit{Voter} $\mathcal{V}_i$ and the \textit{Digital Ballot Box} $\mathcal{D}$ know part of the randomizer value \( r_d + r_d \) (the voter knows $r_v$ and the \textit{Digital Ballot Box} $\mathcal{D}$ knows $r_d$) but neither of them knows the full value.
+
+When submitting his vote, the \textit{Voter} $\mathcal{V}_i$ sends both the cryptogram \( e = (R, C) \) and the proof of correct encryption $PK$. The \textit{Digital Ballot Box} $\mathcal{D}$ accepts the vote cryptogram if the proof validates \( \mathbf{Verify}_G (PK, R - R_d) \) (\Cref{alg: dl ver}). This proves that the \textit{Voter} $\mathcal{V}_i$ did use the empty cryptogram $e_d$ in the construction of the vote cryptogram $e$, thus ensuring that the \textit{Voter} $\mathcal{V}_i$ does not know the randomness value of his cryptogram.
+
+% \begin{figure}[ht]
+%     \centering
+%     \begin{tikzpicture}[framed]
+%         \matrix (m) [matrix of nodes, nodes = {draw = none, anchor = base west, align = left, text depth = 0pt} ]{
+%             \textbf{Voter $\mathcal{V}_i$} & & \textbf{Digital Ballot Box} $\mathcal{D}$ \\ 
+%             /*knows $x_j, M$*/ & & /*knows \( \boldsymbol{Y} = (Y_1, ..., Y_{n_\mathrm{v}}) \)*/ \\ [2mm]
+%             & & \scriptsize /*generate empty cryptogram*/ \\ [-1mm]
+%             & & \( r_0 \in_\mathrm{R} \mathbb{Z}_q \) \\
+%             & & \( e_0 = (R_0, C_0) \gets \mathbf{Enc}_{Y_\mathrm{enc}} (\mathcal{O}, r_0) \) \\
+%             & send $e_0$ & \\ [3mm]
+%             & & \scriptsize /*$\mathcal{D}$ starts the protocol for proving to $\mathcal{V}_i$ \\
+%             % \scriptsize /*$\mathcal{D}$ starts the protocol for proving & \scriptsize to $\mathcal{V}_j$ & \scriptsize fds  \\
+%             & & \scriptsize that $e_0$ is an empty cryptogram. \\ 
+%             & & \scriptsize protocol from \Cref{fig: protocol for proving multiple discrete logarithms}*/ \\ [2mm]
+%             & & \( k \in_\mathrm{R} \mathbb{Z}_q \) \\
+%             & & \( K_\mathrm{G} \gets [k]R_0 \), \( K_\mathrm{Y} \gets [k]C_0 \) \\
+%             & send $K_\mathrm{G}$, $K_\mathrm{Y}$ & \\
+%             \( c \in_\mathrm{R} \mathbb{Z}_q \) & & \\
+%             & send $c$ & \\
+%             & & \( z \gets k + c \cdot r_0 \pmod q \) \\
+%             & send $z$ & \\
+%             \( [z]G \stackrel{?}{=} K_\mathrm{G} + [c]R_0 \) & & \\
+%             \( [z]Y_\mathrm{enc} \stackrel{?}{=} K_\mathrm{Y} + [c]C_0 \) & & \\ [4mm]
+%             \scriptsize /*when $\mathcal{V}_i$ accepts the proof & & \\ 
+%             \scriptsize protocol from \Cref{fig: protocol for proving multiple discrete logarithms} ends*/ & & \\ [3mm]
+%             \scriptsize /*proof of empty cryptogram*/ & & \\ [-1mm]
+%             \( PK_0 \gets (K_\mathrm{G}, K_\mathrm{Y}, c, z) \) & & \\ [2mm]
+%             \( r_1 \in_\mathrm{R} \mathbb{Z}_q \) & & \\
+%             \( e_1 \gets \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_1) \) & & \\ [2mm]
+%             \scriptsize /*vote cryptogram*/ & & \\ [-1mm]
+%             \( e \gets \mathbf{AddEnc} (e_0, e_1) \) & & \\ [2mm]
+%             \scriptsize /*proof of correct encryption*/ & & \\ [-1mm]
+%             \( PK \gets \mathbf{Prove}_G (r_1) \) & & \\
+%             % & send $e, PK_1$ & \\
+%             % & & if \( \mathbf{Verify}_G (PK_1, R - R_0) \) \\
+%             % & & -- accept cryptogram $e$ \\
+%         };
+%         \draw[shorten <= -0.5cm] (m-1-1.south east)--(m-1-1.south west);
+%         \draw[shorten <= -0.5cm] (m-1-3.south east)--(m-1-3.south west);
+%         \draw[-latex] (m-6-2.south east)--(m-6-2.south west);
+%         \draw[-latex] (m-12-2.south east)--(m-12-2.south west);
+%         \draw[-latex] (m-14-2.south west)--(m-14-2.south east);
+%         \draw[-latex] (m-16-2.south east)--(m-16-2.south west);
+%         \draw[dashed, shorten <=-6.5cm, shorten >=-2cm] (m-9-3.south west)--(m-9-3.south east);
+%         \draw[dashed, shorten <=0cm, shorten >=-7.5cm] (m-19-1.north west)--(m-19-1.north east);
+%     \end{tikzpicture}
+%     \caption{Protocol for generating a vote cryptogram}
+%     \label{fig: protocol for generating a vote cryptogram}
+% \end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (v) {
+            \textbf{Voter} $\mathcal{V}_i$};
+        \node[title, right=of v] (dbb) {
+            \textbf{Digital Ballot Box} $\mathcal{D}$};
+        
+        % internal knowledge
+        \node[block, below=of v] (v1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_i$, $Y_\mathcal{D}$, $p$ */
+            };
+        \node[block, below=of dbb] (dbb1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_\mathcal{D}$, $Y_\mathrm{enc}$, $\boldsymbol{Y} = \{Y_1, ..., Y_{n_\mathrm{v}}\}$, \\
+            \phantom{/}* $\boldsymbol{h} = \{ h_1, ..., h_{n_\mathrm{b}} \}$ */
+            };
+        \node[anchor=south west] at (dbb1.south -| v1.west) (v1-corner) {};
+        
+        %All content
+        \node[block, below=of v1-corner.south west, anchor=north west, text width=] (v2) {
+            $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $c_\mathrm{v} \gets \mathsf{Com}(r_\mathrm{v}, s_\mathrm{v})$ \\
+            $m \gets$ "encryption commitment" \\
+            $\sigma_i \gets \mathsf{Sign}(x_i; m || c_\mathrm{v} || p)$
+            };
+        \node[arrow, below=of v2.south, anchor=north west] (a1) {
+            $i$, $\sigma_i$, $m$, $c_\mathrm{v}$, $p$
+            };
+        \node[block, anchor=north east, text width={}] at (a1.south -| dbb.east) (dbb2) {
+            verify that $m$, $c_\mathrm{v}$, and $p$ are compatible \\
+            and $\mathsf{SigVer} (Y_i, \sigma_i; m || c_\mathrm{v} || p)$ then: \\ [9pt]
+            $t_{n_\mathrm{b}+1} \gets$ current timestamp \\
+            $h_{n_\mathrm{b}+1} \gets \mathcal{H}(m || c_\mathrm{v} || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\ [9pt]
+            /* store on the Bulletin Board as a new \\
+            \phantom{/}* item the tuple: \\
+            \phantom{/}* $(m, c_\mathrm{v}, \mathcal{V}_i, \sigma_i, t_{n_\mathrm{b}+1}, p, h_{n_\mathrm{b}+1})$ */ \\ [9pt]
+            $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $c_\mathrm{d} \gets \mathsf{Com}(r_\mathrm{d}, s_\mathrm{d})$ \\
+            $\sigma_\mathcal{D} \gets \mathsf{Sign}(x_\mathcal{D}; m || c_\mathrm{d} || h_{n_\mathrm{b}+1})$ \\
+            $t_{n_\mathrm{b}+2} \gets$ current timestamp \\
+            $h_{n_\mathrm{b}+2} \gets \mathcal{H}(m || c_\mathrm{d} || h_{n_\mathrm{b}+1} || h_{n_\mathrm{b}+1} || t_{n_\mathrm{b}+2})$ \\ [9pt]
+            /* store on the Bulletin Board as a new \\
+            \phantom{/}* item the tuple: \\
+            \phantom{/}* $(m, c_\mathrm{d}, \mathcal{D}, \sigma_\mathcal{D}, t_{n_\mathrm{b}+2}, h_{n_\mathrm{b}+1}, h_{n_\mathrm{b}+2})$ */ \\ [9pt]
+            $e_\mathrm{d} \gets \mathsf{Enc}(Y_\mathrm{enc}, \mathcal{O}; r_\mathrm{d})$ \\
+            $\rho \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_i || h_{n_\mathrm{b}+2})$
+            };
+        \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
+            $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$, $c_\mathrm{d}$, $\sigma_\mathcal{D}$, $t_{n_\mathrm{b}+2}$, $h_{n_\mathrm{b}+2}$, $e_\mathrm{d}$
+            };
+        \node[block, anchor=north west, text width=] at (a2.south -| w2.west) (v3) {
+            verify that \\
+            $h_{n_\mathrm{b}+1} = \mathcal{H}(m || c_\mathrm{v} || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$, \\
+            $h_{n_\mathrm{b}+2} = \mathcal{H}(m || c_\mathrm{d} || h_{n_\mathrm{b}+1} || h_{n_\mathrm{b}+1} || t_{n_\mathrm{b}+2})$ \\
+            and $\mathsf{SigVer}(Y_\mathcal{D}, \rho; \sigma_i || h_{n_\mathrm{b}+2})$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (v1-corner.south west)--(dbb1.south east);
+        \draw[->] (a1.south west)--(a1.south east);
+        \draw[->] (a2.south east)--(a2.south west);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for submitting encryption commitments}
+    \label{fig: protocol for submitting encryption commitments}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (v) {
+            \textbf{Voter} $\mathcal{V}_i$};
+        \node[title, right=of v] (dbb) {
+            \textbf{Digital Ballot Box} $\mathcal{D}$};
+        
+        % internal knowledge
+        \node[block, below=of v] (v1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_i$, $Y_\mathcal{D}$, $p$, $M$, $Y_\mathrm{enc}$, $r_\mathrm{v}$, $e_\mathrm{d}$ */
+            };
+        \node[block, below=of dbb] (dbb1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_\mathcal{D}$, $Y_\mathrm{enc}$, $\boldsymbol{Y} = \{Y_1, ..., Y_{n_\mathrm{v}}\}$, \\
+            \phantom{/}* $\boldsymbol{h} = \{h_1, ..., h_{n_\mathrm{b}}\}$, $e_\mathrm{d} = (R_\mathrm{d}, C_\mathrm{d})$ */
+            };
+        \node[block, anchor=south west] at (dbb1.south -| v1.west) (v1-corner) {};
+        
+        %All content
+        \node[block, below=of v1-corner.south west, anchor=north west] (v2) {
+            $e_\mathrm{v} \gets \mathsf{Enc}(Y_\mathrm{enc}, M; r_\mathrm{v})$ \\
+            $e \gets \mathsf{HomAdd}(e_\mathrm{d}, e_\mathrm{v})$ \\
+            $PK \gets \mathsf{DLProve}(r_\mathrm{v}, G)$ \\
+            $m \gets$ "cryptograms" \\
+            $\sigma_i \gets \mathsf{Sign}(x_i; m || e || p)$
+            };
+        \node[arrow, below=of v2.south, anchor=north west] (a1) {
+            $i$, $\sigma_i$, $p$, $PK$, $m$, $e = (R, C)$
+            };
+        \node[block, anchor=north east, text width={}] at (a1.south -| dbb.east) (dbb2) {
+            verify that $m$, $e$ and $p$ are compatible, \\
+            $\mathsf{SigVer} (Y_i, \sigma_i; m || e || p)$ and \\
+            $\mathsf{DLVer}(PK, G; R - R_\mathrm{d})$ then: \\ [9pt]
+            $t_{n_\mathrm{b}+1} \gets$ current timestamp \\
+            $h_{n_\mathrm{b}+1} \gets \mathcal{H}(m || e || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\ [9pt]
+            /* store on the Bulletin Board as a \\
+            \phantom{/}* new item the tuple: \\
+            \phantom{/}* $(m, e, \mathcal{V}_i, \sigma_i, t_{n_\mathrm{b}+1}, p, h_{n_\mathrm{b}+1})$ */ \\ [9pt]
+            $m_\mathrm{vts} \gets$ "verification track start" \\
+            $\sigma_\mathcal{D} \gets \mathsf{Sign}(x_\mathcal{D}; m_\mathrm{vts} || \perp || h_{n_\mathrm{b}+1})$ \\
+            $t_\mathrm{vts} \gets$ current timestamp \\
+            $h_\mathrm{vts} \gets \mathcal{H}(m_\mathrm{vts} || \perp || h_{n_\mathrm{b}+1} || h_{n_\mathrm{b}+1} || t_\mathrm{vts})$ \\ [9pt]
+            /* store on the hidden verification \\
+            \phantom{/}* track as the start item the tuple: \\
+            \phantom{/}* $(m_\mathrm{vts}, \perp, \mathcal{D}, \sigma_\mathcal{D}, t_\mathrm{vts}, h_{n_\mathrm{b}+1}, h_\mathrm{vts})$ */ \\ [9pt]
+            $\rho \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_i || h_\mathrm{vts})$
+            };
+        \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
+            $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$, $m_\mathrm{vts}$, $t_\mathrm{vts}$, $h_\mathrm{vts}$
+            };
+        \node[block, anchor=north west, text width={}] at (a2.south -| w2.west) (v3) {
+            verify that \\
+            $h_{n_\mathrm{b}+1} = \mathcal{H}(m || e || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$, \\
+            $h_\mathrm{vts} = \mathcal{H}(m_\mathrm{vts} || \perp || h_{n_\mathrm{b}+1} || h_{n_\mathrm{b}+1} || t_\mathrm{vts})$ and \\
+            $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma_i || h_\mathrm{vts})$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (v1-corner.south west)--(dbb1.south east);
+        \draw[->] (a1.south west)--(a1.south east);
+        \draw[->] (a2.south east)--(a2.south west);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for submitting the encrypted ballot}
+    \label{fig: protocol for submitting the encrypted ballot}
+\end{figure}
+
+% \begin{algorithm}[H]
+% \floatname{algorithm}{VoteCryptogramGeneration}
+% \renewcommand{\thealgorithm}{}
+% \caption{Protocol for generating a vote cryptogram}
+% \begin{algorithmic}[1]
+% \STATE Bulletin board : Computes an empty cryptogram \( e_0 = (R_0, C_0) \leftarrow \mathbf{Enc}_{Y_\mathrm{enc}} (\mathcal{O}, r_0) \), where \( r_0 \in_R \mathbb{Z}_q \), and sends it to the voter.
+% \STATE Bulletin board + Browser : Participate in the protocol for generating a proof of empty cryptogram in form of a discrete logarithm interactive zero knowledge proof \( PK_0 \leftarrow \mathbf{Prove}_{G, Y_\mathrm{enc}} (r_0) \).
+% \STATE Browser : Verifies proof \( b \leftarrow \mathbf{Verify}_{G, Y_\mathrm{enc}} (PK_0, R_0, C_0) \). If the proof validates, the browser continues the process.
+% \STATE Browser : Encrypts the voting choice \( M \in \boldsymbol{M} \) and homomorphically combines it with the empty cryptogram received from the bulletin board to form the final vote cryptogram \( e_1 = (R_1, C_1) \leftarrow \mathbf{AddEnc} (e_0, \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_1)) \), where \( r_1 \in_R \mathbb{Z}_q \).
+% \STATE Browser : Generates a proof that the empty cryptogram was used in the voting process (proof of correct encryption) in form of a discrete logarithm non-interactive zero knowledge proof \( PK_1 \leftarrow \mathbf{Prove}_G (r_1) \).
+% \STATE Bulletin board : To accept the vote cryptogram $e_1$, the bulletin board has to validate the proof of correct encryption \( \mathbf{Verify}_G (PK_1, R_1 - R_0) \).
+% \end{algorithmic}
+% \end{algorithm} 
+
+
+% After the vote cryptogram has been registered and published on the bulletin board, the voter receives a confirmation receipt $\rho$ that can be used later to verify that her vote is registered correctly on the bulletin board and to verify that the hash values of the bulletin board are consistent.
+
+
+\clearpage
+\subsubsection{Challenging a Vote Cryptogram} \label{sec: challenging a vote cryptogram}
+After encrypting a ballot, a the \textit{Voter} $\mathcal{V}_i$ can choose whether to test or submit it. To perform the testing process of an encrypted ballot, the voter needs to interact with the \textit{External Verifier} $\mathcal{X}$ that will perform all the testing operations on behalf of the voter, according to the data delivered by the \textit{Digital Ballot Box} $\mathcal{D}$. At the end of the testing process, the voter will be presented with the vote choice(s) that were encoded in the encrypted ballot. When doing the testing procedure, the encrypted ballot that is being tested gets spoiled. Therefore, the voter needs to redo the vote cryptogram generation process from \cref{sec: vote cryptogram generation process} to get a new encrypted ballot, which the voter has to choose again whether to test or to submit. This process can be repeated until the voter trusts the legitimacy of the next encrypted ballot generated by the voting application. The protocol is inspired from \cite{Benaloh06}.
+
+The \textit{Voter} $\mathcal{V}_i$ holds the ancestry $\alpha_\mathrm{vts} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{vts} \}$, where $\alpha_\mathrm{cfg}$ is the list of board items that define the election configuration, $b_\mathrm{vos}$ is the \textit{voter session} item, $b_\mathrm{vec}$ is the \textit{voter encryption commitment} item, $b_\mathrm{sec}$ is the \textit{server encryption commitment} item, $b_\mathrm{bac}$ is the \textit{ballot cryptograms} item and $b_\mathrm{vts}$ is the \textit{verification track start} item, each with their respective hash addresses $h_\mathrm{vos}$, $h_\mathrm{vec}$, $h_\mathrm{sec}$, $h_\mathrm{bac}$ and $h_\mathrm{vts}$. The \textit{Digital Ballot Box} $\mathcal{D}$ is in possession of the entire bulletin board $\lambda$ that includes the ancestry of the verification track start item $\alpha_\mathrm{vts}$. The ancestry $\alpha_\mathrm{vts}$ has been created during the vote cryptogram generation process (\cref{sec: vote cryptogram generation process}). The \textit{External Verifier} $\mathcal{X}$ starts with no internal knowledge.
+
+The first part of the protocol (\cref{fig: protocol for challenging a vote cryptogram part 1a} and \cref{fig: protocol for challenging a vote cryptogram part 1b}) establish a trusted connection amongst the \textit{Voter} and the \textit{External Verifier} over the bulletin board. The \textit{Voter} inputs to the \textit{External Verifier} the address of the \textit{verification track start} item $h_\mathrm{vts}$, which then asks the \textit{Digital Ballot Box} for the ancestry of the item at that address. The \textit{Digital Ballot Box} delivers the ancestry $\alpha_\mathrm{vts}$, which the \textit{External Verifier} validates by $\mathsf{AncestryVer}(\alpha_\mathrm{vts})$. If valid, the \textit{External Verifier} notifies the \textit{Voter} that the ballot was successfully found.
+
+Then, \textit{Voter} $\mathcal{V}_i$ interacts with the \textit{Digital Ballot Box} to append a \textit{spoil request} item $b_\mathrm{spr} = (\text{"spoil request"}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$ (according to the rules from \cref{sec: bulletin board event types}), where $\sigma_\mathrm{spr}$ is the voter's signature on the concatenation of the text "spoil request" and the address of the \textit{ballot cryptograms} item $h_\mathrm{bac}$, and $h_\mathrm{spr}$ is the address of the new \textit{spoil request} item. The symbol $\perp$ denotes that the \textit{spoil request} item has no content. The voter is provided with the item $b_\mathrm{spr}$ and the receipt $\rho_\mathrm{spr}$ which is a signature of the \textit{Digital Ballot Box} on the concatenation of the voter's signature $\sigma_\mathrm{spr}$ and the address of the item $h_\mathrm{spr}$. \textit{Voter} verifies the integrity of the new board item and of the receipt.
+
+In \cref{fig: protocol for challenging a vote cryptogram part 1b} is presented that the item $b_\mathrm{spr}$ and the receipt $\rho_\mathrm{spr}$ are delivered also to the \textit{External Verifier}, which checks that the \textit{spoil request} item is consistent with the ancestry of the \textit{ballot cryptograms} item $\mathsf{AncestryVer}(\alpha_\mathrm{bac} \cup \{ b_\mathrm{spr} \})$, where $\alpha_\mathrm{vts} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{vts} \}$. If validation succeeds, \textit{External Verifier} generates its own key pair $(x_\mathcal{X}, Y_\mathcal{X}) \gets \mathsf{KeyGen}()$ and interacts with the \textit{Digital Ballot Box} to append the \textit{verifier} item $b_\mathrm{ver} = (\text{"verifier"}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$ (according to the rules from \cref{sec: bulletin board event types}), where $\sigma_\mathrm{ver}$ is the external verifier's signature on the concatenation of the text "verifier", its public key $Y_\mathcal{X}$ and the address of the \textit{spoil request} item $h_\mathrm{spr}$. The value $h_\mathrm{ver}$ is the address of the new \textit{verifier} item. \textit{Digital Ballot Box} returns to the \textit{External Verifier} the item $b_\mathrm{ver}$ and the receipt $\rho_\mathrm{ver}$ which is a signature of the \textit{Digital Ballot Box} on the concatenation of the external verifier's signature $\sigma_\mathrm{ver}$ and the address of the item $h_\mathrm{ver}$. \textit{External Verifier} checks the integrity of the new board item and of the receipt. If they validate, \textit{External Verifier} presents to the \textit{Voter} the address of the \textit{verifier} item $h_\mathrm{ver}$.
+
+\textit{Digital Ballot Box} also notifies the \textit{Voter} about the \textit{verifier} item $b_\mathrm{ver}$ and the receipt $\rho_\mathrm{ver}$. The voter checks that the \textit{verifier} item is consistent with the ancestry of the \textit{spoil request} item $\mathsf{AncestryVer}(\alpha_\mathrm{spr} \cup b_\mathrm{ver})$ and verifies the integrity of the receipt. If both validate, then the \textit{Voter} compares the address of $b_\mathrm{ver}$ (i.e. $h_\mathrm{ver}$) with the address received from the \textit{External Verifier}. If they match, the \textit{Voter} and the \textit{External Verifier} successfully established a trusted connection and can continue the protocol.
+
+In the last part of the protocol (\cref{fig: protocol for challenging a vote cryptogram part 2a} and \cref{fig: protocol for challenging a vote cryptogram part 2b}) both the \textit{Voter} and \textit{Digital Ballot Box} deliver to the \textit{External Verifier}, in a secure manner, their randomizer values. The \textit{External Verifier} checks that all the values are correct and use them to decrypt the voter's ballot cryptograms and present the vote choices to the \textit{Voter} for assessment.
+
+In \cref{fig: protocol for challenging a vote cryptogram part 2a}, the \textit{Voter} interacts with the \textit{Digital Ballot Box} to append a \textit{voter commitment opening} item $b_\mathrm{vco}$ = ("voter commitment opening", $d_\mathrm{vco}$, $\mathcal{V}_i$, $\sigma_\mathrm{vco}$, $t_\mathrm{vco}$, $h_\mathrm{ver}$, $h_\mathrm{vco}$) (according to the rules from \cref{sec: bulletin board event types}), where $\sigma_\mathrm{vco}$ is the voter's signature on the concatenation of the text "voter commitment opening", the content of the item $d_\mathrm{vco}$ and the address of the \textit{verifier} item $h_\mathrm{ver}$. The value $h_\mathrm{vco}$ is the address of the new \textit{voter commitment opening} item. The content of the item $d_\mathrm{vco}$ is the encryption of the values $r_\mathrm{v}$ and $s_\mathrm{v}$ with a symmetric key $k_\mathrm{v}$ derived from a Diffie-Hellmann key exchange between the \textit{Voter's} and the \textit{External Verifier's} public key infrastructure (i.e. $k_\mathrm{v} = \mathsf{DHKDF}(x_i, Y_\mathcal{X}) = \mathsf{DHKDF}(x_\mathcal{X}, Y_i)$, where $(x_i, Y_i)$ is the \textit{Voter's} key pair and $(x_\mathcal{X}, Y_\mathcal{X})$ is the \textit{External Verifier's} key pair). 
+
+\textit{Digital Ballot Box} also appends a \textit{server commitment opening} item $b_\mathrm{sco}$ = ("server commitment opening", $d_\mathrm{sco}$, $\mathcal{D}$, $\sigma_\mathrm{sco}$, $t_\mathrm{sco}$, $h_\mathrm{vco}$, $h_\mathrm{sco}$), where $\sigma_\mathrm{sco}$ is the signature of the \textit{Digital Ballot Box} on the item and $h_\mathrm{sco}$ is the address of the new \textit{server commitment opening} item. The content of the item $d_\mathrm{vco}$ is the encryption of the values $r_\mathrm{d}$ and $s_\mathrm{d}$ with a symmetric key $k_\mathrm{d}$ derived from a Diffie-Hellmann key exchange between the \textit{Digital Ballot Box} and the \textit{External Verifier's} public key infrastructure (i.e. $k_\mathrm{d} = \mathsf{DHKDF}(x_\mathcal{D}, Y_\mathcal{X}) = \mathsf{DHKDF}(x_\mathcal{X}, Y_\mathcal{D})$, where $(x_\mathcal{D}, Y_\mathcal{D})$ is the key pair of \textit{Digital Ballot Box} and $(x_\mathcal{X}, Y_\mathcal{X})$ is the \textit{External Verifier's} key pair). 
+
+Note that $r_\mathrm{v}$, $s_\mathrm{v}$ and $r_\mathrm{d}$, $s_\mathrm{d}$ respectively, are the commitment values generated during the vote cryptogram generation process described in \cref{sec: vote cryptogram generation process}.
+
+\textit{Digital Ballot Box} returns to the \textit{Voter} both items $b_\mathrm{vco}$ and $b_\mathrm{sco}$ and the receipt $\rho_\mathrm{sco}$ which is a signature of \textit{Digital Ballot Box} on the concatenation of the voter's signature $\sigma_\mathrm{vco}$ and the address of the \textit{server commitment opening} item $h_\mathrm{sco}$. \textit{Voter} checks the integrity of the new board items and of the receipt.
+
+In \cref{fig: protocol for challenging a vote cryptogram part 2b} is presented that the items $b_\mathrm{vco}$ and $b_\mathrm{sco}$ and the receipt $\rho_\mathrm{sco}$ are delivered also to the \textit{External Verifier}, which checks that the two new items are consistent with the ancestry of the \textit{verifier} item $\mathsf{AncestryVer}(\alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \})$. If validation succeeds, \textit{External Verifier} decrypts the commitment opening values $(r_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{TxtDec}(d_\mathrm{vco}, k_\mathrm{v})$ from the content of the \textit{voter commitment opening} item $b_\mathrm{vco}$ and the values $(r_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{TxtDec}(d_\mathrm{sco}, k_\mathrm{d})$ from the content of the \textit{server commitment opening} item $b_\mathrm{sco}$, respectively. Note that the symmetric keys are derived from the Diffie-Hellmann key exchange between the respective parties, i.e. $k_\mathrm{v} = \mathsf{DHKDF}(x_\mathcal{X}, Y_i)$ for the shared key between the \textit{Voter} and the \textit{External Verifier} and $k_\mathrm{d} = \mathsf{DHKDF}(x_\mathcal{X}, Y_\mathcal{D})$ for the shared key between the \textit{Digital Ballot Box} and the \textit{External Verifier}.
+
+Then, the \textit{External Verifier} verifies both the voter and the server commitments ($c_\mathrm{v}$ and $c_\mathrm{d}$) from the \textit{voter encryption commitment} and the \textit{server encryption commitment} items ($b_\mathrm{vec}$ and $b_\mathrm{sec}$) received in the ancestry of the \textit{verification track start} item $\alpha_\mathrm{vts} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{vts} \}$. If both commitment are valid, i.e. $\mathsf{ComVer}(c_\mathrm{v}, r_\mathrm{v}, s_\mathrm{v})$ and $\mathsf{ComVer}(c_\mathrm{d}, r_\mathrm{d}, s_\mathrm{d})$, then the \textit{External Verifier} can decrypt the ballot and present it to the \textit{Voter}.
+
+To perform the decryption, the \textit{External Verifier} tweaks the cryptogram by replacing the randomizer of the tuple with the encryption key $e' \gets (Y_\mathrm{enc}, C)$, where the original cryptogram $e = (R, C)$ is found in the content of the \textit{ballot cryptograms} item $b_\mathrm{bac}$. As decryption key, it uses the sum of the voter's and the server's randomizers $r' \gets r_\mathrm{v} + r_\mathrm{d}$. The resulting vote $V' \gets \mathsf{Dec}(r', e')$ is delivered to the \textit{Voter}.
+
+The \textit{Voter} verifies that the received vote $V'$ matches with the intended selection $V$ from the vote cryptogram generation process (\cref{sec: vote cryptogram generation process}) and acts accordingly. If the vote matches, then the \textit{Voter} is assured that the voting application behaved correctly (i.e. it encrypted a genuine vote). Otherwise, the \textit{Voter} has evidence that the voting application has misbehaved during the process.
+
+\clearpage
+\begin{landscape}
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            after_arrow/.style={yshift=-5},
+            % every node/.style={draw},
+            ]{
+        
+        % Actors
+        \node[title_3, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title_3, right=of v] (ev) {
+            \textbf{External Verifier $\mathcal{X}$}};
+        \node[title_3, right=of ev] (dbb) {
+            \textbf{Digital Ballot Box $\mathcal{D}$}};
+        
+        % internal knowledge
+        \node[internal_3, below=of v] (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $h_\mathrm{bac}$, $h_\mathrm{vts}$, \\
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{vts} \}$
+            };
+        \node[internal_3, below=of ev] (ev_ik) {
+            no internal knowledge
+            };
+        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, \\
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{vts} \}$, $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$
+            };
+        
+        % All content
+        \node[new_arrow, towards_right, between={v.center}{ev.center}] at (v_ik.south -| v.center) (a_1) {
+            $h_\mathrm{vts}$
+            };
+        \node[new_arrow, towards_right, between={ev.center}{dbb.center}] at (a_1.south -| ev.center) (a_2) {
+            $h_\mathrm{vts}$
+            };
+        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (a_2.south -| dbb.center) (a_3) {
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{vts} \}$
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_3.south -| ev.center) (ev_1) {
+            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{vts})$
+            };
+        \node[new_arrow, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_4) {
+            "ballot found"
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_4.south -| v.center) (v_1) {
+            $m_\mathrm{spr} \gets $ "spoil request" \\
+            $\sigma_\mathrm{spr} \gets \mathsf{Sign}(x_i; m_\mathrm{spr} || \perp || h_\mathrm{bac})$
+            };
+        \node[new_arrow, towards_right, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_5) {
+            $i$, $m_\mathrm{spr}$, $\sigma_\mathrm{spr}$, $h_\mathrm{bac}$
+            };
+        \node[process_3, keep_right, after_arrow] at (a_5.south -| dbb.east) (dbb_1) {
+            verify that $\mathsf{SigVer} (Y_i, \sigma_\mathrm{spr}; m_\mathrm{spr} || \perp || h_\mathrm{bac})$ then: \\ [4pt]
+            $t_\mathrm{spr} \gets$ current time, \\
+            $h_\mathrm{spr} \gets \mathcal{H}(m_\mathrm{spr} || \perp || h_\mathrm{bac} || h_{n_\mathrm{b}} || t_\mathrm{spr})$ \\
+            $b_\mathrm{spr} \gets (m_\mathrm{spr}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$, \\
+            $\lambda \gets \lambda \cup \{ b_\mathrm{spr} \}$ \\ 
+            $\rho_\mathrm{spr} \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathrm{spr} || h_\mathrm{spr})$
+            };
+        \node[new_arrow, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_6) {
+            $b_\mathrm{spr} = (m_\mathrm{spr}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$, $\rho_\mathrm{spr}$
+            };
+        \node[process_3, keep_left, after_arrow] at (a_6.south -| v.west) (v_2) {
+            verify that $h_\mathrm{spr} = \mathcal{H}(m || \perp || h_\mathrm{bac} || h_{n_\mathrm{b}} || t_\mathrm{spr})$ \\
+            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{spr}; \sigma_\mathrm{spr} || h_\mathrm{spr})$
+            };
+        \node[below=of v_2] (bottom){};
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (v_ik.south west)--(dbb_ik.south east);
+        
+        \draw[dotted] (v_ik.south -| v.center)--(v_1.north -| v.center);
+        \draw[dotted] (v_1.south -| v.center)--(v_2.north -| v.center);
+        \draw[dotted] (v_2.south -| v.center)--(bottom.south -| v.center);
+        
+        \draw[dotted] (a_1.south -| ev.center)--(ev_1.north -| ev.center);
+        \draw[dotted] (ev_1.south -| ev.center)--(bottom.south -| ev.center);
+        
+        \draw[dotted] (dbb_ik.south -| dbb.center)--(dbb_1.north -| dbb.center);
+        \draw[dotted] (dbb_1.south -| dbb.center)--(bottom.south -| dbb.center);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for challenging a vote cryptogram (part 1a)}
+    \label{fig: protocol for challenging a vote cryptogram part 1a}
+\end{figure}
+
+\clearpage
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            after_arrow/.style={yshift=-5},
+            % every node/.style={draw},
+            ]{
+        
+        % Actors
+        \node[title_3, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title_3, right=of v] (ev) {
+            \textbf{External Verifier $\mathcal{X}$}};
+        \node[title_3, right=of ev] (dbb) {
+            \textbf{Digital Ballot Box $\mathcal{D}$}};
+        
+        % internal knowledge
+        \node[internal_3, below=of v.south west, anchor=north west, text width={}] (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $h_\mathrm{bac}$, $h_\mathrm{vts}$, \\
+            $\alpha_\mathrm{spr} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{spr} \}$, \\ $b_\mathrm{vts}$
+            };
+        \node[internal_3, below=of ev] (ev_ik) {
+            internal knowledge: $Y_\mathcal{D}$, \\
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{vts} \}$
+            };
+        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, \\
+            $\alpha_\mathrm{spr} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{spr} \}$, \\ $b_\mathrm{vts}$, $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$
+            };
+        
+        % All content
+        \node[below=of dbb_ik] (top){};
+        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (top.south -| dbb.center) (a_7) {
+            \phantom{$b_\mathrm{spr} = (\mathcal{V}_i)$}
+            };
+        \node[align=center, font=\small, anchor=north west] at (top.south -| ev.center) (a_7_content) {
+            $b_\mathrm{spr} = (m_\mathrm{spr}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$, $\rho_\mathrm{spr}$
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_7.south -| ev.center) (ev_2) {
+            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{bac} \cup \{ b_\mathrm{spr} \})$ \\
+            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{spr}; \sigma_\mathrm{spr} || h_\mathrm{spr})$ then: \\ [4pt]
+            $(x_\mathcal{X}, Y_\mathcal{X}) \gets \mathsf{KeyGen}()$, $m_\mathrm{v} \gets "verifier"$ \\
+            $\sigma_\mathrm{ver} \gets \mathsf{Sign}(x_\mathcal{X}; m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr})$
+            };
+        \node[new_arrow, towards_right, between={ev.center}{dbb.center}] at (ev_2.south -| ev.center) (a_8) {
+            $h_\mathrm{vts}$, $m_\mathrm{v}$, $Y_\mathcal{X}$, $\sigma_\mathrm{ver}$
+            };
+        \node[process_3, keep_right, after_arrow] at (a_8.south -| dbb.east) (dbb_2) {
+            verify that $\mathsf{SigVer} (Y_\mathcal{X}, \sigma_\mathrm{ver}; m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr})$ then: \\ [4pt]
+            $t_\mathrm{ver} \gets$ current time, $h_\mathrm{ver} \gets \mathcal{H}(m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr} || h_\mathrm{vts} || t_\mathrm{ver})$ \\
+            $b_\mathrm{ver} \gets (m_\mathrm{v}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$ \\
+            $\lambda \gets \lambda \cup \{ b_\mathrm{ver} \}$, $\rho_\mathrm{ver} \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathrm{ver} || h_\mathrm{ver})$
+            };
+        \node[new_arrow, towards_left, between={v.center}{dbb.center}] at (dbb_2.south -| dbb.center) (a_9) {
+            $b_\mathrm{ver} = (m_\mathrm{v}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$, $\rho_\mathrm{ver}$
+            };
+        \node[process_3, keep_left, after_arrow] at (a_9.south -| v.west) (v_3) {
+            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{spr} \cup \{ b_\mathrm{ver} \})$ \\
+            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{ver}; \sigma_\mathrm{ver} || h_\mathrm{ver})$
+            };
+        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (a_9.south -| dbb.center) (a_10) {
+            \phantom{$b_\mathrm{ver} = (Y_\mathcal{X})$}
+            };
+        \node[align=center, font=\small, anchor=north west] at (a_9.south -| ev.center) (a_10_content) {
+            $b_\mathrm{ver} = (m_\mathrm{v}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$, $\rho_\mathrm{ver}$
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_10.south -| ev.center) (ev_3) {
+            verify that $h_\mathrm{ver} = \mathcal{H}(m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr} || h_\mathrm{vts} || t_\mathrm{ver})$ \\
+            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{ver}; \sigma_\mathrm{ver} || h_\mathrm{ver})$
+            };
+        \node[new_arrow, towards_left, between={v.center}{ev.center}] at (ev_3.south -| ev.center) (a_11) {
+            $h'_\mathrm{ver} = h_\mathrm{ver}$
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_11.south -| v.center) (v_4) {
+            verify that $h_\mathrm{ver} = h'_\mathrm{ver}$
+            };
+        \node[below=of v_4] (bottom){};
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (top.north -| v.west)--(top.north -| dbb.east);
+        
+        \draw[dotted] (top.north -| v.center)--(v_3.north -| v.center);
+        \draw[dotted] (v_3.south -| v.center)--(v_4.north -| v.center);
+        \draw[dotted] (v_4.south -| v.center)--(bottom.south -| v.center);
+        
+        \draw[dotted] (top.north -| ev.center)--(ev_2.north -| ev.center);
+        \draw[dotted] (ev_2.south -| ev.center)--(ev_3.north -| ev.center);
+        \draw[dotted] (ev_3.south -| ev.center)--(bottom.south -| ev.center);
+        
+        \draw[dotted] (top.north -| dbb.center)--(dbb_2.north -| dbb.center);
+        \draw[dotted] (dbb_2.south -| dbb.center)--(bottom.south -| dbb.center);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for challenging a vote cryptogram (part 1b)}
+    \label{fig: protocol for challenging a vote cryptogram part 1b}
+\end{figure}
+
+\clearpage
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            after_arrow/.style={yshift=-5},
+            % every node/.style={draw},
+            ]{
+        
+        % Actors
+        \node[title_3, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title_3, right=of v] (ev) {
+            \textbf{External Verifier $\mathcal{X}$}};
+        \node[title_3, right=of ev] (dbb) {
+            \textbf{Digital Ballot Box $\mathcal{D}$}};
+        
+        % internal knowledge
+        \node[internal_3, below=of v] (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathcal{X}$, $h_\mathrm{bac}$, \\
+            $h_\mathrm{vts}$, $h_\mathrm{ver}$, $\alpha_\mathrm{ver} = \alpha_\mathrm{spr} \cup \{ b_\mathrm{ver} \}$, $b_\mathrm{ver}$, \\
+            $r_\mathrm{v}$, $s_\mathrm{v}$
+            };
+        \node[internal_3, below=of ev] (ev_ik) {
+            internal knowledge: $x_\mathcal{X}$, $Y_\mathcal{D}$ \\
+            $\alpha_\mathrm{ver} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{spr}, b_\mathrm{ver} \}$, $b_\mathrm{vts}$
+            };
+        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, $Y_\mathcal{X}$, \\
+            $\alpha_\mathrm{ver} = \alpha_\mathrm{spr} \cup \{ b_\mathrm{ver} \}$, $b_\mathrm{vts}$, $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$
+            };
+        
+        % All content
+        \node[below=of v_ik] (top){};
+        \node[process_3, keep_left] at (top.south -| v.west) (v_1) {
+            $k_\mathrm{v} \gets \mathsf{DHKDF}(x_i, Y_\mathcal{X})$ \\
+            $d_\mathrm{vco} \gets \mathsf{TxtEnc}(r_\mathrm{v} || s_\mathrm{v}, k_\mathrm{v})$ \\
+            $m_\mathrm{vco} \gets$ "voter encryption commitment opening" \\
+            $\sigma_\mathrm{vco} \gets \mathsf{Sign}(x_i; m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver})$
+            };
+        \node[new_arrow, towards_right, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_1) {
+            $i$, $m_\mathrm{vco}$, $d_\mathrm{vco}$, $\sigma_\mathrm{vco}$, $h_\mathrm{ver}$
+            };
+        \node[process_3, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
+            verify that $\mathsf{SigVer} (Y_i, \sigma_\mathrm{vco}; m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver})$ then: \\ [4pt]
+            $t_\mathrm{vco} \gets$ current time, $h_\mathrm{vco} \gets \mathcal{H}(m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver} || h_\mathrm{ver} || t_\mathrm{vco})$ \\
+            $b_\mathrm{vco} \gets (m_\mathrm{vco}, d_\mathrm{vco}, \mathcal{V}_i, \sigma_\mathrm{vco}, t_\mathrm{vco}, h_\mathrm{ver}, h_\mathrm{vco})$ \\
+            $k_\mathrm{d} \gets \mathsf{DHKDF}(x_\mathcal{D}, Y_\mathcal{X})$, $d_\mathrm{sco} \gets \mathsf{TxtEnc}(r_\mathrm{d} || s_\mathrm{d}, k_\mathrm{d})$ \\
+            $m_\mathrm{sco} \gets$ "server encryption commitment opening" \\
+            $t_\mathrm{sco} \gets$ current time, $h_\mathrm{sco} \gets \mathcal{H}(m_\mathrm{sco} || d_\mathrm{vco} || h_\mathrm{vco} || h_\mathrm{vco} || t_\mathrm{sco})$ \\
+            $b_\mathrm{sco} \gets (m_\mathrm{sco}, d_\mathrm{sco}, \mathcal{D}, \sigma_\mathrm{sco}, t_\mathrm{sco}, h_\mathrm{vco}, h_\mathrm{sco})$ \\
+            $\lambda \gets \lambda \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \}$, $\rho_\mathrm{sco} \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathrm{vco} || h_\mathrm{sco})$
+            };
+        \node[new_arrow, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_2) {
+            $b_\mathrm{vco} = (m_\mathrm{vco}, d_\mathrm{vco}, \mathcal{V}_i, \sigma_\mathrm{vco}, t_\mathrm{vco}, h_\mathrm{ver}, h_\mathrm{vco})$, \\
+            $b_\mathrm{sco} = (m_\mathrm{sco}, d_\mathrm{sco}, \mathcal{D}, \sigma_\mathrm{sco}, t_\mathrm{sco}, h_\mathrm{vco}, h_\mathrm{sco})$, $\rho_\mathrm{sco}$
+            };
+        \node[process_3, keep_left, after_arrow] at (a_2.south -| v.west) (v_2) {
+            verify that $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{sco}; \sigma_\mathrm{vco} || h_\mathrm{sco})$, \\
+            $h_\mathrm{vco} = \mathcal{H}(m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver} || h_\mathrm{ver} || t_\mathrm{vco})$ and \\
+            $h_\mathrm{sco} = \mathcal{H}(m_\mathrm{sco} || d_\mathrm{sco} || h_\mathrm{vco} || h_\mathrm{vco} || t_\mathrm{sco})$
+            };
+        \node[below=of v_2] (bottom){};
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (top.north -| v.west)--(top.north -| dbb.east);
+        
+        \draw[dotted] (top.north -| v.center)--(v_1.north -| v.center);
+        \draw[dotted] (v_1.south -| v.center)--(v_2.north -| v.center);
+        \draw[dotted] (v_2.south -| v.center)--(bottom.south -| v.center);
+        
+        \draw[dotted] (top.north -| ev.center)--(bottom.south -| ev.center);
+        
+        \draw[dotted] (top.north -| dbb.center)--(dbb_1.north -| dbb.center);
+        \draw[dotted] (dbb_1.south -| dbb.center)--(bottom.south -| dbb.center);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for challenging a vote cryptogram (part 2a)}
+    \label{fig: protocol for challenging a vote cryptogram part 2a}
+\end{figure}
+
+\clearpage
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            after_arrow/.style={yshift=-5},
+            % every node/.style={draw},
+            ]{
+        
+        % Actors
+        \node[title_3, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title_3, right=of v] (ev) {
+            \textbf{External Verifier $\mathcal{X}$}};
+        \node[title_3, right=of ev] (dbb) {
+            \textbf{Digital Ballot Box $\mathcal{D}$}};
+        
+        % internal knowledge
+        \node[internal_3, below=of v] (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathcal{X}$, $h_\mathrm{bac}$, \\
+            $h_\mathrm{vts}$, $h_\mathrm{ver}$, $\alpha_\mathrm{sco} = \alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \}$, $b_\mathrm{ver}$, \\
+            $r_\mathrm{v}$, $s_\mathrm{v}$, $V$
+            };
+        \node[internal_3, below=of ev] (ev_ik) {
+            internal knowledge: $x_\mathcal{X}$, $Y_i$, $Y_\mathcal{D}$,  \\
+            $\alpha_\mathrm{ver}$, $b_\mathrm{vts}$, $c_\mathrm{v}$, $c_\mathrm{d}$, $Y_\mathrm{enc}$, $e = (R, C)$
+            };
+        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, $Y_\mathcal{X}$, \\
+            $\alpha_\mathrm{sco} = \alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \}$, $\rho_\mathrm{sco}$, $b_\mathrm{vts}$, \\
+            $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$, $r_\mathrm{d}$, $s_\mathrm{d}$
+            };
+        
+        % All content
+        \node[below=of v_ik] (top){};
+        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (top.south -| dbb.center) (a_1) {
+            \phantom{$b_\mathrm{vco} = (\mathcal{V}_i)$} \\
+            \phantom{$b_\mathrm{sco} = (\mathcal{D})$, $\rho_\mathrm{sco}$}
+            };
+        \node[align=center, font=\small, anchor=north west] at (top.south -| ev.center) (a_1_content) {
+            $b_\mathrm{vco} = (m_\mathrm{vco}, d_\mathrm{vco}, \mathcal{V}_i, \sigma_\mathrm{vco}, t_\mathrm{vco}, h_\mathrm{ver}, h_\mathrm{vco})$, \\
+            $b_\mathrm{sco} = (m_\mathrm{sco}, d_\mathrm{sco}, \mathcal{D}, \sigma_\mathrm{sco}, t_\mathrm{sco}, h_\mathrm{vco}, h_\mathrm{sco})$, $\rho_\mathrm{sco}$
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_1.south -| ev.center) (ev_1) {
+            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \})$ \\
+            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{sco}; \sigma_\mathrm{vco} || h_\mathrm{sco})$ then: \\ [4pt]
+            $k_\mathrm{v} \gets \mathsf{DHKDF}(x_\mathcal{X}, Y_i)$, $(r_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{TxtDec}(d_\mathrm{vco}, k_\mathrm{v})$ \\
+            $k_\mathrm{d} \gets \mathsf{DHKDF}(x_\mathcal{X}, Y_\mathcal{D})$, $(r_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{TxtDec}(d_\mathrm{sco}, k_\mathrm{d})$ \\ [4pt]
+            verify that $\mathsf{ComVer}(c_\mathrm{v}, r_\mathrm{v}, s_\mathrm{v})$
+            and $\mathsf{ComVer}(c_\mathrm{d}, r_\mathrm{d}, s_\mathrm{d})$ then: \\ [4pt]
+            $r' \gets r_\mathrm{v} + r_\mathrm{d}$, $e' \gets (Y_\mathrm{enc}, C)$, $V' \gets \mathsf{Dec}(r', e')$
+            };
+        \node[new_arrow, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_2) {
+            $V'$
+            };
+        \node[process_3, keep_middle, after_arrow] at (a_2.south -| v.center) (v_1) {
+            verify that $V = V'$
+            };
+        \node[below=of v_1] (bottom){};
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (v_ik.south west)--(dbb_ik.south east);
+        
+        \draw[dotted] (top.north -| v.center)--(v_1.north -| v.center);
+        \draw[dotted] (v_1.south -| v.center)--(bottom.south -| v.center);
+        
+        \draw[dotted] (top.north -| ev.center)--(ev_1.north -| ev.center);
+        \draw[dotted] (ev_1.south -| ev.center)--(a_2.south -| ev.center);
+        
+        \draw[dotted] (top.north -| dbb.center)--(bottom.south -| dbb.center);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for challenging a vote cryptogram (part 2b)}
+    \label{fig: protocol for challenging a vote cryptogram part 2b}
+\end{figure}
+\clearpage
+\end{landscape}
+
+
+\clearpage
+\subsubsection{Vote Confirmation Receipt} \label{sec: vote confirmation receipt}
+Once the vote cryptogram $e_i$ has been registered, the \textit{Voter} $\mathcal{V}_i$ receives back from the \textit{Digital Ballot Box} $\mathcal{D}$ a confirmation receipt in form of a Schnorr signature (\Cref{alg: sign}) \( \rho_i = \mathbf{Sign}_{x_\mathrm{sign}} (\sigma_i || h_{\mathrm{b},i}) \), together with the new board hash value $h_{\mathrm{b},i}$, the previous board hash value $h_{\mathrm{b},i-1}$ and the registration time stamp $t_{\mathrm{r},i}$. Recall from \Cref{sec: pre-election phase} that $x_\mathrm{sign}$ is the \textit{Digital Ballot Box} $\mathcal{D}$'s signing key.
+
+The receipt certifies that the vote cryptogram has been registered on the bulletin board at exactly version $h_{\mathrm{b},i}$. The \textit{Voter} $\mathcal{V}_i$ can use this receipt to verify, at any time, that her vote is included on the board, and that the history of the board has not changed by validating the hash value. 
+
+If the previous board hash value $h_{\mathrm{b},i-1}$ does not match with the acknowledged hash $h_{\mathrm{a},i}$, that means a "race" situation (described in the previous section) has happened and the current \textit{Voter} $\mathcal{V}_i$ has lost the race, i.e. while the current \textit{Voter} $\mathcal{V}_i$ was preparing her vote submission, another \textit{Voter} $\mathcal{V}_i$ has successfully managed to post another vote submission. This is a perfectly valid scenario that can occur in busy situations.
+
+Note that, if a \textit{Voter} $\mathcal{V}_i$ has a confirmation receipt that does not correspond with the current state of the bulletin board, that immediately reveals an attempt to break the integrity of the bulletin board and should be reported to the election authorities.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (v) {
+            \textbf{Voter} $\mathcal{V}_i$};
+        \node[title, right=of v] (dbb) {
+            \textbf{Digital Ballot Box} $\mathcal{D}$};
+        
+        % internal knowledge
+        \node[block, below=of v] (v1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_i$, $Y_\mathcal{D}$, $p$ */
+            };
+        \node[block, below=of dbb] (dbb1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x_\mathcal{D}$, $\boldsymbol{Y} = \{Y_1, ..., Y_{n_\mathrm{v}}\}$, \\
+            \phantom{/}* $\boldsymbol{h} = \{h_1, ... h_{n_\mathrm{b}}\}$ */
+            };
+        \node[block, anchor=south west] at (dbb1.south -| v1.west) (v1-corner) {};
+        
+        %All content
+        \node[block, below=of v1-corner.south west, anchor=north west] (v2) {
+            $m \gets$ "cast" \\
+            $\sigma_i \gets \mathsf{Sign}(x_i; m || p)$
+            };
+        \node[arrow, below=of v2.south, anchor=north west] (a1) {
+            $i$, $\sigma_i$, $m$, $p$
+            };
+        \node[block, anchor=north west] at (a1.south -| dbb1.west) (dbb2) {
+            verify that $m$ and $p$ are compatible \\
+            and $\mathsf{SigVer} (Y_i, \sigma_i; m || p)$ then: \\ [9pt]
+            $t_{n_\mathrm{b}+1} \gets$ current timestamp \\
+            $h_{n_\mathrm{b}+1} \gets \mathcal{H}(m || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\ [9pt]
+            /* store on the Bulletin Board as a \\
+            \phantom{/}* new item the tuple: \\
+            \phantom{/}* $(m, \perp, \mathcal{V}_i, \sigma_i, t_{n_\mathrm{b}+1}, p, h_{n_\mathrm{b}+1})$ */ \\ [9pt]
+            $\rho \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_i || h_{n_\mathrm{b}+1})$
+            };
+        \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
+            $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$
+            };
+        \node[block, anchor=north west] at (a2.south -| w2.west) (v3) {
+            verify that \\
+            $h_{n_\mathrm{b}+1} = \mathcal{H}(m || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\
+            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma_i || h_{n_\mathrm{b}+1})$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (v1-corner.south west)--(dbb1.south east);
+        \draw[->] (a1.south west)--(a1.south east);
+        \draw[->] (a2.south east)--(a2.south west);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for casting a submitted ballot}
+    \label{fig: protocol for casting a submitted ballot}
+\end{figure}

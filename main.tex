@@ -1,0 +1,79 @@
+\documentclass{article}
+\input{Setup/Packages}
+\input{Setup/Settings}
+
+\title{AVX}
+\author{Assembly Voting}
+\date{2022}
+
+\begin{document}
+
+\maketitle
+%\thispagestyle{fancy}
+\thispagestyle{empty}
+
+\input{Frontmatter/Frontpage}
+\newpage
+\pagenumbering{roman}
+\input{Frontmatter/Abstract}
+\newpage
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\input{Chapters/1 Introduction}
+\input{Chapters/1.1 State of solution}
+\input{Chapters/1.2 Intended audience}
+\input{Chapters/1.3 Protocol scope and objectives}
+\input{Chapters/1.4 Document outline}
+\clearpage
+\input{Chapters/2 Solution entities}
+\input{Chapters/2.1 Election roles}
+\input{Chapters/2.2 Communication channels}
+\input{Chapters/2.3 Public bulletin board}
+\input{Chapters/2.4 Voter registration modes}
+\input{Chapters/2.5 Requirements}
+\clearpage
+\input{Chapters/3 Election protocol}
+\input{Chapters/3.1 Overview}
+\input{Chapters/3.2 Pre-election phase}
+\input{Chapters/3.3 Election phase}
+\input{Chapters/3.4 Post-election phase}
+\input{Chapters/3.5 Election properties}
+\clearpage
+\input{Chapters/4 Auditing process}
+\input{Chapters/4.1 Individual verification mechanisms}
+\input{Chapters/4.2 Public auditing process}
+\input{Chapters/4.3 Private auditing process}
+\clearpage
+\input{Chapters/5 Threat model}
+% \input{Chapters/5.1 Trust, actors and channels}
+% \input{Chapters/5.2 Trust-dependent assumptions}
+% \input{Chapters/5.3 Threat types}
+% \input{Chapters/5.4 Threat and risk analysis}
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+\addcontentsline{toc}{section}{References}
+%\printbibliography[heading=bibintoc,title={References}]
+
+\appendix
+\clearpage
+\input{Backmatter/A Theoretical backgroud}
+\input{Backmatter/A.1 Mathematics}
+\input{Backmatter/A.2 Elliptic curve}
+\input{Backmatter/A.3 Zero knowledge proofs}
+\input{Backmatter/A.4 Hash functions}
+\input{Backmatter/A.5 Elgamal cryptosystem}
+\input{Backmatter/A.6 Schnorr digital signatures}
+\input{Backmatter/A.7 Pedersen commitment scheme}
+\input{Backmatter/A.8 Groth's argument of shuffle}
+\clearpage
+\input{Backmatter/B Extra features}
+\input{Backmatter/B.1 Affidavit document extension}
+\input{Backmatter/B.2 Continuous result extraction}
+\clearpage
+\end{document}

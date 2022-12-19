@@ -1,0 +1,360 @@
+\subsection{Elgamal cryptosystem} \label{app: elgamal cryptosystem}
+The \textit{Elgamal cryptosystem} is an asymmetric, randomized encryption scheme, where anybody can encrypt a message using the encryption key resulting in a \textit{cryptogram}, while only the one in possession of the decryption key can extract the message of a cryptogram. The scheme consists of a triple (\textsf{KeyGen}, \textsf{Enc}, \textsf{Dec}) of algorithms that work on the elliptic curve described in \Cref{app: elliptic curve discrete logarithm problem}. The scheme is considered secure under the \textit{discrete logarithm assumption}.
+
+An Elgamal key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\Cref{alg: key gen}), where $x$ is a randomly chosen scalar representing the private decryption key and $Y$ is an elliptic curve point corresponding to the public encryption key.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{KeyGen}()$}
+    
+    $x \in_\mathrm{R} \mathbb{Z}_q$ \;
+    $Y \gets [x]G$ \;
+    \Return{$(x, Y)$} \tcp*{$(x, Y) \in \mathbb{Z}_q \times \mathbb{P}$}
+    
+    \label{alg: key gen}
+\end{algorithm}
+
+The encryption algorithm $e = (R, C) \gets \mathsf{Enc} (Y, M; r)$ (\Cref{alg: enc}) can be used by anybody in possession of the public encryption key $Y$ to generate a cryptogram on a message $M$, using the randomnizer $r$. The cryptogram $e$ can be decrypted back to the original message $M$, only by the one in possession of the private decryption key $x$ in the decryption algorithm $M \gets \mathsf{Dec} (x, e)$ (\Cref{alg: dec}). Note that both $\mathsf{Enc}$ and $\mathsf{Dec}$ work on messages that are formatted as elliptic curve points $M \in \mathbb{P}$.
+
+For convenience of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P}$ as the set of all possible cryptograms.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{Enc} (Y, M; r)$}
+    \KwData{The encryption key $Y \in \mathbb{P}$}
+    \myinput{The message $M \in \mathbb{P}$}
+    \myinput{The randomizer $r \in \mathbb{Z}_q$}
+    
+    $R \gets [r]G$ \;
+    $S \gets [r]Y$ \;
+    $C \gets S + M$ \;
+    $e \gets (R, C)$ \;
+    \Return{$e$} \tcp*{$e \in \mathbb{E}$}
+    
+    \label{alg: enc}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{Dec} (x, e)$}
+    \KwData{The decryption key $x \in \mathbb{Z}_q$}
+    \myinput{The cryptogram $e = (R, C) \in \mathbb{E}$}
+    
+    $S \gets [x]R$ \;
+    $M \gets C - S$ \;
+    \Return{$M$} \tcp*{$M \in \mathbb{P}$}
+    
+    \label{alg: dec}
+\end{algorithm}
+
+
+\subsubsection{Encryption of arbitrary data}
+A special encryption scheme ($\mathsf{KeyGen}$, $\mathsf{TxtEnc}$, $\mathsf{TxtDec}$) exists in case the message to be encrypted is not an elliptic curve point but instead, an arbitrary length message $m \in \mathbb{B}^*$ e.g. a text message. The strategy is to transform the encryption-decryption key pair into a symmetric encryption key using a \textit{key encapsulation method} based on \textit{Diffie Hellman Key Exchange}. Then, the symmetric key is used to encrypt the message $m$ using standard \textit{AES encryption} algorithms \cite{NIST01}. For decryption, the same symmetric key is derived and then used to decrypt message $m$ using standard \textit{AES} algorithms.
+
+We describe the \textit{AES standard algorithms} as the encryption algorithm $c \gets \mathsf{AESEnc} (k, m)$ and the decryption algorithm $m \gets \mathsf{AESDec} (k, c)$, where $c \in \mathbb{B}^*$ is the ciphertext of message $m \in \mathbb{B}^*$ encrypted with the symmetric key $k \in \mathbb{B}^{128 \text{ or } 256 \text{ or } 512 \text{ or ...}}$ that can have various size in length.
+
+An encryption key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\Cref{alg: key gen}), where $x$ is a random private decryption key and $Y$ is an elliptic curve point used as the public encryption key.
+
+To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encryption key $Y$ can run the algorithm $e = (R, c) \gets \mathsf{TxtEnc} (Y, m)$ (\Cref{alg: txt enc}). The original message $m$ can be decrypted back only by the one in possession of the private decryption key $x$ by running the decryption algorithm $m \gets \mathsf{TxtDec} (x, e)$ (\Cref{alg: txt dec}).
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{TxtEnc} (Y, m)$}
+    \KwData{The encryption key $Y \in \mathbb{P}$}
+    \myinput{The message $m \in \mathbb{B}^*$}
+    
+    $(r, R) \gets \mathsf{KeyGen}()$ \tcp*{\Cref{alg: key gen}}
+    $S \gets [r]Y$ \;
+    $k \gets \mathcal{H} (S || R)$ \;
+    $c \gets \mathsf{AESEnc} (k, m)$ \;
+    $e \gets (R, c)$ \;
+    \Return{$e$} \tcp*{$e \in \mathbb{P} \times \mathbb{B}^*$}
+    
+    \label{alg: txt enc}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{TxtDec} (x, e)$}
+    \KwData{The decryption key $x \in \mathbb{Z}_q$}
+    \myinput{The encryption $e = (R, c) \in \mathbb{P} \times \mathbb{B}^*$}
+    
+    $S \gets [x]R$ \;
+    $k \gets \mathcal{H} (S || R)$ \;
+    $m \gets \mathsf{AESDec} (k, c)$ \;
+    \Return{$m$} \tcp*{$m \in \mathbb{B}^*$}
+    
+    \label{alg: txt dec}
+\end{algorithm}
+
+
+\subsubsection{Homomorphic Encryption}
+Elgamal encryption based on elliptic curve cryptographic primitive is a \textit{homomorphic} encryption scheme with respect to point addition. That means, component wise addition of two cryptograms would result in a new, valid cryptogram that contains the two messages added together.
+\[
+\mathsf{Enc}(Y, M_1; r_1) + \mathsf{Enc}(Y, M_2; r_2) = \mathsf{Enc}(Y, M_1 + M_2; r_1 + r_2)
+\]
+
+The resulting encryption of the homomorphic addition of two cryptograms is $e' = (R', C') \gets \mathsf{HomAdd} (e_1; e_2)$ (\Cref{alg: hom add}).
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{HomAdd}(e_1; e_2)$}
+    \KwData{The first cryptogram $e_1 = (R_1, C_1) \in \mathbb{E}$}
+    \myinput{The second cryptogram $e_2 = (R_2, C_2) \in \mathbb{E}$}
+    
+    $R' \gets R_1 + R_2$ \;
+    $C' \gets C_1 + C_2$ \;
+    $e' \gets (R', C')$\;
+    \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
+    
+    \label{alg: hom add}
+\end{algorithm}
+
+Following the procedure above, we can \textit{re-encrypt} a given cryptogram $e = (R, C) \gets \mathsf{Enc}(Y, M; r)$ by homomorphically adding it to an \textit{empty cryptogram} (an encryption of the neutral point $\mathcal{O}$) with randomizer $r' \in_\mathrm{R} \mathbb{Z}_q$. The result is a new, randomly different cryptogram that contains the same message $M$. The process of generating the new cryptogram $e' = (R', C') \gets \mathsf{ReEnc} (Y, e; r')$ is described in \Cref{alg: re enc}.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{ReEnc} (Y, e; r')$}
+    \KwData{The encryption key $Y \in \mathbb{P}$}
+    \myinput{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
+    \myinput{The new randomizer $r' \in \mathbb{Z}_q$}
+    
+    $e_2 \gets \mathsf{Enc}(Y, \mathcal{O}; r')$ \tcp*{\Cref{alg: enc}}
+    $e' \gets \mathsf{HomAdd} (e, e_2)$ \tcp*{\Cref{alg: hom add}}
+    \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
+    
+    \label{alg: re enc}
+\end{algorithm}
+
+Usually, a re-encrypted cryptogram comes with a re-encryption proof to assure that the content of the cryptogram has not been changed. The proof is a non-interactive discrete logarithm equality proof (described in \Cref{app: discrete logarithm proofs}) $PK = (K, c, r) \gets \mathsf{DLProve} (r', \{G, Y\})$, while the proof verification algorithm is $\mathsf{DLVer} (PK, \{G, Y\}; \{R'-R, C'-C\})$.
+
+Naturally, addition can be expanded to multiplication to achieve the fact that:
+\[
+\mathsf{Enc}(Y, M; r) + \mathsf{Enc}(Y, M; r) = 2 \cdot \mathsf{Enc}(Y, M; r) = \mathsf{Enc}(Y, [2]M; 2 \cdot r).
+\]
+The resulting encryption of the homomorphic multiplication of a cryptogram is $e' = (R', C') \gets \mathsf{HomMul}(e; n)$ (\Cref{alg: hom mul}).
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{HomMul} (e; n)$}
+    \KwData{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
+    \myinput{The multiplication factor $n \in \mathbb{Z}$}
+    
+    $R' \gets [n]R$ \;
+    $C' \gets [n]C$ \;
+    $e' \gets (R',C')$ \;
+    \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
+    
+    \label{alg: hom mul}
+\end{algorithm}
+
+
+\subsubsection{Elgamal Threshold Cryptosystem} \label{app: elgamal threshold cryptosystem}
+A $t$ out of $n$ threshold cryptosystem is a homomorphic encryption scheme where the decryption key is split among $n$ key holders, called \textit{trustees}. Anybody can encrypt a message using the encryption key. Decryption of a message happens during a process in which at least $t$ trustees have to collaborate in a cryptographic protocol. It is recommended that $t \geq 2/3 \cdot n$. The entire scheme is inspired from \cite{Pedersen91} which is based on mathematical principles of the threshold cryptosystem \cite{Desmedt89, Shamir79}.
+
+The key generation process will output the tuple $(sx_1, ..., sx_n, Y)$, where $Y$ is the public encryption key and each $sx_i$ is a private share of the decryption key, one for each of the $n$ trustees. The process is performed by all trustees, while being facilitated by a central entity called \textit{the server}. The entire process is described by the protocol called \textit{the threshold ceremony} illustrated in \Cref{fig: threshold ceremony}.
+
+During the \textit{threshold ceremony}, all trustees generate a private-public key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ and publish to the server their public keys. The public encryption key is computed by the sum of the public keys of all trustees \( Y = \sum_{i=1}^n Y_i \), while nobody being in the possession of the decryption key \( x = \sum_{i=1}^n x_i \), because all $x_i$ are secret. Instead, all trustees work together to distribute $x$ such that any $t$ trustees can find it when necessary. 
+
+Each trustee $\mathcal{T}_i$ generates a polynomial function of degree $t-1$
+\[
+f_i(z) = x_i + p_{i,1} \cdot z + ... + p_{i,t-1} \cdot z^{t-1}
+\]
+and publishes to the server the points $(P_{i,1}, ..., P_{i,t-1})$, where $(p_{i, k}, P_{i,k}) \gets \mathsf{KeyGen}()$ is called a private-public coefficient pair, with $k \in \{1, ..., t-1\}$.
+
+When all trustees have published their public coefficients, each trustee computes a \textit{partial secret share of the decryption key} for each of the other trustees by $s_{i,j} \gets f_i(j)$, and encrypts them with that specific trustee's public key $c_{i,j} \gets \mathsf{TxtEnc}(Y_j, s_{i,j})$. Finally, all trustees publish to the server all encrypted \textit{partial secret shares of the decryption key}.
+
+By encrypting the partial secret shares with different trustee's public key, we make sure that only that specific trustee can read his \textit{partial secret shares of the decryption key}. This procedure is a small deviation from \cite{Pedersen91}, which we introduced in order to simulate a secret communication channel between each two trustees.
+
+Finally, each trustee $\mathcal{T}_i$ downloads from the server their encrypted \textit{partial secret shares} $c_{j,i}$, with $j \in \{1, ..., n\}$, decrypts them $s_{j,i} \gets \mathsf{TxtDec}(x_i, c_{j,i})$ and validates that they are consistent with the polynomial coefficients of the other trustees $[s_{j,i}]G = Y_j + \sum_{k=1}^{t-1} [i^k] P_{j,k}$. If all \textit{partial secret shares} validate, then trustee $\mathcal{T}_i$ computes his \textit{secret share of the decryption key} by $sx_i \gets \sum_{j=1}^n s_{j,i}$ and stores it privately until needed.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            spaced/.style={yshift=-6},
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (t) {
+            \textbf{Trustee $\mathcal{T}_i$}};
+        \node[title, right=of p] (s) {
+            \textbf{Server}};
+        
+        %All content
+        \node[block, below=of s.south west, anchor=north west] (s1) {
+            $\boldsymbol{Y} \gets \{\}$, $\boldsymbol{P} \gets \{\}$, $\boldsymbol{c} \gets \{\}$
+            };
+        \node[arrow, anchor=north west] at (s1.south -| t.south) (a1) {
+            invites trustee
+            };
+        \node[block, anchor=north west] at (a1.south -| t.west) (t1) {
+            $(x_i, Y_i) \gets \mathsf{KeyGen}()$
+            };
+        \node[arrow, below=of t1.south, anchor=north west] (a2) {
+            $Y_i$
+            };
+        \node[block, anchor=north west] at (a2.south -| s1.west) (s2) {
+            $\boldsymbol{Y} \gets \boldsymbol{Y} \cup \{Y_i\}$
+            };
+        \node[banner, spaced, anchor=north west] at (s2.south -| t1.west) (b1) {
+            \scriptsize when all $\mathcal{T}_i$ have published $Y_i$
+            };
+        \node[block, spaced, anchor=north west] at (b1.south -| s2.west) (s3) {
+            set $t \in [\frac{2}{3}n, ..., n]$
+            };
+        \node[arrow, anchor=north west] at (s3.south -| t1.south) (a3) {
+            $t$, $\boldsymbol{Y} = \{Y_1, ..., Y_n\}$
+            };
+        \node[block, text width=195, anchor=north west] at (a3.south -| t1.west) (t2) {
+            $(p_{i, k}, P_{i, k}) \gets \mathsf{KeyGen}()$, with $k \in \{1, ..., t-1\}$ \\
+            $f_i(a) = x_i + \sum\limits_{k=1}^{t-1} p_{i, k} \cdot a^k \pmod q$ \\
+            $s_{i, j} \gets f_i(j)$, with $j \in \{1, ..., n\}$ \\
+            $c_{i, j} \gets \mathsf{TxtEnc} (Y_j, s_{i, j})$
+            };
+        \node[arrow, anchor=north west] at (t.south |- t2.south) (a4) {
+            $P_{i, k}$, $c_{i, j}$
+            };
+        \node[block, text width=162, anchor=north east] at (a4.south -| s3.east) (s4) {
+            $\boldsymbol{P} \gets \boldsymbol{P} \cup \{P_{i, k}\}$, with $k \in \{1, ..., t-1\}$ \\
+            $\boldsymbol{c} \gets \boldsymbol{c} \cup \{c_{i, j}\}$, with $j \in \{1, ..., n\}$
+            };
+        \node[banner, spaced, anchor=north west] at (s4.south -| t2.west) (b2) {
+            \scriptsize when all $\mathcal{T}_i$ have published $P_{i, k}$ and $c_{i, j}$
+            };
+        \node[arrow, spaced, anchor=north west] at (b2.south -| t.south) (a5) {
+            $\boldsymbol{P} = \{P_{1, 1}, ..., P_{n, t-1}\}$, $\{c_{1, i}, ..., c_{n, i}\}$
+            };
+        \node[block, text width=188, anchor=north west] at (a5.south -| t2.west) (t3) {
+            $s_{j, i} \gets \mathsf{TxtDec} (x_i, c_{j, i})$, with $j \in \{1, ..., n\}$ \\ [9pt]
+            verify that \\
+            $[s_{j,i}]G = Y_j + \sum\limits_{k=1}^{t-1} [i^k]P_{j, k}$ \\
+            then: \\ [9pt]
+            $sx_i \gets \sum\limits_{j=1}^{n} s_{j, i} \pmod q$
+            };
+        \node[arrow, anchor=north west] at (t.south |- t3.south) (a6) {
+            validates
+            };
+        \node[banner, spaced, anchor=north west] at (a6.south -| t3.west) (b3) {
+            \scriptsize when all $\mathcal{T}_i$ have validated
+            };
+        \node[block, spaced, anchor=north west] at (b3.south -| s.west) (s5) {
+            $Y \gets \sum\limits_{i=1}^{n} Y_i$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (t.south west)--(s.south east);
+        \draw[dotted] (b1.north west)--(b1.north east);
+        \draw[dotted] (b1.south west)--(b1.south east);
+        \draw[dotted] (b2.north west)--(b2.north east);
+        \draw[dotted] (b2.south west)--(b2.south east);
+        \draw[dotted] (b3.north west)--(b3.north east);
+        \draw[dotted] (b3.south west)--(b3.south east);
+        \draw[->] (a1.south east)--(a1.south west);
+        \draw[->] (a2.south west)--(a2.south east);
+        \draw[->] (a3.south east)--(a3.south west);
+        \draw[->] (a4.south west)--(a4.south east);
+        \draw[->] (a5.south east)--(a5.south west);
+        \draw[->] (a6.south west)--(a6.south east);
+        }
+    \end{tikzpicture}
+    \caption{Threshold ceremony}
+    \label{fig: threshold ceremony}
+\end{figure}
+
+At the end of the \textit{threshold ceremony}, for each trustee $\mathcal{T}_i$, with $i \in \{1, ..., n\}$, the \textit{public share of the decryption key} ($sY_i = [sx_i]G$) is publicly computable by the following:
+\[
+sY_i \gets \sum\limits_{j=1}^{n} (Y_j + \sum\limits_{k=1}^{t-1} [i^k]P_{j, k}).
+\]
+
+The encryption algorithm of the threshold cryptosystem is identical to the algorithm described in \Cref{app: elgamal cryptosystem}:
+\[
+e = (R, C) \gets \mathsf{Enc}(Y, M; r).
+\]
+
+The decryption protocol of the threshold cryptosystem is inspired from paper \cite{Desmedt89}. At least $t$ trustees are needed to collaborate in the protocol described in \Cref{fig: threshold decryption} in order to extract the message $M$ of a cryptogram $e = (R, C)$. We define $\tau \subset \{1, ..., n\}$ to be the subset of trustees that do participate in the decryption protocol, with $|\tau| \geq t$. 
+
+Each trustee $\mathcal{T}_i$, with $i \in \tau$, computes a partial decryption $S_i \gets [sx_i]R$ and sends it to the server, where $sx_i$ is trustee's share of the decryption key. The trustee also publishes a proof of correct decryption in form of a non-interactive discrete logarithm zero knowledge proof $PK \gets \mathsf{DLProve} (sx_i, \{G, R\})$ (\Cref{alg: dl prove}).
+
+When receiving a partial decryption from a trustee $\mathcal{T}_i$, the server accepts it if the proof of correct decryption validates by $\mathsf{DLVer} (PK, \{G, R\}, \{sY_i, S_i\})$ (\Cref{alg: dl ver}), where $sY_i$ is trustee's \textit{public share of the decryption key}.
+
+After it received valid, partial decryptions from all trustees $\mathcal{T}_i$, with $i \in \tau$, the server aggregates all partial decryptions together to finalize the decryption and to output the message $M$. The aggregation process from \cite{Desmedt89} is described as follows:
+
+Basically, $M = C - [x]R$, where $x$ is the main decryption key that nobody has. A possible way of computing $[x]R$ is by calculating the \textit{Lagrange Interpolation Polynomial} where each term is a partial decryption $S_i$ received from a trustee $\mathcal{T}_i$ that needs to be multiplied by the \textit{Lagrange Interpolation Polynomial coefficient} which is $\lambda(i) = \prod_{j \in \tau, j \neq i} \frac{-j}{i-j} \pmod q$. Formally,
+\[
+M \gets C - \sum_{i \in \tau} [\lambda(i)]S_i\text{, with } |\tau| \geq t .
+\]
+
+Note that the \textit{Lagrange Interpolation Polynomial} can be computed only when the number of terms is at least the degree of the polynomial, i.e $|\tau| \geq t$.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            spaced/.style={yshift=-6},
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (t) {
+            \textbf{Trustee $\mathcal{T}_i$}};
+        \node[title, right=of p] (s) {
+            \textbf{Server}};
+            
+        % internal knowledge
+        \node[block, below=of t] (t1) {
+            /* internal knowledge: \\
+            \phantom{/}* $sx_i$ */
+            };
+        \node[block, below=of s] (s1) {
+            /* internal knowledge: \\
+            \phantom{/}* $e = (R, C)$, $\{sY_1, ..., sY_n\}$ */
+            };
+        
+        %All content
+        \node[block, below=of s1] (s2) {
+            $\tau \gets \{\}$
+            };
+        \node[arrow, anchor=north west] at (s2.south -| t1.south) (a1) {
+            $e = (R, C)$
+            };
+        \node[block, anchor=north west] at (a1.south -| t1.west) (t2) {
+            $S_i \gets [sx_i]R$ \\
+            $PK \gets \mathsf{DLProve} (sx_i, \{G, R\})$
+            };
+        \node[arrow, below=of t2.south, anchor=north west] (a2) {
+            $S_i$, $PK$
+            };
+        \node[block, anchor=north west] at (a2.south -| s1.west) (s3) {
+            verify that \\
+            $\mathsf{DLVer} (PK, \{G, R\}, \{sY_i, S_i\})$ \\
+            then: \\ [9pt]
+            $\tau \gets \tau \cup \{i\}$
+            };
+        \node[banner, spaced, anchor=north west] at (s3.south -| t2.west) (b1) {
+            \scriptsize when enough $\mathcal{T}_i$ have published $S_i$, i.e. $|\tau| \geq t$
+            };
+        \node[block, text width=168, spaced, anchor=north east] at (b1.south -| s3.east) (s4) {
+            $\lambda(i) \gets \prod\limits_{j \in \tau, j \neq i} \frac{-j}{i-j} \pmod q$, with $i \in \tau$ \\
+            $M \gets C - \sum_{i \in \tau} [\lambda(i)]S_i$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (t.south west)--(s.south east);
+        \draw[dashed] (t1.south west)--(s1.south east);
+        \draw[dotted] (b1.north west)--(b1.north east);
+        \draw[dotted] (b1.south west)--(b1.south east);
+        \draw[->] (a1.south east)--(a1.south west);
+        \draw[->] (a2.south west)--(a2.south east);
+        }
+    \end{tikzpicture}
+    \caption{Threshold decryption}
+    \label{fig: threshold decryption}
+\end{figure}
+
+
+\subsubsection{Proving the Content of a Cryptogram} \label{app: proving the content of a cryptogram}
+Once a cryptogram is generated $e = (R, C) \gets \mathsf{Enc} (Y, M; r)$, only the \textit{sender} (the one who generated the cryptogram) and the \textit{receiver} (the one in possession of the decryption key $x$) know the value of the message $M$. Both of them have the possibility to prove to somebody else (or publicly prove) the content of the cryptogram.
+
+The one who generated the cryptogram can prove to a verifier that the cryptogram $e$ contains message $M$ by engaging in the protocol from \Cref{fig: protocol for proving multiple discrete logarithms} in order to prove the knowledge of the randomizer $PK[(r): R = [r]G \wedge (C - M) = [r]Y]$. To generate a publicly verifiable proof, the \textit{sender} can generate a non-interactive proof $PK \gets \mathsf{DLProve} (r, \{G, Y\})$ (\Cref{alg: dl prove}). Any public verifier is convinced that cryptogram $e$ contains message $M$ if the verification algorithm succeeds $\mathsf{DLVer} (PK, \{G, Y\}; \{R, C - M\})$ (\Cref{alg: dl ver}).
+
+At the same time, the one in possession of the decryption key $x$ can prove the content of the cryptogram $e$ to a verifier by engaging in the same protocol from \Cref{fig: protocol for proving multiple discrete logarithms} but this time for proving the knowledge of the decryption key $PK[(x): Y = [x]G \wedge (C - M) = [x]R]$. To generate a publicly verifiable proof, the \textit{receiver} of the cryptogram can generate a non-interactive proof $PK \gets \mathsf{DLProve} (x, \{G, R\})$ (\Cref{alg: dl prove}). Any public verifier is convinced that cryptogram $e$ contains message $M$ if the verification algorithm succeeds $\mathsf{DLVer} (PK, \{G, R\}; \{Y, C - M\})$ (\Cref{alg: dl ver}).

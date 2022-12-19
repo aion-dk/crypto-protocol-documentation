@@ -1,0 +1,125 @@
+\clearpage
+\subsection{Zero Knowledge Proofs}
+A \textit{zero knowledge proof} (ZKP) is an algorithm by which one party (the \textit{prover}) can prove to another party (the \textit{verifier}) that she knows a secret value $x$, without disclosing any information about $x$. A ZKP can be \textit{interactive}, where the prover and the verifier have to collaborate in a protocol for the verifier to get convinced of the proof. A ZKP can also be \textit{non-interactive}. In this case, the prover alone generates a proof that is publicly verifiable, thus convincing any public verifier of its statement. 
+
+There exists two algorithms \textsf{Prove} for generating a proof and \textsf{Ver} for verifying whether a proof validates. A classic proof has a structure of a triple (commitment, challenge and response). In an interactive zero knowledge protocol, a prover commits to a value, the verifier independently and randomly generates a challenge, the prover computes a response based on the challenge received and the verifier checks that the proof validates. The proof can be turned into a non-interactive one, using the \textit{Fiat-Shamir heuristic} as described in \cite{Fiat87}. The prover computes alone the challenge, in a deterministic manner, based on the commitment, using a hash function.
+
+
+\subsubsection{Discrete Logarithm Proofs} \label{app: discrete logarithm proofs}
+A simple kind of ZKP is the \textit{discrete logarithm proof} that proves knowledge of value $x$, such that $Y = [x]G$, formally 
+\[ PK[(x) : Y = [x]G]. \]
+The most intuitive application of this could be to prove the possession of the private key associated with a public key.
+
+A bit more complex ZKP is the \textit{discrete logarithm equality proof} that proves that two different elliptic curve points $Y, P \in \mathbb{P}$ have the same elliptic curve discrete logarithm $x \in \mathbb{Z}_q$ in regards to two distinct generators $G, H \in \mathbb{P}$.
+\[ PK[(x) : Y = [x]G \wedge P = [x]H]. \]
+
+An optimization in proving the discrete logarithm equality between multiple points in regards to their generators has been described in \cite{Chow10}. Using the optimized algorithm for proving that
+\[ PK[(x) : \bigwedge_{i=0}^{n} Y_i = [x]G_i] \]
+we generate the proof $PK = (K, c, r)$ by following the protocol described in \cref{fig: protocol for proving multiple discrete logarithms}. The optimization consists in the fact that the commitment $K$ is just one point regardless of the value of $n$.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (p) {
+            \textbf{Prover}};
+        \node[title, right=of p] (v) {
+            \textbf{Verifier}};
+        
+        % internal knowledge
+        \node[block, below=of p] (p1) {
+            /* internal knowledge: \\
+            \phantom{/}* $x$, $\boldsymbol{G} = \{G_0, ..., G_n\}$, \\
+            \phantom{/}* $\boldsymbol{Y} = \{Y_0, ..., Y_n\}$ */
+            };
+        \node[block, below=of v] (v1) {
+            /* internal knowledge: \\
+            \phantom{/}* $\boldsymbol{G} = \{G_0, ..., G_n\}$, \\
+            \phantom{/}* $\boldsymbol{Y} = \{Y_0, ..., Y_n\}$ */
+            };
+        
+        %All content
+        \node[block, text width=180, below=of p1.south west, anchor=north west] (p2) {
+            $k \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $z_i \gets \mathcal{H} (i || Y_1 || ... || Y_n)$, with $i \in \{ 1, ..., n \}$ \\
+            $K \gets [k](G_0 + \sum\limits_{i=1}^n [z_i]G_i)$
+            };
+        \node[arrow, anchor=north west] at (p.south |- p2.south) (a1) {
+            $K$
+            };
+        \node[block, anchor=north west] at (a1.south -| v1.west) (v2) {
+            $c \in_\mathrm{R} \mathbb{Z}_q$ \\
+            };
+        \node[arrow, anchor=north west] at (a1.west |- v2.south) (a2) {
+            $c$
+            };
+        \node[block, anchor=north west] at (a2.south -| p2.west) (p3) {
+            $r \gets k + c \cdot x \pmod q$
+            };
+        \node[arrow, below=of p3.south, anchor=north west] (a3) {
+            $r$
+            };
+        \node[block, text width=178, anchor=north east] at (a3.south -| v2.east) (v3) {
+            $z_i = \mathcal{H} (i || Y_1 || ... || Y_n)$, with $i \in \{ 1, ..., n \}$ \\ [9pt]
+            verify that \\
+            $[r](G_0 + \sum\limits_{i=1}^n [z_i]G_i) = K + [c](Y_0 + \sum\limits_{i=1}^n [z_i]Y_i)$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (p.south west)--(v.south east);    
+        \draw[dashed] (p1.south west)--(v1.south east);
+        \draw[->] (a1.south west)--(a1.south east);
+        \draw[->] (a2.south east)--(a2.south west);
+        \draw[->] (a3.south west)--(a3.south east);
+        }
+    \end{tikzpicture}
+    \caption{Protocol for proving multiple discrete logarithms}
+    \label{fig: protocol for proving multiple discrete logarithms}
+\end{figure}
+
+The proof of multiple discrete logarithms can be turned into a non-interactive one by computing the challenge of the proof based on the commitment, using a hash function. The proof is generated by the algorithm $PK \gets \mathsf{DLProve}(x, \boldsymbol{G})$ (\Cref{alg: dl prove}), where $\boldsymbol{G} = \{G_0, ... G_n\}$ is the list of generators.
+
+A public verifier accepts the proof if the algorithm $\mathsf{DLVer}(PK, \boldsymbol{G}; \boldsymbol{Y})$ returns true, where $\boldsymbol{Y} = \{Y_0, ..., Y_n\}$. The verification algorithm is described in \Cref{alg: dl ver}.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{DLProve} (x, \boldsymbol{G})$}
+    \KwData{The private key $x \in \mathbb{Z}_q$}
+    \myinput{The list of generators $\boldsymbol{G} = \{G_0, G_1, ..., G_n\} \in \mathbb{P}^{n+1}$}
+    
+    $k \in_\mathrm{R} \mathbb{Z}_q$ \;
+    \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
+        $z_i \gets \mathcal{H} (i || Y_1 || ... || Y_n)$ \tcp*{$Y_j = [x]G_j$, $j \in \{ 1, ..., n \}$}
+    }
+    $K \gets [k](G_0 + \sum\limits_{i=1}^n [z_i]G_i)$ \;
+    $c \gets \mathcal{H}(G_0 || ... || G_n || K || Y_0 || ... || Y_n)$ \;
+    $r \gets k + c \cdot x \pmod q$ \;
+    $PK \gets (K, c, r)$ \;
+    \Return{$PK$} \tcp*{$PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
+    
+    \label{alg: dl prove}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{DLVer}(PK, \boldsymbol{G}; \boldsymbol{Y})$}
+    \KwData{The proof $PK = (K, c, r) \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
+    \myinput{The list of generators $\boldsymbol{G} = \{G_0, G_1, ..., G_n\} \in \mathbb{P}^{n+1}$}
+    \myinput{The list of public keys $\boldsymbol{Y} = \{Y_0, Y_1, ..., Y_n\} \in \mathbb{P}^{n+1}$}
+    
+    \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
+        $z_i \gets \mathcal{H} (i || Y_1 || ... || Y_n)$
+    }
+    \eIf{$c = \mathcal{H}(G_0 || ... || G_n || K || Y_0 || ... || Y_n)$ \\ 
+    \KwAnd $[r](G_0 + \sum\limits_{i=1}^n [z_i]G_i) = K + [c](Y_0 + \sum\limits_{i=1}^n [z_i]Y_i)$}{
+        $b \gets 1$ \tcp*{proof is valid}
+        }{
+        $b \gets 0$ \tcp*{proof is invalid}
+        }
+    \Return{$b$} \tcp*{$b \in \mathbb{B}$}
+    
+    \label{alg: dl ver}
+\end{algorithm}

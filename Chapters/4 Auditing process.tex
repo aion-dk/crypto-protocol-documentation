@@ -1,0 +1,26 @@
+\section{Auditing process} \label{sec: auditing process}
+This section describes the entire auditing process of an election, i.e. all the verification mechanisms, who conducts them and what cryptographic algorithms they are made of. These verification mechanisms can be split into three categories:
+\begin{itemize}
+    \item individually verifiable
+    \item publicly verifiable
+    \item private auditing process
+\end{itemize}
+
+Individual verification mechanisms are targeted to one single person and allows him to verify one single piece of information. This type of verification mechanism is used only when the piece of information in question is relevant only to that single individual, for example, a voter verifies that his voting application behaves correctly. 
+
+Public verification mechanisms are accessible to anybody. They are used to validate that the entire election process behaves correctly. This kind of mechanisms is typically run by certified auditors that will validate or invalidate an election result. Nevertheless, they could be run by any public person that has access to the right verification algorithms.
+
+The system provides verification mechanisms of the following aspects:
+\begin{itemize}
+    \item vote is cast as intended
+    \item vote is registered as cast
+    \item votes are counted as registered
+    \begin{itemize}
+        \item mixing procedure
+        \item decryption
+    \end{itemize}
+    \item eligibility of the registered votes
+    \item integrity of the bulletin board
+\end{itemize}
+
+Private auditing process are only accessible to the internal verification of AVX. This type of verification is only used during the voter registration mode 'On-demand' described in \Cref{sec: on-demand mode}. This process is used when the identification and authentication of a user has to be audited during post-election. The private auditing process is used when auditing each users' confirmation token, authentication token, and public key.
