@@ -21,11 +21,6 @@
 \multi@col@width=0pt
 
 \tikzset{
-    title/.style={
-        text width=160,
-        minimum height=20,
-        align=center
-    },
     block/.style={
         text width=160,
         align=left
@@ -55,19 +50,37 @@
     new_block_3/.style={align=left, font=\small},
     internal_3/.style={new_block_3, text width=173},
     process_3/.style={new_block_3, text width={}, draw, dotted, rounded corners},
-    keep_left/.style={anchor=north west},
-    keep_middle/.style={anchor=north},
-    keep_right/.style={anchor=north east},
-    first/.style={yshift=-4},
     new_arrow/.style={align=center, font=\small},
-    towards_right/.style={anchor=north west, append after command={
-                [->] (\tikzlastnode.south west)edge(\tikzlastnode.south east)[dashed]}
-    },
-    towards_left/.style={anchor=north east, append after command={
-                [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}
-    }
 }
 
+% internal node styles
+\tikzset{
+  block_font/.style = {font=\small},
+  half_size/.style = {text width=160}
+}
+
+% main types of nodes
+\tikzset{
+  title/.style = {half_size, minimum height=20, align=center},
+  internal/.style = {half_size, align=left},
+  process_v2/.style = {block_font, align=left, draw, dotted, rounded corners},
+  arrow_v2/.style = {block_font, align=center}
+}
+
+% other helpful node styles
+\tikzset{
+  first/.style={yshift=-4},
+  after_arrow/.style={yshift=-5},
+  keep_left/.style={anchor=north west},
+  keep_middle/.style={anchor=north},
+  keep_right/.style={anchor=north east},
+  towards_right/.style = {anchor=north west, append after command={
+    [->] (\tikzlastnode.south west)edge(\tikzlastnode.south east)[dashed]}},
+  towards_left/.style = {anchor=north east, append after command={
+    [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}}
+}
+
+% between function for dynamic width of nodes
 \tikzset{
     between/.style 2 args={
         insert path={

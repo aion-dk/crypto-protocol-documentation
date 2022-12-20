@@ -32,11 +32,12 @@ In order to write a new item on the bulletin board, a writer needs to follow the
 
 
 \subsubsection{Writing on the bulletin board} \label{sec: writing on the bulletin board}
-This section describes the protocol that any writer needs to follow in order to write an event on the bulletin board. The election protocol allows a predefined set of actors ($\mathcal{E}$, $\mathcal{V}_i$, $\mathcal{D}$ or $\mathcal{X}$) to write events on the bulletin board, but for the sake of generalization, \Cref{fig: protocol for writing an item on the bulletin board} presents the interaction between a generic writer $\mathcal{W}$ and the \textit{Digital Ballot Box} $\mathcal{D}$ necessary for publishing the $i$\textsuperscript{th} event on the bulletin board.
+This section describes the protocol that any writer needs to follow in order to write an event on the bulletin board. The election protocol allows a predefined set of actors ($\mathcal{E}$, $\mathcal{V}_i$, $\mathcal{D}$ or $\mathcal{X}$) to write events on the bulletin board, but for the sake of generalization, \Cref{fig: protocol for writing an item on the bulletin board} presents the interaction between a generic writer $\mathcal{W}$ and the \textit{Digital Ballot Box} $\mathcal{D}$ necessary for publishing the $i^{th}$ event on the bulletin board, that consists of: the item type $m_i$, the content of the item $c_i$ and the address of the parent item $p_i$.
 
 \begin{figure}[ht]
     \centering
-    \begin{tikzpicture}[framed, node distance=0,
+    \begin{tikzpicture}[framed,
+            node distance=0,
             % every node/.style={draw}
             ]{
             
@@ -47,48 +48,51 @@ This section describes the protocol that any writer needs to follow in order to 
             \textbf{Digital Ballot Box} $\mathcal{D}$};
         
         % internal knowledge
-        \node[block, below=of w] (w1) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_\mathcal{W}$, $Y_\mathcal{D}$, $m_i$, $c_i$, $p_i$ \\
-            \phantom{/}*/
+        \node[internal, below=of w] (w_ik) {
+            internal knowledge: $x_\mathcal{W}$, $Y_\mathcal{D}$, \\
+            $m_i$, $c_i$, $p_i$
             };
-        \node[block, below=of dbb] (dbb1) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_\mathcal{D}$, $Y_\mathcal{W}$, $\boldsymbol{h} = \{h_1, ... h_{i-1}\}$ \\
-            \phantom{/}*/
+        \node[internal, below=of dbb] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{W}$, \\ $\boldsymbol{h} = \{h_1, ..., h_{i-1}\}$
             };
         
         % All content
-        \node[block, below=of w1] (w2) {
+        % \node[below=of w_ik] (top){};
+        \node[process_v2, first, keep_left] at (w_ik.south -| w.west) (w_1) {
             $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$
             };
-        \node[arrow, below=of w2.south, anchor=north west] (a1) {
+        \node[arrow_v2, towards_right, between={w.center}{dbb.center}] at (w_1.south -| w.center) (a_1) {
             $\sigma_i$, $m_i$, $c_i$, $p_i$
             };
-        \node[block, anchor=north west] at (a1.south -| dbb1.west) (dbb2) {
-            verify that $m_i$, $c_i$, and $p_i$ are compatible and $\mathsf{SigVer} (Y_\mathcal{W}, \sigma_i; m_i || c_i || p_i)$ then: \\ [9pt]
+        \node[process_v2, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
+            verify that $m_i$, $c_i$ and $p_i$ comply \\
+            to the rules according to $\boldsymbol{h}$ and \\
+            $\mathsf{SigVer} (Y_\mathcal{W}, \sigma_i; m_i || c_i || p_i)$ \\
+            then: \\ [9pt]
             $t_i \gets$ current timestamp \\
             $h_i \gets \mathcal{H}(m_i || c_i || p_i || h_{i-1} || t_i)$ \\
             $\rho_i \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_i || h_i)$ \\ [9pt]
-            /* store on the Bulletin Board \\
-            \phantom{/}* as the $i^\mathrm{th}$ item the tuple: \\
-            \phantom{/}* $(m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h_i)$ \\
-            \phantom{/}*/
+            store tuple $(m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h_i)$ \\
+            as $i^\mathrm{th}$ item on the bulletin board
             };
-        \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
+        \node[arrow_v2, towards_left, between={w.center}{dbb.center}] at (dbb.center |- dbb_1.south) (a_2) {
             $\rho_i$, $t_i$, $h_i$, $h_{i-1}$
             };
-        \node[block, anchor=north west] at (a2.south -| w2.west) (w3) {
+        \node[process_v2, keep_left, after_arrow] at (a_2.south -| w.west) (w_2) {
             verify that \\
-            $h_i = \mathcal{H}(m_i || c_i || p_i || h_{i-1} || t_i)$ and \\
+            $h_i = \mathcal{H}(m_i || c_i || p_i || h_{i-1} || t_i)$ \\
             $\mathsf{SigVer} (Y_\mathcal{D}, \rho_i; \sigma_i || h_i)$
             };
+        % \node[below=of w_2] (bottom){};
         
         % Arrows and lines
         \draw[dashed] (w.south west)--(dbb.south east);    
-        \draw[dashed] (w1.south west)--(dbb1.south east);
-        \draw[->] (a1.south west)--(a1.south east);
-        \draw[->] (a2.south east)--(a2.south west);
+        \draw[dashed] (w_ik.south west)--(dbb_ik.south east);
+
+        \draw[dotted] (w_1.south -| w.center)--(w_2.north -| w.center);
+
+        \draw[dotted] (a_1.south -| dbb.center)--(dbb_1.north -| dbb.center);
+        \draw[dotted] (dbb_1.south -| dbb.center)--(a_2.south -| dbb.center);
         }
     \end{tikzpicture}
     \caption{Protocol for writing an item on the bulletin board}
