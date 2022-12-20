@@ -1,8 +1,5 @@
 \subsection{Election phase} \label{sec: election phase}
 
-\cref{alg: bytes to point}
-\cref{fig: argument of shuffle of cryptograms protocol}
-
 The election phase lasts from the election start date until the election end date. During this time, any \textit{Voter} $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ can cast a valid digital ballot by performing the following steps:
 \begin{enumerate}
     \item The \textit{Voter} $\mathcal{V}_i$ asks the \textit{Digital Ballot Box} $\mathcal{D}$ for the latest election configuration items which presents the means of voter authentication and all contest options.
@@ -344,7 +341,7 @@ When submitting his vote, the \textit{Voter} $\mathcal{V}_i$ sends both the cryp
         \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
             $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$, $c_\mathrm{d}$, $\sigma_\mathcal{D}$, $t_{n_\mathrm{b}+2}$, $h_{n_\mathrm{b}+2}$, $e_\mathrm{d}$
             };
-        \node[block, anchor=north west, text width=] at (a2.south -| w2.west) (v3) {
+        \node[block, anchor=north west, text width=] at (a2.south -| v2.west) (v3) {
             verify that \\
             $h_{n_\mathrm{b}+1} = \mathcal{H}(m || c_\mathrm{v} || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$, \\
             $h_{n_\mathrm{b}+2} = \mathcal{H}(m || c_\mathrm{d} || h_{n_\mathrm{b}+1} || h_{n_\mathrm{b}+1} || t_{n_\mathrm{b}+2})$ \\
@@ -418,7 +415,7 @@ When submitting his vote, the \textit{Voter} $\mathcal{V}_i$ sends both the cryp
         \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
             $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$, $m_\mathrm{vts}$, $t_\mathrm{vts}$, $h_\mathrm{vts}$
             };
-        \node[block, anchor=north west, text width={}] at (a2.south -| w2.west) (v3) {
+        \node[block, anchor=north west, text width={}] at (a2.south -| v2.west) (v3) {
             verify that \\
             $h_{n_\mathrm{b}+1} = \mathcal{H}(m || e || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$, \\
             $h_\mathrm{vts} = \mathcal{H}(m_\mathrm{vts} || \perp || h_{n_\mathrm{b}+1} || h_{n_\mathrm{b}+1} || t_\mathrm{vts})$ and \\
@@ -491,7 +488,6 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
-            after_arrow/.style={yshift=-5},
             % every node/.style={draw},
             ]{
         
@@ -579,7 +575,6 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
-            after_arrow/.style={yshift=-5},
             % every node/.style={draw},
             ]{
         
@@ -677,7 +672,6 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
-            after_arrow/.style={yshift=-5},
             % every node/.style={draw},
             ]{
         
@@ -758,7 +752,6 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
-            after_arrow/.style={yshift=-5},
             % every node/.style={draw},
             ]{
         
@@ -888,7 +881,7 @@ Note that, if a \textit{Voter} $\mathcal{V}_i$ has a confirmation receipt that d
         \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
             $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$
             };
-        \node[block, anchor=north west] at (a2.south -| w2.west) (v3) {
+        \node[block, anchor=north west] at (a2.south -| v2.west) (v3) {
             verify that \\
             $h_{n_\mathrm{b}+1} = \mathcal{H}(m || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\
             and $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma_i || h_{n_\mathrm{b}+1})$
