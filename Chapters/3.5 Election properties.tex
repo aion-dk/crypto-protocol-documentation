@@ -22,11 +22,11 @@ Therefore, we claim that Assembly Voting X has the \textit{confidentiality prope
 One can argue that, because the bulletin board data is public, somebody could save all the data for long enough until the elliptic curve cryptosystem will be broken, and so will be able to decrypt all the data contrarily to our protocol. This fact demonstrates that our system does not comply to the \textit{everlasting confidentiality property}. We take note of this fact and we accept it.
 
 \paragraph{Anonymity}
-This property is reached by implementing a mixnet of mixers that sequentially shuffle the list of vote cryptograms in an indistinguishable way, before they get decrypted (section \ref{sec: mixing phase}).
+This property is reached by implementing a mixnet of nodes (trustees) that sequentially shuffle the list of vote cryptograms in an indistinguishable way, before they get decrypted (section \ref{sec: mixing phase}).
 
-Obviously, each mixer knows the way it shuffled the list of cryptograms but it does not know how it was shuffled by the other mixers. Thus, it is important that mixers do not communicate with each other.
+Obviously, each trutsee knows the way it shuffled the list of cryptograms but it does not know how it was shuffled by the other trustees. Thus, it is important that trustees do not communicate with each other.
 
-We claim that Assembly Voting X is an \textit{anonymous voting system} on the assumption that there is a mixnet of multiple mixers out of which at least one is honest.
+We claim that Assembly Voting X is an \textit{anonymous voting system} on the assumption that there is a set of multiple trustess out of which at least one is honest.
 
 \paragraph{Integrity}
 The integrity of the election is preserved in our system by publishing all events (vote submissions or system events) on the bulletin board. Moreover, the bulletin board has a \textit{blockchain-like} structure that guarantees that the history of the bulletin board never changes. Also, the voters act like miners of the blockchain whenever they submit a new vote cryptogram, by signing on the history of the blockchain.
