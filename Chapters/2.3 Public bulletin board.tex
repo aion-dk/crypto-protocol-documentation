@@ -1,7 +1,7 @@
 \subsection{Public bulletin board} \label{sec: public bulletin board}
-All events that happen during an election are published by the \textit{Digital Ballot Box} $\mathcal{D}$ as items on a publicly available bulletin board. Each item from the board is owned (or written) by a relevant actor. Each item posted on the bulletin board describes a specific event and it is uniquely identifiable by its \textit{hash value} or \textit{address}. The \textit{address} of the last item on the board represents the \textit{board hash value} at that specific point in time. All events are stored as an \textit{append only list}, that means, no event can be removed or replaced and each new event is appended at the end of the list. The structure of the bulletin board has been inspired from \cite{Heather09}.
+All events that happen during an election are published by the Digital Ballot Box $\mathcal{D}$ as items on a publicly available bulletin board. Each item from the board is owned (or written) by a relevant actor. Each item posted on the bulletin board describes a specific event and it is uniquely identifiable by its \textit{hash value} or \textit{address}. The \textit{address} of the last item on the board represents the \textit{board hash value} at that specific point in time. All events are stored as an \textit{append only list}, that means, no event can be removed or replaced and each new event is appended at the end of the list. The structure of the bulletin board has been inspired from \cite{Heather09}.
 
-The way we deviate from \cite{Heather09} is that, to append a new item on the board, the writer needs to include as part of the new item the address of any existing item from the board, instead of referencing exactly the previous item. We call this reference, the parent item. Finally, the \textit{address} of the new item is computed by the \textit{Digital Ballot Box} $\mathcal{D}$ by hashing the content of the item (including the reference to the parent item) concatenated with the current \textit{board hash value} and a registration timestamp. $\mathcal{D}$ signs the \textit{address} of the new item and delivers it to the writer as proof of acceptance of the new item on the board. Note that it is the \textit{Digital Ballot Box} that ensures the link of the new item to the previous item on the board.
+The way we deviate from \cite{Heather09} is that, to append a new item on the board, the writer needs to include as part of the new item the address of any existing item from the board, instead of referencing exactly the previous item. We call this reference, the parent item. Finally, the \textit{address} of the new item is computed by the Digital Ballot Box $\mathcal{D}$ by hashing the content of the item (including the reference to the parent item) concatenated with the current \textit{board hash value} and a registration timestamp. $\mathcal{D}$ signs the \textit{address} of the new item and delivers it to the writer as proof of acceptance of the new item on the board. Note that it is the Digital Ballot Box that ensures the link of the new item to the previous item on the board.
 
 As a result of this modification, each item from the bulletin board references 2 other items:
 \begin{enumerate}
@@ -9,7 +9,7 @@ As a result of this modification, each item from the bulletin board references 2
     \item The previous item of the board
 \end{enumerate}
 
-This modification to the bulletin board structure implies that the \textit{history} property described in \cite{Heather09} is protected in this case by the \textit{Digital Ballot Box}. Furthermore, we introduce a new property to the bulletin board called \textit{ancestry} which is defined by items being related to each other in a meaningful way. As a result, when traversed on the \textit{ancestry} line, the structure of the bulletin board looks like a tree, while, when traversed on the \textit{history} line, the structure looks linear. 
+This modification to the bulletin board structure implies that the \textit{history} property described in \cite{Heather09} is protected in this case by the Digital Ballot Box. Furthermore, we introduce a new property to the bulletin board called \textit{ancestry} which is defined by items being related to each other in a meaningful way. As a result, when traversed on the \textit{ancestry} line, the structure of the bulletin board looks like a tree, while, when traversed on the \textit{history} line, the structure looks linear. 
 
 In addition, we introduce a new concept to the bulletin board structure, that we call a \emph{hidden verification track}, that is used to perform the ballot checking process described in \cref{sec: challenging a vote cryptogram}. It is called:
 \begin{itemize}
@@ -24,15 +24,15 @@ The different kinds of items (i.e. the values that $m_i$ can have) and the event
 
 In order to write a new item on the bulletin board, a writer needs to follow the protocol described in \cref{sec: writing on the bulletin board}. The following actors are allowed to write on the bulletin board:
 \begin{itemize}
-    \item \textit{Election Administrator} $\mathcal{E}$ is the actor that writes all the configuration events of an election.
-    \item \textit{Voters} $\mathcal{V}_i$, with $i \in \{1, ..., n_\mathrm{v}\}$, are the actors that write all the vote related events of an election.
-    \item \textit{Digital Ballot Box} $\mathcal{D}$ is the actor that ultimately accepts all the events that are published on the bulletin board. In addition, $\mathcal{D}$ also writes on the board all the auxiliary events that support the voting process.
-    \item \textit{External Verifier} $\mathcal{X}$ is the actor that writes events related to ballot checking process. These events are written on the hidden verification track of the bulletin board.
+    \item Election Administrator $\mathcal{E}$ is the actor that writes all the configuration events of an election.
+    \item Voters $\mathcal{V}_i$, with $i \in \{1, ..., n_\mathrm{v}\}$, are the actors that write all the vote related events of an election.
+    \item Digital Ballot Box $\mathcal{D}$ is the actor that ultimately accepts all the events that are published on the bulletin board. In addition, $\mathcal{D}$ also writes on the board all the auxiliary events that support the voting process.
+    \item External Verifier $\mathcal{X}$ is the actor that writes events related to ballot checking process. These events are written on the hidden verification track of the bulletin board.
 \end{itemize}
 
 
 \subsubsection{Writing on the bulletin board} \label{sec: writing on the bulletin board}
-This section describes the protocol that any writer needs to follow in order to write an event on the bulletin board. The election protocol allows a predefined set of actors ($\mathcal{E}$, $\mathcal{V}_i$, $\mathcal{D}$ or $\mathcal{X}$) to write events on the bulletin board, but for the sake of generalization, \cref{fig: protocol for writing an item on the bulletin board} presents the interaction between a generic writer $\mathcal{W}$ and the \textit{Digital Ballot Box} $\mathcal{D}$ necessary for publishing the $i^{th}$ event on the bulletin board.
+This section describes the protocol that any writer needs to follow in order to write an event on the bulletin board. The election protocol allows a predefined set of actors ($\mathcal{E}$, $\mathcal{V}_i$, $\mathcal{D}$ or $\mathcal{X}$) to write events on the bulletin board, but for the sake of generalization, \cref{fig: protocol for writing an item on the bulletin board} presents the interaction between a generic writer $\mathcal{W}$ and the Digital Ballot Box $\mathcal{D}$ necessary for publishing the $i^{th}$ event on the bulletin board.
 
 \begin{figure}[ht]
     \centering
@@ -97,207 +97,62 @@ This section describes the protocol that any writer needs to follow in order to 
     \label{fig: protocol for writing an item on the bulletin board}
 \end{figure}
 
-The publicly available information consists of: the public key of the writer $Y_\mathcal{W}$, the public key of the \textit{Digital Ballot Box} $Y_\mathcal{D}$ and all the already existing items on the bulletin board with their respective addresses $\boldsymbol{h} = \{h_1, ... h_{i-1}\}$. The writer alone is in possession of his private key $x_\mathcal{W}$, while the \textit{Digital Ballot Box} is in possession of its private key $x_\mathcal{D}$.
+The publicly available information consists of: the public key of the writer $Y_\mathcal{W}$, the public key of the Digital Ballot Box $Y_\mathcal{D}$ and all the already existing items on the bulletin board with their respective addresses $\boldsymbol{h} = \{h_1, ... h_{i-1}\}$. The writer alone is in possession of his private key $x_\mathcal{W}$, while the Digital Ballot Box is in possession of its private key $x_\mathcal{D}$.
 
 The protocol starts by the writer actively choosing the event type $m_i$ and the content $c_i$ to be appended on the bulletin board as the $i^\mathrm{th}$ item. All the event types are described in the \cref{sec: bulletin board event types}. The content of the item is a text blob describing a specific event. The structure of the message has to follow the rules described in \cref{sec: bulletin board event types} depending on the type of item chosen. Then, the writer chooses a pre-existing item on the bulletin board as the parent of the new item. The parent item is referenced by its address $p_i \in \boldsymbol{h}$. The choice of parent item is done according to the rules described in \cref{sec: bulletin board event types} depending on the type of item chosen.
 
-The writer signs with his private key $x_\mathcal{W}$ the concatenation of the new item type, the content and the parent address. The signature $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$ is sent together with the item type $m_i$, the content $c_i$ and the parent address $p_i$ to the \textit{Digital Ballot Box} as a request to append the new item on the board.
+The writer signs with his private key $x_\mathcal{W}$ the concatenation of the new item type, the content and the parent address. The signature $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$ is sent together with the item type $m_i$, the content $c_i$ and the parent address $p_i$ to the Digital Ballot Box as a request to append the new item on the board.
 
-\textit{Digital Ballot Box} verifies whether $m_i$, $c_i$ and $p_i$ are chosen according to the rules specified in \cref{sec: bulletin board event types} and whether the request has a valid signature. If all validations succeed, \textit{Digital Ballot Box} computes the address of the new item $h_i$ by hashing a concatenation of the type of the new item $m_i$, its content $c_i$, its parent hash value $p_i$, the current board hash value $h_{i-1}$ and the registration timestamp $t_i$. It then stores the new item on the bulletin board as the tuple $(m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h_i)$, where $\mathcal{W}$ is a reference to the writer.
+Digital Ballot Box verifies whether $m_i$, $c_i$ and $p_i$ are chosen according to the rules specified in \cref{sec: bulletin board event types} and whether the request has a valid signature. If all validations succeed, Digital Ballot Box computes the address of the new item $h_i$ by hashing a concatenation of the type of the new item $m_i$, its content $c_i$, its parent hash value $p_i$, the current board hash value $h_{i-1}$ and the registration timestamp $t_i$. It then stores the new item on the bulletin board as the tuple $(m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h_i)$, where $\mathcal{W}$ is a reference to the writer.
 
-The \textit{Digital Ballot Box} signs with its private key $x_\mathcal{D}$ the concatenation of the writer's signature $\sigma_i$ and the address of the new item $h_i$. The resulting signature $\rho_i$ is sent together with the registration timestamp $t_i$, the new board hash value $h_i$ and the previous board hash value $h_{i-1}$ to the writer as proof that the item has been appended on the board.
+The Digital Ballot Box signs with its private key $x_\mathcal{D}$ the concatenation of the writer's signature $\sigma_i$ and the address of the new item $h_i$. The resulting signature $\rho_i$ is sent together with the registration timestamp $t_i$, the new board hash value $h_i$ and the previous board hash value $h_{i-1}$ to the writer as proof that the item has been appended on the board.
 
 Finally, the writer verifies whether the address of the new item is computed correctly and whether the response has a valid signature.
 
-Note that, when the protocol is performed by a specific writer, for example, the \textit{Voter} $\mathcal{V}_i$, the writer's key pair $(x_\mathcal{W}, Y_\mathcal{W})$ will be replaced by the voter's key pair $(x_i, Y_i)$.
+Note that, when the protocol is performed by a specific writer, for example, the Voter $\mathcal{V}_i$, the writer's key pair $(x_\mathcal{W}, Y_\mathcal{W})$ will be replaced by the voter's key pair $(x_i, Y_i)$.
 
 
 \subsubsection{Bulletin board event types} \label{sec: bulletin board event types}
-The bulletin board has been designed as a self-documented event log. In order to support that, it needs to contain many kinds of items that are documenting different events throughout the election, such as events related to election configuration, events related to the voting process or events related to challenging a vote cryptogram process (described in \cref{sec: challenging a vote cryptogram}). Each event is documented as an item on the bulletin board.
+The bulletin board has been designed as a self-documented event log. In order to support that, it needs to contain many kinds of items that are documenting different events throughout the election, such as events related to the pre-election phase for configuring the election, events related to the voting process or events related to the post-election phase for publishing a result. Each event is documented as an item on the bulletin board.
 
-All bulletin board items have many of the same attributes in their structure, that is listed below which is to be called \textbf{metadata}:
+All bulletin board items have the same structure $(m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h_i)$ as describe in \cref{sec: writing on the bulletin board} but each item type has its own rules when it comes to:
 \begin{itemize}
-    \item \textit{type} is a string that defines the type of the bulletin board item.
-    \item \textit{content} is data that describes the details of the event.
-    \item \textit{writer} is a reference to the writer of the item (e.g. a \textit{Voter} or the \textit{Digital Ballot Box}).
-    \item \textit{signature} is a digital signature of the writer on the item.
-    \item \textit{registration time} is a timestamp documenting when the event happened.
-    \item \textit{parent} is a reference to a previously existing item on the bulletin board.
-    \item \textit{address} is a unique identifier for each item on the board.
+    \item what data it contains $c_i$,
+    \item who the author $\mathcal{W}$ is,
+    \item what parent $p_i$ can it have.
 \end{itemize}
 
 The full list of item types and rules can be studied in \cref{app: bulletin board item types}. The list below briefly describes all item types that can be grouped in the following 3 categories:
 
 \paragraph{Configuration items}
 \begin{enumerate}
-    \item 
-        The \textit{genesis} is the initial item of the bulletin board and it describes some metadata of the election. Basically, this is the item that spawns a new bulletin board. The structure of it consists of the \textbf{metadata} and the following attributes:
-        \begin{itemize}
-            \item the elliptic curve domain parameters $(p, a, b, G, q, h)$,
-            \item the public key of the \textit{Digital Ballot Box} $Y_\mathcal{D}$,
-            \item the URL of the bulletin board,
-            \item the voter authorization mode.
-        \end{itemize}
-        The following rules apply to the \textit{genesis} item:
-        \begin{itemize}
-            \item It is written by the \textit{Digital Ballot Box} $\mathcal{D}$.
-            \item It has no \textit{parent}.
-            \item The \textit{genesis} item is the first item of the board.
-            \item There is one single \textit{genesis} item on the entire bulletin board (i.e. the data in the \textit{genesis} item does not support updates). 
-        \end{itemize}
-    \item
-        The \textit{election configuration} is an item specifying some configuration on election level. The structure of it consists of the \textbf{metadata} and the following attributes:
-        \begin{itemize}
-            \item the public key of the \textit{Election Administrator} $Y_\mathcal{E}$,
-            \item the start and end time of the election.
-        \end{itemize}
-        The following rules apply to the \textit{election configuration} item:
-        \begin{itemize}
-            \item It is written by the \textit{Election Administrator} $\mathcal{E}$.
-            \item It has as \textit{parent} the previous configuration item.
-            \item The first \textit{election configuration} item defines the initial configuration of the election.
-            \item The following \textit{election configuration} items define updates that are made to the election configuration.
-            \item \textcolor{orange}{How does an update affect a running election?}
-        \end{itemize}
+    \item The \textit{genesis} is the initial item of the bulletin board and it describes some metadata of the election. Basically, this is the item that spawns a new bulletin board. It defines the elliptic curve domain parameters $(p, a, b, G, q, h)$, the public key of the Digital Ballot Box $Y_\mathcal{D}$, the public key of the Election Administrator $Y_\mathcal{E}$, and the URL of the bulletin board. It is written by the Digital Ballot Box $\mathcal{D}$ and it has no parent reference.
     
-    \item 
-        The \textit{contest configuration} is an item defining the configuration of a contest. The structure of it consists of the \textbf{metadata} and the following attributes:
-        \begin{itemize}
-            \item a unique identifier of the contest,
-            \item the marking rules of the contest,
-            \item the question type of the contest,
-            \item the list of candidates with their unique labels $\{m_1, ..., m_{n_\mathrm{c}}\}$, where $n_\mathrm{c}$ is the number of candidates,
-            \item the result rules of the contest.
-        \end{itemize}
-        The following rules apply to the \textit{contest configuration} item:
-        \begin{itemize}
-            \item It is written by the \textit{Election Administrator} $\mathcal{E}$.
-            \item It has as \textit{parent} the previous configuration item.
-            \item The first \textit{contest configuration} item with a specific contest identifier defines the initial configuration of that contest.
-            \item The following \textit{contest configuration} items with a specific contest identifier define updates that are made to that contest configuration.
-            \item \textcolor{orange}{What attributes are allowed to be updated?}
-            \item \textcolor{orange}{How does an update affect a running election?}
-        \end{itemize}
-        
-    \item 
-        The \textit{threshold configuration} is the item defining the ballot encryption key and all data relevant to the threshold ceremony. The structure of it consists of the \textbf{metadata} and the following attributes:
-        \begin{itemize}
-            \item the encryption key $Y_\mathrm{enc}$,
-            \item the threshold setup $t$-out-of-$n_\mathrm{t}$, where $t$ is the amount of trustees needed for decryption and $n_\mathrm{t}$ is the total number of trustees,
-            \item the list of trustees, each defined by its public key $Y_{\mathcal{T}_i}$ and the list of public polynomial coefficients $\{P_{\mathcal{T}_i,1}, ..., P_{\mathcal{T}_i,t-1}\}$. This data is relevant for auditing purpose.
-        \end{itemize}
-        The following rules apply to the \textit{threshold configuration} item:
-            \begin{itemize}
-                \item It is written by the \textit{Election Administrator} $\mathcal{E}$.
-                \item It has as \textit{parent} the previous configuration item.
-                \item There is one single \textit{threshold configuration} item on the entire bulletin board (i.e. the threshold configuration does not support updates).
-            \end{itemize}
+    \item The \textit{election configuration} is an item specifying some configuration on election level (e.g. the start and end time of the election). It is written by the Election Administrator $\mathcal{E}$ and it references as a \textit{parent} the previous configuration item. Follow up \textit{election configuration} items act like configuration updates.
     
-    \item 
-        The \textit{voters configuration} is the item defining all eligible voters in the election. This item is present when the voter registration mode is \textbf{pre-election}. The structure of it consists of the \textbf{metadata}, and a list of all voters each defined by the following attributes:
-        \begin{itemize}
-            \item a unique identifier $vID_i$,
-            \item the public key $Y_i$,
-            \item a flag defining whether the voter is enabled or not. \textcolor{orange}{This is so the election administrators is able to disable a voter if necessary. This information is public to maintain end to end verifiability.}
-        \end{itemize}
-        The following rules apply to the \textit{voters configuration} item:
-        \begin{itemize}
-            \item It is written by the \textit{Election Administrator} $\mathcal{E}$.
-            \item It has as \textit{parent} the previous configuration item.
-            \item There is one single \textit{voters configuration} item on the entire bulletin board.
-        \end{itemize}
+    \item The \textit{contest configuration} is an item defining the configuration of a contest. It contains a unique identifier of the contest, its marking rules, question type, result rules and list of candidates with their unique labels $\{m_1, ..., m_{n_\mathrm{c}}\}$, where $n_\mathrm{c}$ is the total number of candidates. The item is written by the Election Administrator $\mathcal{E}$ and it references as a \textit{parent} the previous configuration item. Follow up \textit{contest configuration} items with the same contest identifier act like updates to that contest configuration.
     
-    \item
-        The \textit{voter configuration} is an item that describes a change in the list of voters. It can be used either to add a new voter or to update an existing voter. This item can be present when the voter registration mode is \textbf{pre-election}. The structure of it consists of the \textbf{metadata} and the following attributes:
-        \begin{itemize}
-            \item the voter identifier $vID_i$,
-            \item the public key $Y_i$,
-            \item the enabled flag. \textcolor{orange}{This is so the election administrators is able to disable a voter if necessary. This information is public to maintain end to end verifiability.}
-        \end{itemize}
-        The following rules apply to the \textit{voter configuration} item:
-        \begin{itemize}
-            \item It is written by the \textit{Election Administrator} $\mathcal{E}$.
-            \item It has as \textit{parent} the previous configuration item.
-            \item If the voter identifier $vID$ has been previously defined on the bulletin board, then this item updates that voter's configuration.
-            \item Otherwise, this item defines a new eligible voter.
-            \item \textcolor{orange}{What attributes of a voter can be changed?}
-            \item \textcolor{orange}{What if a voter is disabled after having voted?}
-        \end{itemize}
+    \item The \textit{threshold configuration} is the item defining the ballot encryption key $Y_\mathrm{enc}$ and the threshold setup $t$ out-of $n_\mathrm{t}$, where $t$ is the amount of trustees needed for decryption and $n_\mathrm{t}$ is the total number of trustees. It also specifies all the trustee data, that includes: the set of trustees $\boldsymbol{\mathcal{T}} = \{\mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}}\}$, their public keys $Y_{\mathcal{T}_i}$ and their public polynomial coefficients $P_{\mathcal{T}_{i,j}}$, with $i \in \{1, ..., n_\mathrm{t}\}$ anf $j \in \{1, ..., t-1\}$. The \textit{threshold configuration} item is written by the Election Administrator $\mathcal{E}$, it references as a \textit{parent} the previous configuration item and it cannot be updated throughout the election phase.
     
-    \item
-        The \textit{voter authorization configuration} is the item describing the configuration of the \textit{Voter Authorizer} $\mathcal{A}$ and \textit{Identity Providers} $\{\mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$, where $n_\mathrm{i}$ is the number of providers. This item is present when the voter registration mode is \textbf{on-demand}. The structure of it consists of the \textbf{metadata} and the following attributes:
-        \begin{itemize}
-            \item the public key of the \textit{Voter Authorizer} $Y_\mathcal{A}$,
-            \item a list that contains all \textit{Identity Providers} defined by their public keys $\{Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}}\}$.
-        \end{itemize}
-        The following rules apply to the \textit{voter authorization configuration} item:
-        \begin{itemize}
-            \item It is written by the \textit{Election Administrator} $\mathcal{E}$.
-            \item It has as \textit{parent} the previous configuration item.
-            \item The first \textit{voter authorization configuration} item defines the initial configuration of the \textit{Voter Authorizer} and the \textit{Identity Providers}.
-            \item The following \textit{voter authorization configuration} items define updates that are made to the configuration of the \textit{Voter Authorizer} or the \textit{Identity Providers}.
-            \item \textcolor{orange}{How does an update affect a running election?}
-            \item \textcolor{orange}{How does an update affect a currently open voting session authorized by the old configuration of the \textit{Voter Authorizer}?}
-        \end{itemize}
+    \item The \textit{actor config} is an item that introduces a new actor on the bulletin board. The new actor is defined by a role and a public key. The roles that actors can have are: the \textit{Voter Authorizer} $\mathcal{A}$, with its public key $Y_\mathcal{A}$ and the \textit{Ballot Adjudicator} $\mathcal{B}$ with its public key $Y_\mathcal{B}$.
+
+    \item The \textit{voter authorization configuration} is the item describing the way voters have to authenticate in order to get authorized to vote. The item defines the \textit{voter authorization mode} and, if applicable (i.e. when \textit{voter authorization mode} is \textbf{on-demand}), the configuration of all Idenitity Providers $\{\mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$, where $n_\mathrm{i}$ is the number of providers. The item is written by the Voter Authorizer $\mathcal{A}$ and it references as a \textit{parent} the previous configuration item.
 \end{enumerate}
 
 \paragraph{Voting items}
 \begin{enumerate}
-    \setcounter{enumi}{7}
-    \item
-        The \textit{voter session} is the item that documents the fact that a new voter has been authorized to cast a vote. This item is present when the voter registration mode is \textbf{on-demand}. The structure of it consists of the \textbf{metadata} and the following voter attributes:
-        \begin{itemize}
-            \item the voter identifier $vID_i$,
-            \item the public key of the \textit{Voter} $Y_i$,
-            \item the authorization token $\sigma_{\mathrm{auth}, i}$ (see \cref{sec: voter authentication procedure} for details) generated by the \textit{Voter Authorization} $\mathcal{A}$.
-        \end{itemize}
-        The following rules apply to the \textit{voter authorization configuration} item:
-        \begin{itemize}
-            \item It is written by the \textit{Digital Ballot Box} $\mathcal{D}$.
-            \item It has as \textit{parent} the previous configuration item.
-            \item A new item is generated whenever a voter is authorized to vote.
-            \item \textcolor{orange}{What if a voter needs to be disabled?}
-        \end{itemize}
+    \setcounter{enumi}{6}
+    \item The \textit{voter session} is the item that documents that a new voter $\mathcal{V}_i$ has been authorized to cast a vote. The item contains the voter identifier $vID_i$, the voter's public key $Y_i$, the voter's weight and an authentication fingerprint used for auditing. When a voter tryies to vote again (threfore overriding the previous vote), a new \textit{voter session} item is generated containing the same voter identifier $vID_i$. The item is written by the Voter Authorizer $\mathcal{A}$ and it references as a \textit{parent} the latest configuration item. The protocol for appending this item is described in \cref{sec: voter authentication procedure}.
+
+    \item The \textit{voter encryption commitment} is the item that settles the encryption parameters chosen by the voter during the vote cryptogram generation process (see \cref{sec: vote cryptogram generation process}). The item consists only of a commitment $c_\mathrm{v}$ to the voter randomizer values. The item is written by the voter $\mathcal{V}_i$ and it references as a \textit{parent} the \textit{voter session} item. Note that the voter public key $Y_i$ is defined in the \textit{voter session} item.
     
-    \item 
-        The \textit{voter encryption commitment} is the item that secretly defines the encryption parameters chosen by the \textit{Voter}. The structure of it consists of the \textbf{metadata} and the commitment values $C$ to all cryptogram randomizers chosen by the \textit{Voter}. The following rules apply to the \textit{voter encryption commitment} item:
-        \begin{itemize} 
-            \item It is written by the \textit{Voter} $\mathcal{V}_i$.
-            \item It has as \textit{parent} the \textit{voter session} item .
-            \item A new item is generated whenever the \textit{Voter} encrypts a new ballot.
-        \end{itemize}
+    \item The \textit{server encryption commitment} is the item that settles the encryption parameters chosen by the Digital Ballot Box during the vote cryptogram generation process (see \cref{sec: vote cryptogram generation process}). The item consists only of a commitment $c_\mathrm{d}$ to the randomizer values of the Digital Ballot Box. The item is written by the Digital Ballot Box $\mathcal{D}$ and it references as a \textit{parent} the \textit{voter encryption commitment} item. This item is generated as a response to the \textit{voter encryption commitment} item being published.
     
-    \item
-        The \textit{server encryption commitment} is the item that secretly defines the encryption parameters chosen by the \textit{Digital Ballot Box}. It is generated as a response to the \textit{voter encryption commitment} being posted. The structure of it consists of the \textbf{metadata} and the commitment values $C$ to all cryptogram randomizers chosen by the \textit{Digital Ballot Box}. The following rules apply to the \textit{server encryption commitment} item:
-        \begin{itemize}
-            \item It is written by the \textit{Digital Ballot Box} $\mathcal{D}$.
-            \item It has as \textit{parent} the \textit{voter encryption commitment} item.
-            \item A new item is generated whenever a \textit{voter encryption commitment} is published.
-        \end{itemize}
+    \item The \textit{ballot cryptograms} is the item that contains the encrypted digital vote, i.e. the cryptogram $e_i$.  The item  is written by the voter $\mathcal{V}_i$ and it references as a parent the \textit{server encryption commitment} item.
     
-    \item
-        The \textit{ballot cryptograms} is the item that contains the encrypted digital ballot. The structure of it consists of the \textbf{metadata} and the cryptograms that the ballot is made out of. The following rules apply to the \textit{ballot cryptograms} item:
-        \begin{itemize}
-            \item It is written by the \textit{Voter} $\mathcal{V}_i$.
-            \item It has as \textit{parent} the \textit{server encryption commitment} item.
-            \item A new item is generated whenever the \textit{Voter} submits a new encrypted digital ballot.
-        \end{itemize}
+    \item The \textit{cast request} is the item that documents the action of casting a previously submitted vote. The item contains no extra content. It is written by the voter $\mathcal{V}_i$ and it references as a \textit{parent} the \textit{ballot cryptograms} item.
     
-    \item
-        The \textit{cast request} is the item that documents the action of casting a previously submitted ballot. The structure of it consists only of \textbf{metadata}. The following rules apply to the \textit{cast request} item:
-        \begin{itemize}
-            \item It is written by the \textit{Voter} $\mathcal{V}_i$.
-            \item It has as \textit{parent} the \textit{ballot cryptograms} item.
-            \item A new item is generated whenever the \textit{Voter} chooses to cast a ballot.
-        \end{itemize}
-    
-    \item
-        The \textit{spoil request} is the item that documents the action of spoiling (or challenge the encryption of) a previously submitted ballot. The structure of it consists only of \textbf{metadata}. The following rules apply to the \textit{spoil request} item:
-        \begin{itemize}
-            \item It is written by the \textit{Voter} $\mathcal{V}_i$.
-            \item It has as \textit{parent} the \textit{ballot cryptograms} item.
-            \item A new item is generated whenever the \textit{Voter} chooses to spoil a ballot.
-        \end{itemize}
+    \item The \textit{spoil request} is the item that documents the decision of challenging a vote cryptogram that has been previously submitted. The process is described in \cref{sec: challenging a vote cryptogram}. The item contains no extra content. It is written by the voter $\mathcal{V}_i$ and it references as a \textit{parent} the \textit{ballot cryptograms} item.
 \end{enumerate}
 
 \paragraph{Hidden items}
