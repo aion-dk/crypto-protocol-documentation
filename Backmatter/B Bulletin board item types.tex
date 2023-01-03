@@ -1,0 +1,231 @@
+\begin{landscape}
+\section{Bulletin board item types} \label{app: bulletin board item types}
+
+All item types that can appear on the bulletin board are described in the following list and are grouped in the following 3 categories:
+
+\paragraph{Configuration items}
+\begin{longtable}{|
+        >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+        >{\centering}p{\dimexpr0.09\linewidth-2\tabcolsep} |
+        >{\raggedright}p{\dimexpr0.30\linewidth-2\tabcolsep} |
+        >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+        p{\dimexpr0.35\linewidth-2\tabcolsep} |
+    } 
+    \hline
+    \textbf{Item} &
+    \textbf{Writer} &
+    \textbf{Content} &
+    \textbf{Parent type} &
+    \textbf{Validation rules} \\
+    \hline
+    \endhead
+
+    genesis &
+    $\mathcal{D}$ &
+    elliptic curve domain parameters $(p, a, b, G, q, h)$, \newline digital ballot box public key $Y_\mathcal{D}$, \newline election admin public key $Y_\mathcal{E}$ &
+    none & 
+    It is the first item of the board.
+    \\ \hline
+
+    election configuration &
+    $\mathcal{E}$ &
+    election title, \newline enabled languages &
+    latest configuration item &
+    The first item defines the configuration. \newline The following items update the configuration.
+    \\ \hline
+
+    contest configuration &
+    $\mathcal{E}$ &
+    contest identifier, \newline contest marking rules, question type and result rules, \newline candidate labels $\{m_1, ..., m_{n_\mathrm{c}}\}$ &
+    latest configuration item &
+    The first item with a contest identifier defines the configuration of that contest. \newline The following items with the same contest identifier update the configuration of that specific contest.
+    \\ \hline
+
+    threshold configuration &
+    $\mathcal{E}$ &
+    ballot encryption key $Y_\mathrm{enc}$, \newline threshold setup $t$ out-of $n_\mathrm{t}$, \newline trustees public keys $\{Y_{\mathcal{T}_1}, ..., Y_{\mathcal{T}_{n_\mathrm{t}}}\}$, \newline trustees public polynomial coefficients $\{P_{\mathcal{T}_1, 1}, ..., P_{\mathcal{T}_{n_\mathrm{t}}, t-1}\}$ &
+    latest configuration item &
+    This item cannot be updated.
+    \\ \hline
+
+    actor configuration &
+    $\mathcal{E}$ &
+    actor identifier, \newline actor role, \newline actor public key &
+    latest configuration item &
+    The first item with an actor identifier defines the configuration of that actor. \newline The following items with the same actor identifier update the configuration of that specific actor. \newline The roles can be: \textit{Voter Authorizer} $\mathcal{A}$ and \textit{Ballot Adjudicator} $\mathcal{B}$.
+    \\ \hline
+
+    voter authorization configuration &
+    $\mathcal{A}$ &
+    the voter authorization mode, \newline configuration of all Identity Providers $\{\mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$ &
+    latest configuration item &
+    The first item defines the voter authorization configuration. \newline The following items update the configuration. \newline The configuration of Identity Providers is included only if voter authorization mode is \textbf{on-demand}.
+    \\ \hline
+
+    voting round &
+    $\mathcal{E}$ &
+    voting round identifier, \newline start date and end date, \newline list of enabled contest identifiers &
+    latest configuration item &
+    The first item with a voting round identifier defines the configuration of that voting round. \newline The following items with the same voting round identifier update the configuration of that specific voting round.
+    \\ \hline
+\end{longtable}
+
+\clearpage
+\paragraph{Voting items}
+\begin{longtable}{|
+    >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+    >{\centering}p{\dimexpr0.09\linewidth-2\tabcolsep} |
+    >{\raggedright}p{\dimexpr0.30\linewidth-2\tabcolsep} |
+    >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+    p{\dimexpr0.35\linewidth-2\tabcolsep} |
+} 
+    \hline
+    \textbf{Item} &
+    \textbf{Writer} &
+    \textbf{Content} &
+    \textbf{Parent type} &
+    \textbf{Validation rules} \\
+    \hline
+    \endhead
+
+    voter session &
+    $\mathcal{A}$ &
+    voter identifier, \newline voter's public key $Y_i$, \newline voter's weight, \newline voter's authentication fingerprint \newline list of assigned contest identifiers &
+    latest configuration item &
+    This item can be created only during the election phase. \newline The following voter session items with the same voter identifier overwrite the previous voter sessions of that voter.
+    \\ \hline
+
+    voter encryption commitment &
+    $\mathcal{V}_i$ &
+    commitment $c_\mathrm{v}$ &
+    the voter session item &
+    Voter's public key $Y_i$ is defined in the voter session item.
+    \\ \hline
+
+    server encryption commitment &
+    $\mathcal{D}$ &
+    commitment $c_\mathrm{d}$ &
+    the voter encryption commitment item &
+    There can be only one server encryption commitment item referencing the voter encryption commitment item. \newline This item is created as a response to the voter encryption commitment item being created.
+    \\ \hline
+
+    ballot cryptograms &
+    $\mathcal{V}_i$ &
+    cryptogram $e_i$ &
+    the server encryption commitment item &
+    There can be only one ballot cryptograms item referencing the server encryption commitment item. \newline Voter's public key $Y_i$ is defined in the voter session item.
+    \\ \hline
+
+    cast request &
+    $\mathcal{V}_i$ &
+    &
+    the ballot cryptograms item &
+    There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline Voter's public key $Y_i$ is defined in the voter session item.
+    \\ \hline
+
+    spoil request &
+    $\mathcal{V}_i$ &
+    &
+    the ballot cryptograms item &
+    There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline Voter's public key $Y_i$ is defined in the voter session item.
+    \\ \hline
+    
+    ballot accepted &
+    $\mathcal{B}$ &
+    &
+    the cast request item or a ballot rejected item &
+    \\ \hline
+
+    ballot rejected &
+    $\mathcal{B}$ &
+    rejection reason &
+    the cast request item or a ballot accepted item &
+    \\ \hline
+\end{longtable}
+
+\clearpage
+\paragraph{Hidden items}
+\begin{longtable}{|
+    >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+    >{\centering}p{\dimexpr0.09\linewidth-2\tabcolsep} |
+    >{\raggedright}p{\dimexpr0.30\linewidth-2\tabcolsep} |
+    >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+    p{\dimexpr0.35\linewidth-2\tabcolsep} |
+}
+    \hline
+    \textbf{Item} &
+    \textbf{Writer} &
+    \textbf{Content} &
+    \textbf{Parent type} &
+    \textbf{Validation rules} \\
+    \hline
+    \endhead
+
+    verification track start &
+    $\mathcal{D}$ &
+    &
+    the ballot cryptograms item &
+    There can be only one verification track start item referencing the ballot cryptograms item. \newline This item is created as a response to the ballot cryptograms item being created.
+    \\ \hline
+
+    verifier &
+    $\mathcal{X}$ &
+    external verifier's public key $Y_\mathcal{X}$ &
+    the verification track start item &
+    This is a self signed item, i.e. the public key of the author is defined in the item itself. \newline There can be only one verifier item referencing the verifiaction track start item.
+    \\ \hline
+
+    voter commitment opening &
+    $\mathcal{V}_i$ &
+    encrypted commitment opening $d_\mathrm{v}$ &
+    the verifier item &
+    There can be only one voter commitment opening item referencing the verifier item.
+    \\ \hline
+
+    server commitment opening &
+    $\mathcal{D}$ &
+    encrypted commitment opening $d_\mathrm{d}$ &
+    the voter commitment opening item &
+    There can be only one server commitment opening item referencing the voter commitment opening item.
+    \\ \hline
+\end{longtable}
+
+\clearpage
+\paragraph{Result items}
+\begin{longtable}{|
+    >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+    >{\centering}p{\dimexpr0.09\linewidth-2\tabcolsep} |
+    >{\raggedright}p{\dimexpr0.30\linewidth-2\tabcolsep} |
+    >{\raggedright}p{\dimexpr0.13\linewidth-2\tabcolsep} |
+    p{\dimexpr0.35\linewidth-2\tabcolsep} |
+} 
+    \hline
+    \textbf{Item} &
+    \textbf{Writer} &
+    \textbf{Content} &
+    \textbf{Parent type} &
+    \textbf{Validation rules} \\
+    \hline
+    \endhead
+
+    extraction intent &
+    $\mathcal{E}$ &
+    &
+    latest config item &
+    \\ \hline
+
+    extraction data &
+    $\mathcal{D}$ &
+    a fingerprint of list of cryptograms $\boldsymbol{e}_0$ &
+    the extraction intent item &
+    There can be a single extraction data item referencing the extraction intent item. \newline The item provides a way of aquiring the list $\boldsymbol{e}_0 = \{ e_1, ..., e_{n_\mathrm{e}} \}$.
+    \\ \hline
+
+    extraction confirmation &
+    $\mathcal{E}$ &
+    list of trustees that participated in the result ceremony $\boldsymbol{\mathcal{T}'}$, \newline fingerprints of each intermediate mixed boards of cryptograms $\boldsymbol{e}_i$ and proofs of correct mixing $(PM_i, AS_i)$, \newline fingerprints of each partial decryption $\boldsymbol{S}_i$ and proofs of correct decryption $PK_i$, \newline signatures from each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}'}$ on all the fingerprints above &
+    the extraction data item &
+    There can be only one extraction confirmation item referencing the extraction data item.
+    \\ \hline
+\end{longtable}
+\end{landscape}
