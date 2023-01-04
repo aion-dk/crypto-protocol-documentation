@@ -1,60 +1,70 @@
 \subsection{Pre-election phase} \label{sec: pre-election phase}
-During the \textit{pre-election phase} the \textit{Election Administrator} $\mathcal{E}$ has to configure the following parameters needed to set up an election:
+During the \textit{pre-election phase} human election officers use the Election Administrator service to configure and setup a new election. That consists of the following steps:
 \begin{itemize}
-    \item the election start date and end date,
-    \item the question of the contests, marking types and result rules,
-    \item the possible answers (vote options) in all contests \( \boldsymbol{m} = \{m_1, ..., m_{n_\mathrm{c}}\} \), where $n_\mathrm{c}$ is the number of vote options, each representing a candidate name,
-    \item the voter authentication method (\textbf{pre-election} or \textbf{on-demand}), which require some further configuration accordingly:
-    \begin{itemize}
-        \item \textbf{(pre-election)} the list of printing authorities \( \boldsymbol{\mathcal{P}} = \{\mathcal{P}_1, ..., \mathcal{P}_{n_\mathrm{p}}\} \) used for distributing voter credentials, each printing authority $\mathcal{P}_i$ being specified to use a particular communication channel for distributing voter credentials, e.g. e-mail, post or SMS
-        \item \textbf{(on-demand)} the \textit{Voter Authorization Service} $\mathcal{A}$ which will generate its signing key pair \( (x_\mathcal{A}, Y_\mathcal{A}) \leftarrow \mathsf{KeyGen}() \) (\Cref{alg: key gen}), where $x_\mathcal{A}$ is the signing key which will be kept secret throughout the election period, and $Y_\mathcal{A}$ is the public signature verification key which will be shared.
-        \item \textbf{(on-demand)} established connection with the \textit{Identity Providers} $\boldsymbol{\mathcal{I}} = \{ \mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$, get their public keys \{ \( Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \) \} and exchange them with the \textit{Voter Authorization Service} $\mathcal{A}$. Each \textit{Identity Provider} $\mathcal{I}_i$ is supposed to use a unique kind of identity as a means of voter identification (e.g. email, phone number, social security number or a specific internal account). 
-    \end{itemize}
-    \item the list of eligible voters \( \boldsymbol{\mathcal{V}} = \{\mathcal{V}_1, ..., \mathcal{V}_{n_\mathrm{v}}\} \), that is defined differently, depending on the voter registration mode:
-    \begin{itemize}
-        \item \textbf{(pre-election)} Each voter $\mathcal{V}_i$ is defined by contact information for each of the communication channels that is used in the voter credential distribution process (\Cref{sec: voter credential distribution process}), e.g. an e-mail address, a postal address or a phone number.
-        \item \textbf{(pre-election)} All printing authorities participate in the \textit{voter credential distribution process} (described in \Cref{sec: voter credential distribution process}) to distribute voter credentials. Public signature verification keys are computed for all voters $\{Y_1, ..., Y_{n_\mathrm{v}}\}$ and shared with the \textit{Election Administrator}.
-        \item \textbf{(on-demand)} Each voter $\mathcal{V}_i$ is defined by unique identities that are used by all \textit{Identity Providers} $\boldsymbol{\mathcal{I}}$ and then verified by the \textit{Voter Authorization Service} $\mathcal{A}$.
-        \item \textbf{(on-demand)} the \textit{Voter Authorization Service} $\mathcal{A}$ is loaded with the list of eligible voters $\boldsymbol{\mathcal{V}}$.
-    \end{itemize}
-    \item the lists of trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$ that participate in the \textit{threshold ceremony}, described in \Cref{sec: threshold ceremony} in order to generate the election encryption key $Y_\mathrm{enc}$.
+    \item initiate a new bulletin board as described in \cref{sec: digital ballot box initialization},
+    \item define election level configuration, including election title, contest titles, candidates and other services required in the election, as decribed in \cref{sec: election configuration},
+    \item define eligible voters and configure voter authorization mode as decribed in \cref{sec: voter authorization configuration},
+    \item facilitate the threshold ceremony as described in \cref{sec: threshold ceremony},
+    \item configure the election phase by setting up voting rounds as in \cref{sec: voting rounds}.
 \end{itemize}
-
-When all configuration is in completed, the \textit{Election Administrator} $\mathcal{E}$ initiates a new \textit{Digital Ballot Box} $\mathcal{D}$ and settles the initial configuration on the bulletin board. The process is described in \Cref{sec: digital ballot box initialization}. 
-
-
-\subsubsection{Threshold Ceremony} \label{sec: threshold ceremony}
-During the threshold ceremony, all \textit{Trustees} $\{\mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}}\}$, coordinated by the \textit{Election Administrator} $\mathcal{E}$, participate in the protocol from \Cref{fig: threshold ceremony} described in \Cref{app: elgamal threshold cryptosystem} in order to generate the election encryption key $Y_\mathrm{enc}$ and each \textit{Trustee's} share of the decryption key $sx_i$. The \textit{Election Administrator} sets the threshold value $t$, such that any $t$ out of the $n_\mathrm{t}$ trustees can perform decryption.
-
-As a result of the threshold ceremony, for verification purpose, the \textit{Election Administrator} exports the following values:
-\begin{itemize}
-    \item the election encryption key $Y_\mathrm{enc}$,
-    \item the threshold setup $t$-out-of-$n_\mathrm{t}$,
-    \item the public keys of each trustee $Y_{\mathcal{T}_i}$, with $i \in \{1, ..., n_\mathrm{t}\}$,
-    \item the public coefficient sets of each trustee $\{P_{i,1}, ..., P_{i,t-1}\}$.
-\end{itemize}
-
-
-\subsubsection{Voter Credential Distribution Process} \label{sec: voter credential distribution process}
-This process is only applicable if the vote registration mode is \textbf{pre-election}, as described in \Cref{sec: pre-election mode}.
-
-Each \textit{Printing Authority} \( \mathcal{P}_j \in \boldsymbol{\mathcal{P}}\), receives a list of voters consisting of contact details for each voter \( \boldsymbol{a} = \{a_1, ..., a_{n_\mathrm{v}}\} \) in form of e-mail addresses or postal addresses or phone numbers, depending on the printing authority's communication channel. The \textit{Printing Authority} generates a random key pair for each of them \( (x_{i, j}, Y_{i, j}) \leftarrow \mathsf{KeyGen}() \) (\Cref{alg: key gen}), with \( j \in \{ 1, ..., n_\mathrm{p} \} \) and \( i \in \{ 1, ..., n_\mathrm{v} \} \). The \textit{Printing Authority} distributes the secret key $x_{i, j}$ to that specific voter $\mathcal{V}_i$ (using voter's contact detail $a_i$) and appends the corresponding public key $Y_{i, j}$ in the list of voters next to the specific voter $\mathcal{V}_i$.
-
-All \textit{Printing Authorities} return to the \textit{Election Administrator} the lists with voters contact details and public keys $(a_i, Y_{i,j})$. The \textit{Election Administrator} combines all public keys received from all \textit{Printing Authorities} for each \textit{Voter} to form the \textit{Voter's} public signature verification key \( Y_i = \sum_{j=1}^{n_\mathrm{p}} Y_{i, j} \).
-
-For authenticating to the voting system, the \textit{Voter} \( \mathcal{V}_i \in \boldsymbol{\mathcal{V}} \) has to input in the browser all secret keys \( \{x_{i, 1}, ..., x_{i, n_\mathrm{p}}\} \) received via different channels from all \textit{Printing Authorities}. The browser will combine all of them to form the \textit{Voter's} signing key \( x_i = \sum_{j=1}^{n_\mathrm{p}} x_{i, j} \pmod q \) which authorizes the voter.
 
 
 \subsubsection{Digital Ballot Box Initialization} \label{sec: digital ballot box initialization}
-The \textit{Election Administrator} $\mathcal{E}$ requests the \textit{Digital Ballot Box} $\mathcal{D}$ to initialize a new bulletin board with the initial election meta-data configuration (including the voter authorization mode).
+An election officer decides the elliptic curve domain parameters $(p, a, b, G, q, h)$ and, according to that, the Election Administrator service generates a new key pair $(x_\mathcal{E}, Y_\mathcal{E}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x_\mathcal{E}$ is its signing key and will be kept secret throughout the election, and $Y_\mathcal{E}$ is its public signature verification key. Then, the Election Administrator requests the Digital Ballot Box to initialize a new bulletin board with the initial election meta-data configuration (including the elliptic curve domain parameters and the public key $Y_\mathcal{E}$). A predefined set of elliptic curve domain parameters is listed in \cref{app: supported elliptic curves}.
 
-On this request, the \textit{Digital Ballot Box} generates a new key pair $(x_\mathcal{D}, Y_\mathcal{D}) \gets \mathsf{KeyGen}()$ (\Cref{alg: key gen}), where $x_\mathcal{D}$ is the signing key and will be kept secret throughout the election period, and $Y_\mathcal{D}$ is the public signature verification key. Then, it spawns a new bulletin board by generating a new \textit{genesis} item (following the protocol in \Cref{fig: protocol for writing an item on the bulletin board}) according to the rules specified in \Cref{sec: bulletin board event types}. Next, the \textit{Digital Ballot Box} returns to the \textit{Election Administrator} with the freshly created item.
+On this request, the Digital Ballot Box generates a new key pair $(x_\mathcal{D}, Y_\mathcal{D}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x_\mathcal{D}$ is its signing key and will be kept secret throughout the election period, and $Y_\mathcal{D}$ is its public signature verification key. Then, it spawns a new bulletin board by generating a new genesis item (following the protocol in \cref{fig: protocol for writing an item on the bulletin board}) according to the rules specified in \cref{sec: bulletin board event types}. Next, the Digital Ballot Box returns to the Election Administrator with the freshly created genesis item. From this point on, the Election Administrator service and the Digital Ballot Box represent indentities $\mathcal{E}$ and $\mathcal{D}$ respectivly on the bulletin board.
 
-Next, the \textit{Election Administrator} generates and writes all the configuration items on the bulletin board by following protocol in \Cref{fig: protocol for writing an item on the bulletin board}. All items are computed and posted one by one, based on the rules defined in \Cref{sec: bulletin board event types}. The items that make up the initial configuration are:
+
+\subsubsection{Election configuration} \label{sec: election configuration}
+Once a bulletin board exists, the Election Administrator $\mathcal{E}$ can generate and write all the configuration items on the bulletin board by following protocol in \cref{fig: protocol for writing an item on the bulletin board}. All items are computed and published one by one, based on the rules defined in \cref{sec: bulletin board event types}. All items are signed with the Election Administrator signing key $x_\mathcal{E}$ and they reference as a parent the address of the previous configuration item. The items that make up the initial configuration are:
 \begin{itemize}
     \item the election configuration item,
-    \item a contest configuration item for each contest,
-    \item the threshold configuration item,
-    \item the voters configuration item, in case voter authorization mode is \textbf{pre-election},
-    \item the voter authorization configuration item, in case voter authorization mode is \textbf{on-demand}.
+    \item contest configuration items for each contest and
+    \item actor configuration items for each other service that needs to interact with the Digiutal Ballot Box, e.g. the Voter Authorizer or the Ballot Adjudicator.
 \end{itemize}
+
+For each contest, the election officer has to configure a contest identifier, marking rules, result rules and a list of candidates represented by $\boldsymbol{m} = \{ m_1, ..., m_{n_\mathrm{c}} \}$, where $n_\mathrm{c}$ is the number of candidates.
+
+For each actor, the Election Administrator service interacts with the other service, e.g. the Voter Authorizer, to generate its own key pair $(x_\mathcal{A}, Y_\mathcal{A}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}). Value $x_\mathcal{A}$ is the Voter Authorizer signing key and will be kept secret throughout the election period while $Y_\mathcal{A}$ is its public signature verification key and it is shared with the Election Administrator. Next, the Election Administrator assignes the role of \textit{voter authorizer} to the public key $Y_\mathcal{A}$. Once the actor configuration item containing the public key $Y_\mathcal{A}$ is published on the bulletin board, the Voter Authorizer becomes indentity $\mathcal{A}$ and can interact with the Digital Ballot Box.
+
+
+\subsubsection{Voter Authorization Configuration} \label{sec: voter authorization configuration}
+An election officer interacts with the Voter Authorizer service to configure the voter authentication mode, which can be either \textbf{pre-election} or \textbf{on-demand}. In order to define the list of eligible voters, the election officer has to perform some extra configuration depending on the voter authentication mode selected previously.
+
+When \textbf{pre-election} voter authentication mode is enabled, the election officer sets up a set of Printing Authorities $\boldsymbol{\mathcal{P}} = \{ \mathcal{P}_1, ..., \mathcal{P}_{n_\mathrm{p}} \}$ used for distributing voter credentials, each Printing Authority $\mathcal{P}_i \in \boldsymbol{\mathcal{P}}$ being specified to use a particular communication channel for distributing voter credentials, e.g. e-mail, post or SMS. Then the election officer provides the list of eligible voters, where each voter is defined by a unique identifier and a list of contact information for each communication channel used by the Printing Authorities.
+
+Next, Printing Authorities and the Voter Authorizer perform the voter credential distribution process (describe in \cref{sec: voter credential distribution process}) to setup the public key of each voter.
+
+Finally, the Voter Authorizer writes the voter authorization configuration item on the bulletin board by following protocol in \cref{fig: protocol for writing an item on the bulletin board} and based on the rules defined in \cref{sec: bulletin board event types}. The item is signed by the Voter Authorizer signing key $x_\mathcal{A}$ and it contains the voter authentication mode.
+
+When \textbf{on-demand} voter authentication mode is enabled, the election officer selects a list of third party Identity Providers $\boldsymbol{\mathcal{I}} = \{ \mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}} \}$ used for authenticating voters during the election phase. Then the election officer provides the list of eligible voters, where each voter is defined by a unique identifier and a list of identities supported by each of the Identity Providers.
+
+Finally, the Voter Authorizer writes the voter authorization configuration item on the bulletin board by following protocol in \cref{fig: protocol for writing an item on the bulletin board} and based on the rules defined in \cref{sec: bulletin board event types}. The item is signed by the Voter Authorizer signing key $x_\mathcal{A}$ and it contains the voter authentication mode and the list of Identity Providers $\mathcal{I}_i$, each defined by their public key $Y_{\mathcal{I}_i}$ and a URL, with $i \in \{ 1, ..., n_\mathrm{i} \}$.
+
+
+\subsubsection{Voter Credential Distribution Process} \label{sec: voter credential distribution process}
+This process is only applicable if the vote authentication mode is \textbf{pre-election}, as described in \cref{sec: pre-election mode}.
+
+Each Printing Authority $\mathcal{P}_j \in \boldsymbol{\mathcal{P}}$, receives a list of voters consisting of contact details for each voter $\boldsymbol{a} = \{ a_1, ..., a_{n_\mathrm{v}} \}$ in form of e-mail addresses or postal addresses or phone numbers, depending on the Printing Authority's communication channel. The Printing Authority generates a random key pair for each of them $(x_{i, j}, Y_{i, j}) \leftarrow \mathsf{KeyGen}()$ (\cref{alg: key gen}), with $i \in \{ 1, ..., n_\mathrm{v} \}$. The Printing Authority distributes the secret key $x_{i, j}$ to that specific voter $\mathcal{V}_i$ (using voter's contact detail $a_i$) and appends the corresponding public key $Y_{i, j}$ in the list of voters next to the specific voter $\mathcal{V}_i$.
+
+All Printing Authorities return to the Voter Authorizer the lists with voters contact details and public keys $(a_i, Y_{i,j})$. The Voter Authorizer combines all public keys received from all Printing Authorities for each voter to form the Voter's public signature verification key $Y_i = \sum_{j=1}^{n_\mathrm{p}} Y_{i, j}$.
+
+For authenticating to the voting system, the Voter $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ has to input in the browser all secret keys $\{ x_{i, 1}, ..., x_{i, n_\mathrm{p}} \}$ received via different channels from all Printing Authorities. The browser will combine all of them to form the Voter's signing key $x_i = \sum_{j=1}^{n_\mathrm{p}} x_{i, j} \pmod q$ which authorizes the voter.
+
+
+\subsubsection{Threshold Ceremony} \label{sec: threshold ceremony}
+An election officer interacts with the Election Administrator service to define the lists of trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$. Then, the Election Administrator coordinates the threshold ceremony during which all Trustees $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ participate in the protocol from \cref{fig: threshold ceremony} described in \cref{app: elgamal threshold cryptosystem} in order to generate the election encryption key $Y_\mathrm{enc}$ and each Trustee's share of the decryption key $sx_i$. The election officer sets the threshold value $t$, such that any $t$ out of the $n_\mathrm{t}$ Trustees can perform decryption.
+
+As a result of the threshold ceremony, the Election Administrator $\mathcal{E}$ writes the threshold configuration item on the bulletin board by following protocol in \cref{fig: protocol for writing an item on the bulletin board} and based on the rules defined in \cref{sec: bulletin board event types}. The item contains:
+\begin{itemize}
+    \item election encryption key $Y_\mathrm{enc}$,
+    \item threshold setup $t$-out-of-$n_\mathrm{t}$,
+    \item public keys of each Trustee $Y_{\mathcal{T}_i}$, with $i \in \{1, ..., n_\mathrm{t}\}$,
+    \item public polynomial coefficients of each trustee $P_{\mathcal{T}_i,j}$, with $j \in \{1, ..., t-1 \}$.
+\end{itemize}
+
+
+\subsubsection{Voting rounds} \label{sec: voting rounds}
+An election officer interacts with the Election Administrator service to define when the election phase is taking place, by setting a start date and an end date. Then, the Election Administrator $\mathcal{E}$ writes a voting round item on the bulletin board by following protocol in \cref{fig: protocol for writing an item on the bulletin board} and based on the rules defined in \cref{sec: bulletin board event types}, specifying the start and end date and enabling all contest identifiers.
+
+For a regular election, a single voting round is sufficient, but multiple voting rounds can be configured to start at different times and different contests could be enabled in each voting round.
