@@ -1,10 +1,143 @@
 \subsection{Election phase} \label{sec: election phase}
+The election phase lasts from the start date until the end date of a voting round. During this time, any voter $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ can cast a valid digital ballot by performing the following steps:
+\begin{itemize}
+    \item authenticate and get authorized to cast a digital ballot on the bulletin board as described in \cref{sec: voter authentication procedure},
+    \item select vote choices and prepare them for encryption as described in \cref{sec: mapping vote options on the elliptic curve},
+    \item encrypt the ballot following the process from \cref{sec: vote cryptogram generation process},
+    \item optionally, perform an audit/verification on the encrypted ballot as described in \cref{sec: challenging a vote cryptogram} and
+    \item finally, cast the encrypted ballot and obtain a vote confirmation receipt as in \cref{sec: vote confirmation receipt}.
+\end{itemize}
 
-The election phase lasts from the election start date until the election end date. During this time, any \textit{Voter} $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ can cast a valid digital ballot by performing the following steps:
+
+\subsubsection{Voter authentication procedure} \label{sec: voter authentication procedure}
+A voter $\mathcal{V}_i$ is considered authorized to cast a digital ballot when it is in possession of a secret signing key $x_i$ that corresponds to an eligible public key $Y_i$ from the bulletin board. This is achieved differently depending on the voter authentication mode.
+
+
+\paragraph{When pre-election voter authentication mode}\mbox{}\\
+Each voter $\mathcal{V}_i$ has to input in the voting application all credentials received from the Printing Authorities $x_{i, j}$, with $j \in \{ 1, ..., n_\mathrm{p} \}$. The application combines all credentials to form the voter's secret signing key $x_i = \sum_{j=1}^{n_\mathrm{p}} x_{i, j} \pmod q$. The associated public key $Y_i$ has been computed and included on the bulletin board in the pre-election phase.
+
+
+\paragraph{When on-demand voter athentication mode}\mbox{}\\
+Each voter $\mathcal{V}_i$ has to follow the protocol from \cref{fig: voter authentication protocol} in order to get authorized to cast a digital ballot on the bulletin board. Specifically, the voter must authenticate and get identity tokens $\sigma_{\mathrm{id}, j}$ from all of the Idenitity Providers $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ that have been configured by the Voter Authorizer in the pre-election phase.
+
+Then, the voting application generates a key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and forwards all identity tokens $\{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$ and the public key $Y_i$ to the Voter Authorizer service $\mathcal{A}$ proving the identity of the voter $\mathcal{V}_i$.
+
+If the Voter Authorizer service can validate all identity tokens and the voter is eligible, i.e. $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$, then it will authorize the use of the public key $Y_i$ for the voter $\mathcal{V}_i$. This is done by the Voter Authorizer $\mathcal{A}$ interacting with the Digital Ballot Box $\mathcal{D}$ in the protocol from \cref{fig: protocol for writing an item on the bulletin board} to write a voter session item on the bulletin board, according to the rules specified in \cref{app: bulletin board item types}. The item contains the voter identifier, the public key $Y_i$, and the authentication fingerprint which is the hash value of all identity tokens received form the voter.
+
+The Voter Authorizer returns to the voter the voter session item and its receipt, as received from the Digital Ballot Box. From this point on, the voter can interact directly with the Digital Ballot Box as the identity $\mathcal{V}_i$.
+
+The Voter Authorizer Service $\mathcal{A}$ stores a link between the voter identity $\mathcal{V}_i$ and all related identity tokens for the purpose of the private auditing process in the post-election phase as described in \cref{sec: private auditing process}. This link is stored privately by the Voter Authorizer service due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
+
+\clearpage
+\begin{landscape}
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed,
+            node distance=0,
+            % every node/.style={draw},
+            ]{
+        
+        % Actors
+        \node[title_3, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title_3, right=of v] (va) {
+            \textbf{Voter Authorizer $\mathcal{A}$}};
+        \node[title_3, right=of va] (ip) {
+            \textbf{Identity Provider $\mathcal{I}_j$}};
+        
+        % internal knowledge
+        \node[internal_3, below=of v] (v_ik) {
+            internal knowledge: $Y_\mathcal{A}$, $Y_\mathcal{D}$, \\
+            $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$
+            };
+        \node[internal_3, below=of va] (va_ik) {
+            internal knowledge: $x_\mathcal{A}$, $\boldsymbol{\mathcal{V}}$, \\
+            $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$
+            };
+        \node[internal_3, below=of ip] (ip_ik) {
+            internal knowledge: $x_{\mathcal{I}_j}$
+            };
+        
+        % All content
+        % \node[below=of v_ik] (top){};
+        \node[arrow_v2, towards_right, between={v.center}{ip.center}] at (v_ik.south -| v.center) (a_1) {
+            authenticate as $\mathcal{V}_i$
+            };
+        \node[process_v2, keep_middle, after_arrow] at (a_1.south -| ip.center) (ip_1) {
+            $\sigma_{\mathrm{id}, j} \gets \mathsf{Sign}(x_{\mathcal{I}_j}; \mathcal{V}_i)$
+            };
+        \node[arrow_v2, towards_left, between={v.center}{ip.center}] at (ip_1.south -| ip.center) (a_2) {
+            $\sigma_{\mathrm{id}, j}$
+            };
+        \node[process_v2, keep_left, after_arrow] at (a_2.south -| v.west) (v_1) {
+            verify that $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$
+            };
+        \node[banner_v2, keep_left, after_arrow, between={v.west}{ip.east}] at (v_1.south -| v.west) (b_1) {
+            when successfully authenticated with all $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ and received $\{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$
+            };
+        \node[process_v2, keep_middle, after_arrow] at (b_1.south -| v.center) (v_2) {
+            $(x_i, Y_i) \gets \mathsf{KeyGen}()$
+            };
+        \node[arrow_v2, towards_right, between={v.center}{va.center}] at (v_2.south -| v.center) (a_3) {
+            $Y_i, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$
+            };
+        \node[process_v2, keep_left, after_arrow] at (a_3.south -| va.west) (va_1) {
+            verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [6pt]
+            $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$, $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \phi)$ \\
+            $m_\mathrm{vs} \gets$ "voter session", $p_\mathrm{vs} \gets$ the address of the latest config item \\
+            perform protocol from \cref{fig: protocol for writing an item on the bulletin board} to append $b_k = (m_\mathrm{vs}, c_\mathrm{vs}, \mathcal{A}, \sigma_\mathcal{A}, t_k, p_\mathrm{vs}, h_k)$ and \\
+            receive $\rho_k$ and $h_{k-1}$ \\
+            internally store the tuple for auditing: $(\mathcal{V}_i, \phi, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \})$
+            };
+        \node[arrow_v2, towards_left, between={v.center}{va.center}] at (va_1.south -| va.south) (a_4) {
+            $b_k = (m_\mathrm{vs}, c_\mathrm{vs}, \mathcal{A}, \sigma_\mathcal{A}, t_k, p_\mathrm{vs}, h_k)$ , $\rho_k$, $h_{k-1}$
+            };
+        \node[process_v2, keep_left, after_arrow] at (a_4.south -| v.west) (v_3) {
+            verify that $m_\mathrm{vs} =$ "voter session", $c_\mathrm{vs} = (\mathcal{V}_i, Y_i, \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}}))$, \\
+            $h_k = \mathcal{H}(m_\mathrm{vs} || c_\mathrm{vs} || p_\mathrm{vs} || h_{k-1} || t_{k-1})$, $\mathsf{SigVer}(Y_\mathcal{A}, \sigma_\mathcal{A}; m_\mathrm{vs} || c_\mathrm{vs} || p_\mathrm{vs})$, $\mathsf{SigVer}(Y_\mathcal{D}, \rho_k; \sigma_\mathcal{A} || h_k)$ 
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(ip.south east);    
+        \draw[dashed] (v_ik.west |- va_ik.south)--(ip_ik.east |- va_ik.south);
+        
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+        
+        \draw[dotted] (v_ik.south)--(v_1.north -| v.center);
+        \draw[dotted] (v_1.south -| v.center)--(b_1.north -| v.center);
+        \draw[dotted] (b_1.south -| v.center)--(v_2.north -| v.center);
+        \draw[dotted] (v_2.south -| v.center)--(v_3.north -| v.center);
+
+        \draw[dotted] (a_3.south -| va.center)--(va_1.north -| va.center);
+        \draw[dotted] (va_1.south -| va.center)--(a_4.south -| va.center);
+
+        \draw[dotted] (a_1.south -| ip.center)--(ip_1.north -| ip.center);
+        \draw[dotted] (ip_1.south -| ip.center)--(a_2.south -| ip.center);
+        }
+    \end{tikzpicture}
+    \caption{Voter authentication protocol}
+    \label{fig: voter authentication protocol}
+\end{figure}
+\end{landscape}
+
+
+\clearpage
+\subsubsection{Mapping vote options on the Elliptic Curve} \label{sec: mapping vote options on the elliptic curve}
+An expressed vote (a vote in plain text) must be able to be converted, deterministically, into an elliptic curve point in order to be used in our cryptographic protocols. Additionally, a point from the elliptic curve must be able to be turned back to a plain text vote, if the point has been constructed from a plain text. Consequently, only a finite number of elliptic curve points can be mapped to a plain text that can be interpreted as valid votes. All the other points will be regarded as invalid votes. 
+
+The mapping procedure from a plain text $m$ to an elliptic curve point $M$ is called \( M \leftarrow \mathbf{String2Point}(m) \) and is described in the \cref{alg: bytes to point}. Recovering the text of the vote $m$ from an elliptic curve point $M$ can be done by calling \( m \leftarrow \mathbf{Point2String}(M) \) (\cref{alg: point to bytes}).
+
+Depending on the election type (referendum, simple election, multiple choice election, STV election), the text $m$ can be constructed in different ways. We recall from \Cref{app: mapping a message on the elliptic curve} that $m$ can be maximum 30 characters in length. 
+
+For convenience, we will describe the case of a simple election where the voters have to select one candidate only. Each candidate must have a distinct name which will be used as $m$ and it can be at most 30 characters in length. All names are turned into elliptic curve points using the $\textbf{String2Point}$ algorithm. When decoded back from an elliptic curve point, the candidate name will be visible in plain text.
+
+
+
+\color{orange}
+\subsubsection{Not used - to be moved or removed}
 \begin{enumerate}
     \item The \textit{Voter} $\mathcal{V}_i$ asks the \textit{Digital Ballot Box} $\mathcal{D}$ for the latest election configuration items which presents the means of voter authentication and all contest options.
-    
-    \item The \textit{Voter} has to get authenticated in order to be in possession of a private signing key $x_i$ that has a corresponding eligible public key $Y_i$ on the \textit{Digital Ballot Box} $\mathcal{D}$. The authentication process varies depending on what voter registration mode is used (\textbf{pre-election} or \textbf{on-demand}). Both authentication processes are described in \Cref{sec: voter authentication procedure}.
  
     \item \label{itm: pick vote} The \textit{Voter} $\mathcal{V}_i$ picks a vote option $m$ and the browser converts it into an elliptic curve point \( M \leftarrow \mathbf{String2Point}(m) \) (\cref{alg: bytes to point}). More details about the conversion algorithms can be found in \Cref{sec: mapping vote options on the elliptic curve}. Next, the browser collaborates with the \textit{Digital Ballot Box} $\mathcal{D}$ in the \textit{vote cryptogram generation process} in order to encrypt the \textit{Voter's} choice. This process is described in \Cref{sec: vote cryptogram generation process}. At the end of this step, the vote cryptogram $e$ is published to the bulletin board together with the two encryption commitments.
     
@@ -19,197 +152,16 @@ The election phase lasts from the election start date until the election end dat
     
     \item The last response from the \textit{Digital Ballot Box} $\mathcal{D}$ that the \textit{Voter} $\mathcal{V}_i$ receives which certifies the acceptance of the \textit{cast request} item on the bulletin board is regarded as a vote receipt. The \textit{Voter} should store this receipt, as it can be used at any time to verify that the vote is registered by the \textit{Digital Ballot Box} as described in \Cref{sec: vote is registered as cast}.
 \end{enumerate}
-
-
-\subsubsection{Voter Authentication Procedure} \label{sec: voter authentication procedure}
-A \textit{Voter} $\mathcal{V}_i$ being authenticated is defined as being in possession of a secret signing key \( x_i \) that corresponds to an eligible public key \( Y_i \) from the bulletin board. This is achieved differently depending on the voter authorization mode:
-
-\paragraph{\textit{Pre-election:}}
-\textit{Voter} $\mathcal{V}_i$ inputs in the browser all credentials received from the \textit{Printing Authorities} $x_{i, j}$, with \( j \in \{ 1, ..., n_\mathrm{p} \} \). The browser combines all credentials to form the \textit{Voter's} secret signing key \( x_i = \sum_{j=1}^{n_\mathrm{p}} x_{i, j} \pmod q \). The associated public key \( Y_i \) has been computed and included on the bulletin board in the pre-election phase.
-
-\paragraph{\textit{On-demand:}}
-The \textit{Voter} $\mathcal{V}_i$ follows the protocol in \Cref{fig: voter authentication protocol} to get authorized to vote and the protocol from \Cref{fig: protocol for registering a voter session} to crate a voter session. Specifically, the \textit{Voter} must fulfill the steps:
-\begin{enumerate}
-    \item the \textit{Voter Authorization Service} $\mathcal{A}$ requests all \textit{Identity Providers} $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ to request identity validation from the \textit{Voter} $\mathcal{V}_i$.
-    
-    \item On successful authentication, each \textit{Identity Provider} $\mathcal{I}_j$ generates an identity token $\sigma_{\mathrm{id}, j} \leftarrow \mathsf{Sign}(x_{\mathcal{I}_j}; \mathcal{V}_i)$ (\Cref{alg: sign}) and shares it with the \textit{Voter}.
-    
-    \item Then, the \textit{Voter} $\mathcal{V}_i$ generates a key pair \( (x_i, Y_i) \leftarrow \mathsf{KeyGen}() \) (\Cref{alg: key gen}) and forwards all identity tokens \( \{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\} \) and the public key $Y_i$ to the \textit{Voter Authorization Service} $\mathcal{A}$.
-    
-    \item If all identity tokens can be verified by \( \mathsf{SigVer} (Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i) \) (\Cref{alg: sig ver}) then the \textit{Voter Authorization Service} $\mathcal{A}$ checks that the $\mathcal{V}_i$ is a eligible voter identity, i.e. \( \mathcal{V}_i \in \boldsymbol{\mathcal{V}} \).
-    
-    \item If eligible then, the \textit{Voter Authorization Service} $\mathcal{A}$ generates an authorization token $\sigma_\mathrm{auth} \leftarrow \mathsf{Sign}(x_\mathcal{A}; vID || Y_i || \phi)$ (\Cref{alg: sign}), where $vID$ is an internally used id for the \textit{Voter} $\mathcal{V}_i$ and $\phi \leftarrow \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$ is a fingerprint to all the tokens that confirm the identity of the voter.
-    
-    \item The \textit{Voter Authorization Service} $\mathcal{A}$ returns the authorization token $\sigma_\mathrm{auth}$ to the \textit{Voter} $\mathcal{V}_i$.
-    
-    \item The \textit{Voter} $\mathcal{V}_i$ submits the token further to the \textit{Digital Ballot Box} $\mathcal{D}$, which verifies the token by $\mathsf{SigVer} (Y_\mathcal{A}, \sigma_\mathrm{auth}; vID || Y_i || \phi)$ (\Cref{alg: sig ver}) and, if valid, appends a \textit{voter session} item on the bulletin board according to the rules from \Cref{sec: bulletin board event types}. The content of the \textit{voter session} item is extracted from the authorization token $\sigma_\mathrm{auth}$.
-    
-    \item The \textit{voter session} item is returned to the \textit{Voter} as a confirmation to his authentication. The address of this item is further needed to generate the rest of the voting items on the bulletin board.
-\end{enumerate}
-
-The \textit{Voter Authorization Service} $\mathcal{A}$ stores a link between the voter identity $\mathcal{V}_i$, all related identity tokens and the authorization token. This is stored for the private auditing process in the post-election phase as described in \Cref{sec: private auditing process}. The link is stored by the \textit{Voter Authorization Service} $\mathcal{A}$ due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
-
-\clearpage
-\begin{landscape}
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}[framed, node distance=0,
-            spaced/.style={yshift=-4},
-            % every node/.style={draw},
-            ]{
-        
-        % Actors
-        \node[title_3, above, anchor=north east] (v) {
-            \textbf{Voter $\mathcal{V}_i$}};
-        \node[title_3, right=of v] (vas) {
-            \textbf{Voter Authorization Service $\mathcal{A}$}};
-        \node[title_3, right=of vas] (ip) {
-            \textbf{Identity Provider $\mathcal{I}_j$}};
-        
-        % internal knowledge
-        \node[block_3, below=of v] (v_ik) {
-            /* internal knowledge: \\
-            \phantom{/}* $Y_\mathcal{A}$, $\{Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}}\}$ */
-            };
-        \node[block_3, below=of vas] (vas_ik) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_\mathcal{A}$, $\boldsymbol{\mathcal{V}}$, $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$ */
-            };
-        \node[block_3, below=of ip] (ip_ik) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_{\mathcal{I}_j}$ */
-            };
-        
-        % All content
-        \node[arrow_3_skip, below=of v_ik.south, anchor=north west] (a_1) {
-            authenticate as $\mathcal{V}_i$
-            };
-        \node[block_3, anchor=north west] at (a_1.south -| ip.west) (ip_1) {
-            $\sigma_{\mathrm{id}, j} \gets \mathsf{Sign}(x_{\mathcal{I}_j}; \mathcal{V}_i)$
-            };
-        \node[arrow_3_skip, anchor=north west] at (ip_1.south -| v.south) (a_2) {
-            $\sigma_{\mathrm{id}, j}$
-            };
-        \node[block_3, anchor=north west, text width=140] at (a_2.south -| v.west) (v_1) {
-            verify that $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$
-            };
-        \node[banner_3, spaced, anchor=north west] at (v_1.south -| v.west) (b_1) {
-            \scriptsize when successfully authenticated with all $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ and received $\{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\}$
-            };
-        \node[block_3, spaced, anchor=north west] at (b_1.south -| v.west) (v_2) {
-            $(x_i, Y_i) \gets \mathsf{KeyGen}()$
-            };
-        \node[arrow_3_next, below=of v_2.south, anchor=north west] (a_3) {
-            $Y_i, \{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\}$
-            };
-        \node[block_3, anchor=north west, text width=310] at (a_3.south -| vas.west) (vas_1) {
-            verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [6pt]
-            generate $vID_i$ based on $\mathcal{V}_i$ \\
-            $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$ \\
-            $\sigma_{\mathrm{auth}, i} \gets \mathsf{Sign}(x_\mathcal{A}, vID_i || Y_i || \phi)$ \\ [6pt]
-            /* store internally the tuple: \\
-            \phantom{/}* $(\mathcal{V}_i, vID_i, \sigma_{\mathrm{auth}, i}, \{\sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}}\})$ */
-            };
-        \node[arrow_3_next, anchor=north west] at (vas_1.south -| v.south) (a_4) {
-            $vID_i, \sigma_{\mathrm{auth}, i}$
-            };
-        \node[block_3, anchor=north west, text width=190] at (a_4.south -| v.west) (v_3) {
-            $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$ \\
-            verify that $\mathsf{SigVer}(Y_\mathcal{A}, \sigma_{\mathrm{auth}, i}, vID_i || Y_i || \phi)$
-            };
-        
-        % Arrows and lines
-        \draw[dashed] (v.south west)--(ip.south east);    
-        \draw[dashed] (v_ik.south west)--(ip_ik.south east);
-        \draw[dotted] (b_1.north west)--(b_1.north east);
-        \draw[dotted] (b_1.south west)--(b_1.south east);
-        \draw[->] (a_1.south west)--(a_1.south east);
-        \draw[->] (a_2.south east)--(a_2.south west);
-        \draw[->] (a_3.south west)--(a_3.south east);
-        \draw[->] (a_4.south east)--(a_4.south west);
-        }
-    \end{tikzpicture}
-    \caption{Voter authentication protocol}
-    \label{fig: voter authentication protocol}
-\end{figure}
-\end{landscape}
-
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}[framed, node distance=0,
-            % every node/.style={draw}
-            ]{
-            
-        % Actors
-        \node[title, above, anchor=north east] (v) {
-            \textbf{Voter} $\mathcal{V}_i$};
-        \node[title, right=of v] (dbb) {
-            \textbf{Digital Ballot Box} $\mathcal{D}$};
-        
-        % internal knowledge
-        \node[block, below=of v] (v_ik) {
-            /* internal knowledge: \\
-            \phantom{/}* $(x_i, Y_i)$, $Y_\mathcal{D}$, $vID_i$, $\phi$, $\sigma_{\mathrm{auth}, i}$ */
-            };
-        \node[block, below=of dbb] (dbb_ik) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_\mathcal{D}$, $Y_\mathcal{A}$, $\boldsymbol{h} = \{h_1, ... h_{n_\mathrm{b}}\}$ */
-            };
-        \node[block, anchor=south west] at (dbb_ik.south -| v_ik.west) (v_ik_corner) {};
-        
-        %All content
-        \node[arrow, below=of v_ik.south, anchor=north west] (a_1) {
-            $vID_i, Y_i, \phi, \sigma_{\mathrm{auth}, i}$
-            };
-        \node[block, anchor=north east] at (a_1.south -| dbb.east) (dbb_1) {
-            verify that \\
-            $\mathsf{SigVer} (Y_\mathcal{A}, \sigma_{\mathrm{auth}, i}; vID_i || Y_i || \phi)$ \\
-            then: \\ [9pt]
-            $m \gets$ "voter session" \\
-            $c \gets (vID_i, Y_i, \phi, \sigma_{\mathrm{auth}, i})$ \\
-            $p \gets$ latest config item from $\boldsymbol{h}$ \\
-            $\sigma_\mathcal{D} \gets \mathsf{Sign}(x_\mathcal{D}, m || c || p)$ \\
-            $t \gets$ current timestamp \\
-            $h_{n_\mathrm{b} + 1} \gets \mathcal{H}(m || c || p || h_{n_\mathrm{b}} || t)$ \\
-            $\rho \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathcal{D} || h_{n_\mathrm{b} + 1})$ \\ [9pt]
-            /* store on the Bulletin Board \\
-            \phantom{/}* as a new item the tuple: \\
-            \phantom{/}* $(m, c, \mathcal{D}, \sigma_\mathcal{D}, t, p, h_{n_\mathrm{b} + 1})$ */
-            };
-        \node[arrow, anchor=north west] at (v.south |- dbb_1.south) (a_2) {
-            $p$, $\sigma_\mathcal{D}$, $t$, $h_{n_\mathrm{b}}$, $h_{n_\mathrm{b} + 1}$, $\rho$
-            };
-        \node[block, below=of a_2.south west] (v_1) {
-            $m \gets$ "voter session" \\
-            $c \gets (vID_i, Y_i, \phi, \sigma_{\mathrm{auth}, i})$ \\ [9pt]
-            verify that \\
-            $h_{n_\mathrm{b} + 1} = \mathcal{H}(m || c || p || h_{n_\mathrm{b}} || t)$, \\
-            $\mathsf{SigVer} (Y_\mathcal{D}, \sigma_\mathcal{D};  m || c || p)$ and \\
-            $\mathsf{SigVer} (Y_\mathcal{D}, \rho;  \sigma_\mathcal{D} || h_{n_\mathrm{b} + 1})$ \\
-            };
-        
-        % Arrows and lines
-        \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (v_ik_corner.south west)--(dbb_ik.south east);
-        \draw[->] (a_1.south west)--(a_1.south east);
-        \draw[->] (a_2.south east)--(a_2.south west);
-        }
-    \end{tikzpicture}
-    \caption{Protocol for registering a voter session}
-    \label{fig: protocol for registering a voter session}
-\end{figure}
-
-
-\color{orange}
-\subsubsection{Mapping Vote Options on the Elliptic Curve} \label{sec: mapping vote options on the elliptic curve}
 \color{black}
-An expressed vote (a vote in plain text) must be able to be converted, deterministically, into an elliptic curve point in order to be used in our cryptographic protocols. Additionally, a point from the elliptic curve must be able to be turned back to a plain text vote, if the point has been constructed from a plain text. Consequently, only a finite number of elliptic curve points can be mapped to a plain text that can be interpreted as valid votes. All the other points will be regarded as invalid votes. 
 
-The mapping procedure from a plain text $m$ to an elliptic curve point $M$ is called \( M \leftarrow \mathbf{String2Point}(m) \) and is described in the \cref{alg: bytes to point}. Recovering the text of the vote $m$ from an elliptic curve point $M$ can be done by calling \( m \leftarrow \mathbf{Point2String}(M) \) (\cref{alg: point to bytes}).
 
-Depending on the election type (referendum, simple election, multiple choice election, STV election), the text $m$ can be constructed in different ways. We recall from \Cref{app: mapping a message on the elliptic curve} that $m$ can be maximum 30 characters in length. 
 
-For convenience, we will describe the case of a simple election where the voters have to select one candidate only. Each candidate must have a distinct name which will be used as $m$ and it can be at most 30 characters in length. All names are turned into elliptic curve points using the $\textbf{String2Point}$ algorithm. When decoded back from an elliptic curve point, the candidate name will be visible in plain text.
+
+
+
+
+
+
 
 
 \subsubsection{Vote Cryptogram Generation Process} \label{sec: vote cryptogram generation process}
@@ -217,7 +169,7 @@ During the vote cryptogram generation process, the \textit{Voter's} browser coll
 
 %The process starts with the \textit{Bulletin Board} $\mathcal{D}$ delivering to the \textit{Voter} $\mathcal{V}_i$ an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_0 \gets \mathbf{Enc} (\mathcal{O}, r_0) \) (algorithm \ref{alg: enc}), where \( r_0 \in_\mathrm{R} \mathbb{Z}_q \). 
 
-The generation process begins by the two parties creating and submitting encryption commitments to be used for the ballots. The Voter $\mathcal{V}_i$ generates its encryption commitment $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ and together with $p$ (the hash address of the voter session created during voter authentication as seen in \Cref{fig: protocol for registering a voter session}) they are signed with the Voter's own private key $x_i$ and is sent to the Digital Ballot Box $\mathcal{D}$ which stores it on the Bulletin Board as an item. The Digital Ballot Box $\mathcal{D}$ then generates its own commitment $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ and stores that on the Bulletin Board as an item as well. The hash of these items are added to Digital Ballot Box's list $\boldsymbol{h}$ of all items on the Bulletin Board. The Digital Ballot Box $\mathcal{D}$ then sends these (tuples) to the Voter that verifies that the correct values were stored on the Bulletin Board. The details on this can be seen in \Cref{fig: protocol for submitting encryption commitments}.
+The generation process begins by the two parties creating and submitting encryption commitments to be used for the ballots. The Voter $\mathcal{V}_i$ generates its encryption commitment $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ and together with $p$ (the hash address of the voter session created during voter authentication as seen in \Cref{fig: voter authentication protocol}) they are signed with the Voter's own private key $x_i$ and is sent to the Digital Ballot Box $\mathcal{D}$ which stores it on the Bulletin Board as an item. The Digital Ballot Box $\mathcal{D}$ then generates its own commitment $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ and stores that on the Bulletin Board as an item as well. The hash of these items are added to Digital Ballot Box's list $\boldsymbol{h}$ of all items on the Bulletin Board. The Digital Ballot Box $\mathcal{D}$ then sends these (tuples) to the Voter that verifies that the correct values were stored on the Bulletin Board. The details on this can be seen in \Cref{fig: protocol for submitting encryption commitments}.
 
 The \textit{Voter} $\mathcal{V}_i$ encrypts his vote $M$ with the randomizer \( r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q \) by generating the cryptogram \( e_v \gets \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_v) \) (\Cref{alg: enc}). The \textit{Voter} $\mathcal{V}_i$ generates the randomizer value $r_V$. Then, the voter generates an encryption commitment item who he/she writes to the Bulletin Board (described in \Cref{sec: writing on the bulletin board}). When receiving the commitment the \textit{Digital Ballot Box} $\mathcal{D}$ generates an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_d \gets \mathbf{Enc} (\mathcal{O}, r_d) \) (\Cref{alg: enc}), where \( r_d \in_\mathrm{R} \mathbb{Z}_q \). The \textit{Digital Ballot Box} $\mathcal{D}$ then generates a commitment to $r_d$ and appends its own and the voters commitment ($r_d$ \& $r_v$) to the bulletin board. The empty cryptogram is then sent back to the voter as well as the item for the voter and board commitment. The \textit{Voter} $\mathcal{V}_i$ finalizes the cryptogram by homomorphically adding his cryptogram to the empty cryptogram received from the server \( e = \mathbf{AddEnc}(e_d, e_v) \) (\Cref{alg: hom add}). The \textit{Voter} $\mathcal{V}_i$ also generates a proof of correct encryption \( PK \gets \mathbf{Prove}_G (r_v) \) (\Cref{alg: dl prove}). The finalized cryptogram is sent to the \textit{Digital Ballot Box} $\mathcal{D}$ and appended on the bulletin board together with the hidden verification track start item that references the cryptogram item. The \textit{Digital Ballot Box} $\mathcal{D}$ returns to the \textit{Voter} $\mathcal{V}_i$ both items.
 %the \textit{Bulletin Board} $\mathcal{D}$ delivering to the \textit{Voter} $\mathcal{V}_i$ an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_0 \gets \mathbf{Enc} (\mathcal{O}, r_0) \) (algorithm \ref{alg: enc}), where \( r_0 \in_\mathrm{R} \mathbb{Z}_q \). 
