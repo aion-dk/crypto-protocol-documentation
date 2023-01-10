@@ -156,15 +156,103 @@ Recovering the byte array $\boldsymbol{b}$ from $M$ can be done by $\boldsymbol{
 
 
 
+\subsubsection{Vote cryptogram generation process} \label{sec: vote cryptogram generation process}
+During the vote cryptogram generation process, the voting application collaborates with the digital ballot box $\mathcal{D}$ for generating the cryptogram $e$ that represents the encryption of the vote $M$. This process results in the fact that neither the voter $\mathcal{V}_i$ nor the digital ballot box $\mathcal{D}$ will be in possession of whole randomizer value $r$ used in the generation process of cryptogram $e$ (recall from \cref{app: elgamal cryptosystem} that $e = \mathsf{Enc}(Y_\mathrm{enc}, M; r)$). That is achieved by both the voter and the digital ballot box building up the randomizer but none of them knowing its entire value. It is important for the voter to not know this value in order to not be able to produce cryptographic evidence of the way he voted (as in \cref{app: proving the content of a cryptogram}), thus achieving \textit{receipt freeness}.
 
 
 
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed,
+            node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (v) {
+            \textbf{Voter $\mathcal{V}_i$}};
+        \node[title, right=of v] (dbb) {
+            \textbf{Digital Ballot Box $\mathcal{D}$}};
+        
+        % internal knowledge
+        \node[internal, below=of v] (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathrm{enc}$, \\
+            $b_\mathrm{vs}$, $M$
+            };
+        \node[internal, below=of dbb] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, \\
+            $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$
+            };
+        
+        %All content
+        \node[process_v2, keep_left, first] at (v_ik.south west) (v_1) {
+            $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $c_\mathrm{vec} \gets \mathsf{Com}(r_\mathrm{v}, s_\mathrm{v})$, $p_\mathrm{vec} \gets$ the address of $b_\mathrm{vs}$ \\
+            $m_\mathrm{vec} \gets$ "voter encryption commitment"
+            };
+        \node[banner_v2, keep_left, after_arrow, between={v.west}{dbb.east}] at (v_1.south west) (b_1) {
+            perform protocol from \cref{fig: protocol for writing an item on the bulletin board} to write $b_\mathrm{vec}$ as the $k^\mathrm{th}$ item \\
+            $(b_\mathrm{vec}, h_{k-1}, \rho_k) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vec}, c_\mathrm{vec}, p_\mathrm{vec})$, where \\
+            $b_\mathrm{vec} = (m_\mathrm{vec}, c_\mathrm{vec}, \mathcal{V}_i, \sigma_\mathrm{vec}, t_k, p_\mathrm{vec}, h_k)$
+            };
+        \node[process_v2, keep_right, after_arrow] at (b_1.south east) (dbb_1) {
+            $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $c_\mathrm{sec} \gets \mathsf{Com}(r_\mathrm{d}, s_\mathrm{d})$, $p_\mathrm{sec} \gets$ the address of $b_\mathrm{vec}$ \\
+            $m_\mathrm{sec} \gets$ "server encryption commitment" \\ [7pt]
+            \scriptsize perform protocol from \cref{fig: protocol for writing an item on the bulletin board} to write $b_\mathrm{sec}$ as \\
+            \scriptsize the $(k+1)^\mathrm{th}$ item \\
+            \scriptsize $(b_\mathrm{sec}, h_k, \rho_{k+1}) \gets \mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sec}, c_\mathrm{sec}, p_\mathrm{sec})$ \\ [7pt]
+            $e_\mathrm{d} \gets \mathsf{Enc}(Y_\mathrm{enc}, \mathcal{O}; r_\mathrm{d})$
+            };
+        \node[arrow_v2, towards_left, between={v.center}{dbb.center}, anchor=north west] at (dbb_1.south -| v.center) (a_1) {
+            $b_\mathrm{sec} = (m_\mathrm{sec}, c_\mathrm{sec}, \mathcal{D}, \sigma_\mathrm{sec}, t_{k+1}, p_\mathrm{sec}, h_{k+1})$, \\
+            $\rho_{k+1}$, $e_\mathrm{d}$
+            };
+        \node[process_v2, keep_left, after_arrow] at (a_1.south -| v.west) (v_2) {
+            verify that $m_\mathrm{sec} =$ "server encryption commitment", \\
+            $h_{k+1} = \mathcal{H}(m_\mathrm{sec} || c_\mathrm{sec} || p_\mathrm{sec} || h_k || t_\mathrm{sec})$, \\
+            $\mathsf{SigVer} (Y_\mathcal{D}, \sigma_\mathrm{sec}; m_\mathrm{sec} || c_\mathrm{sec} || p_\mathrm{sec})$ and \\
+            $\mathsf{SigVer} (Y_\mathcal{D}, \rho_{k+1}; \sigma_\mathrm{sec} || h_{k+1})$ \\ [7pt]
+            $e_\mathrm{v} \gets \mathsf{Enc}(Y_\mathrm{enc}, M; r_\mathrm{v})$ \\
+            $e \gets \mathsf{HomAdd}(e_\mathrm{d}, e_\mathrm{v})$ \\
+            $PK \gets \mathsf{DLProve}(r_\mathrm{v}, G)$ \\
+            $c_\mathrm{bc} \gets e$, $p_\mathrm{bc} \gets$ address of $b_\mathrm{sec}$ \\
+            $m_\mathrm{bc} \gets$ "ballot cryptograms"
+            };
+        \node[arrow_v2, towards_right, between={v.center}{dbb.center}] at (v_2.south -| v.center) (a_2) {
+            $e = (R, C)$, $PK$
+            };
+        \node[process_v2, keep_right, after_arrow] at (a_2.south -| dbb.east) (dbb_2) {
+            verify that $\mathsf{DLVer}(PK, G; R - [r_\mathrm{d}]G)$
+            };
+        \node[banner_v2, keep_left, after_arrow, between={v.west}{dbb.east}] at (dbb_2.south -| v.west) (b_2) {
+            perform protocol from \cref{fig: protocol for writing an item on the bulletin board} to write $b_\mathrm{bc}$ as the $(k+2)^\mathrm{th}$ item \\
+            $(b_\mathrm{bc}, h_{k+1}, \rho_{k+2}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{bc}, c_\mathrm{bc}, p_\mathrm{bc})$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (v.south west)--(dbb.south east);    
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
 
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+        \draw[dotted] (b_2.north west)--(b_2.north east);
+        \draw[dotted] (b_2.south west)--(b_2.south east);
 
+        \draw[dotted] (v_1.south -| v.center)--(b_1.north -| v.center);
+        \draw[dotted] (b_1.south -| v.center)--(v_2.north -| v.center);
+        \draw[dotted] (v_2.south -| v.center)--(b_2.north -| v.center);
 
+        \draw[dotted] (b_1.south -| dbb.center)--(dbb_1.north -| dbb.center);
+        \draw[dotted] (dbb_1.south -| a_1.east)--(a_1.south east);
+        \draw[dotted] (a_2.south east)--(dbb_2.north -| dbb.center);
+        \draw[dotted] (dbb_2.south -| dbb.center)--(b_2.north -| dbb.center);
+        }
+    \end{tikzpicture}
+    \caption{Encrypted ballot submission protocol}
+    \label{fig: ncrypted ballot submission protocol}
+\end{figure}
 
-\subsubsection{Vote Cryptogram Generation Process} \label{sec: vote cryptogram generation process}
-During the vote cryptogram generation process, the \textit{Voter's} browser collaborates with the \textit{Digital Ballot Box} $\mathcal{D}$ for generating the cryptogram. This process results in the fact that the \textit{Voter} $\mathcal{V}_i$ will not be in possession of the randomizer value used in the cryptogram $e$. That is achieved by both the browser and the \textit{Digital Ballot Box} $\mathcal{D}$ building up the randomizer but none of them knowing its entire value. It is important for the \textit{Voter} $\mathcal{V}_i$ not to know this value so he cannot produce cryptographic evidence of the way he voted (as in \Cref{app: proving the content of a cryptogram}), thus enforcing \textit{receipt freeness}. The encryption commitment generation process is described in \Cref{fig: protocol for submitting encryption commitments} and the vote cryptogram generation process is described in \Cref{fig: protocol for submitting the encrypted ballot}.
 
 %The process starts with the \textit{Bulletin Board} $\mathcal{D}$ delivering to the \textit{Voter} $\mathcal{V}_i$ an empty cryptogram (an encryption of the neutral point $\mathcal{O}$) \( e_0 \gets \mathbf{Enc} (\mathcal{O}, r_0) \) (algorithm \ref{alg: enc}), where \( r_0 \in_\mathrm{R} \mathbb{Z}_q \). 
 
