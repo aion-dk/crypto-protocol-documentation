@@ -32,7 +32,7 @@ In order to write a new item on the bulletin board, a writer needs to follow the
 
 
 \subsubsection{Writing on the bulletin board} \label{sec: writing on the bulletin board}
-This section describes the protocol that any writer needs to follow in order to write an event on the bulletin board. The election protocol allows a predefined set of actors ($\mathcal{E}$, $\mathcal{V}_i$, $\mathcal{D}$ or $\mathcal{X}$) to write events on the bulletin board, but for the sake of generalization, \cref{fig: protocol for writing an item on the bulletin board} presents the interaction between a generic writer $\mathcal{W}$ and the Digital Ballot Box $\mathcal{D}$ necessary for publishing the $i^{th}$ event on the bulletin board.
+This section describes the protocol that any writer needs to follow in order to write an event on the bulletin board. The election protocol allows a predefined set of actors ($\mathcal{E}$, $\mathcal{V}_i$, $\mathcal{D}$ or $\mathcal{X}$) to write events on the bulletin board, but for the sake of generalization, protocol \ref{fig: write item on the bulletin board protocol} presents the interaction between a generic writer $\mathcal{W}$ and the Digital Ballot Box $\mathcal{D}$ necessary for publishing the $i^{th}$ event on the bulletin board.
 
 \begin{figure}[ht]
     \centering
@@ -93,8 +93,9 @@ This section describes the protocol that any writer needs to follow in order to 
         \draw[dotted] (dbb_1.south -| dbb.center)--(a_2.south -| dbb.center);
         }
     \end{tikzpicture}
-    \caption{Protocol for writing an item on the bulletin board}
-    \label{fig: protocol for writing an item on the bulletin board}
+    \renewcommand\figurename{Protocol}
+    \caption{Write item on the bulletin board protocol}
+    \label{fig: write item on the bulletin board protocol}
 \end{figure}
 
 The publicly available information consists of: the public key of the writer $Y_\mathcal{W}$, the public key of the Digital Ballot Box $Y_\mathcal{D}$ and all the already existing items on the bulletin board with their respective addresses $\boldsymbol{h} = \{h_1, ... h_{i-1}\}$. The writer alone is in possession of his private key $x_\mathcal{W}$, while the Digital Ballot Box is in possession of its private key $x_\mathcal{D}$.
