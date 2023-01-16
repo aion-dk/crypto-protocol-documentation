@@ -361,181 +361,100 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
         % Actors
         \node[title_3, above, anchor=north east] (v) {
             \textbf{Voter $\mathcal{V}_i$}};
-        \node[title_3, right=of v] (ev) {
+        \node[title_3, text width=160, right=of v] (ev) {
             \textbf{External Verifier $\mathcal{X}$}};
-        \node[title_3, right=of ev] (dbb) {
+        \node[title_3, text width=186, right=of ev] (dbb) {
             \textbf{Digital Ballot Box $\mathcal{D}$}};
-        
+
         % internal knowledge
         \node[internal_3, below=of v] (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $h_\mathrm{bac}$, $h_\mathrm{vts}$, \\
-            $\alpha_\mathrm{vts} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{vts} \}$
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$
             };
-        \node[internal_3, below=of ev] (ev_ik) {
+        \node[internal_3, text width=160, below=of ev] (ev_ik) {
             no internal knowledge
             };
-        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, \\
-            $\alpha_\mathrm{vts} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{vts} \}$, $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$
+        \node[internal_3, text width=186, below=of dbb] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, \\
+            $\{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \} \in \boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts} \}$
             };
         
         % All content
-        \node[new_arrow, towards_right, between={v.center}{ev.center}] at (v_ik.south -| v.center) (a_1) {
-            $h_\mathrm{vts}$
+        \node[arrow_v2, towards_right, between={v.center}{ev.center}] at (dbb_ik.south -| v.center) (a_1) {
+            address of $b_\mathrm{vts}$
             };
-        \node[new_arrow, towards_right, between={ev.center}{dbb.center}] at (a_1.south -| ev.center) (a_2) {
-            $h_\mathrm{vts}$
+        \node[arrow_v2, towards_right, between={ev.center}{dbb.center}, after_arrow] at (a_1.north -| ev.center) (a_2) {
+            address of $b_\mathrm{vts}$
             };
-        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (a_2.south -| dbb.center) (a_3) {
-            $\alpha_\mathrm{vts} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{vts} \}$
+        \node[process_3, keep_middle, after_arrow] at (a_2.south -| dbb.center) (dbb_1) {
+            $\alpha_\mathrm{vts} \gets \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$
+            };
+        \node[arrow_v2, towards_left, between={ev.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_3) {
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$
             };
         \node[process_3, keep_middle, after_arrow] at (a_3.south -| ev.center) (ev_1) {
-            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{vts})$
+            $Y_i = $ the content of $b_\mathrm{vs}$, $\{ Y_\mathcal{D}, Y_\mathcal{E}, Y_\mathcal{A} \} = $ the contents of $\alpha_\mathrm{cnf}$ \\
+            verify $\mathsf{AncestryVer}(\alpha_\mathrm{vts}, \perp)$ and $\mathsf{ItemVer}(b_j, Y_\mathcal{W})$ for each $b_j \in \alpha_\mathrm{vts}$, \\
+            where $\mathcal{W} \in \{ \mathcal{D}, \mathcal{E}, \mathcal{A}, \mathcal{V}_i \}$ according to rules form \cref{app: bulletin board item types}
             };
-        \node[new_arrow, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_4) {
+        \node[arrow_v2, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_4) {
             "ballot found"
             };
-        \node[process_3, keep_middle, after_arrow] at (a_4.south -| v.center) (v_1) {
-            $m_\mathrm{spr} \gets $ "spoil request" \\
-            $\sigma_\mathrm{spr} \gets \mathsf{Sign}(x_i; m_\mathrm{spr} || \perp || h_\mathrm{bac})$
+        \node[process_3, keep_left, after_arrow] at (a_4.south -| v.west) (v_1) {
+            $m_\mathrm{sr} \gets $ "spoil request", $c_\mathrm{sr} \gets \perp$, $p_\mathrm{sr} \gets$ address of $b_\mathrm{bc}$
             };
-        \node[new_arrow, towards_right, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_5) {
-            $i$, $m_\mathrm{spr}$, $\sigma_\mathrm{spr}$, $h_\mathrm{bac}$
+        \node[banner_v2, keep_left, after_arrow, between={v.west}{dbb.east}] at (v_1.south -| v.west) (b_1) {
+            $\mathcal{V}_i$ and $\mathcal{D}$ perform protocol \ref{fig: write item on the bulletin board protocol} to write $b_\mathrm{sr}$ as the $k^\mathrm{th}$ item of $\boldsymbol{b}$ \\
+            $(b_\mathrm{sr}, \rho_\mathrm{sr}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{sr}, c_\mathrm{sr}, p_\mathrm{sr})$, therefore $b_\mathrm{sr} \in \boldsymbol{b}$
             };
-        \node[process_3, keep_right, after_arrow] at (a_5.south -| dbb.east) (dbb_1) {
-            verify that $\mathsf{SigVer} (Y_i, \sigma_\mathrm{spr}; m_\mathrm{spr} || \perp || h_\mathrm{bac})$ then: \\ [4pt]
-            $t_\mathrm{spr} \gets$ current time, \\
-            $h_\mathrm{spr} \gets \mathcal{H}(m_\mathrm{spr} || \perp || h_\mathrm{bac} || h_{n_\mathrm{b}} || t_\mathrm{spr})$ \\
-            $b_\mathrm{spr} \gets (m_\mathrm{spr}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$, \\
-            $\lambda \gets \lambda \cup \{ b_\mathrm{spr} \}$ \\ 
-            $\rho_\mathrm{spr} \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathrm{spr} || h_\mathrm{spr})$
+        \node[arrow_v2, towards_left, between={ev.center}{dbb.center}] at (b_1.south -| dbb.center) (a_5) {
+            $b_\mathrm{sr}$
             };
-        \node[new_arrow, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_6) {
-            $b_\mathrm{spr} = (m_\mathrm{spr}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$, $\rho_\mathrm{spr}$
+        \node[process_3, keep_left, after_arrow] at (a_5.south -| ev.west) (ev_2) {
+            $h_\mathrm{bc} \gets$ the address of $b_\mathrm{bc}$ \\
+            verify $\mathsf{AncestryVer}(\{ b_\mathrm{sr} \}, h_\mathrm{bc})$ and $\mathsf{ItemVer}(b_\mathrm{sr}, Y_i)$ then: \\ [4pt]
+
+            $(x_\mathcal{X}, Y_\mathcal{X}) \gets \mathsf{KeyGen}()$, \\
+            $m_\mathrm{v} \gets$ "verifier", $c_\mathrm{v} \gets Y_\mathcal{X}$, $p_\mathrm{v} \gets$ address of $b_\mathrm{sr}$
             };
-        \node[process_3, keep_left, after_arrow] at (a_6.south -| v.west) (v_2) {
-            verify that $h_\mathrm{spr} = \mathcal{H}(m || \perp || h_\mathrm{bac} || h_{n_\mathrm{b}} || t_\mathrm{spr})$ \\
-            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{spr}; \sigma_\mathrm{spr} || h_\mathrm{spr})$
+        \node[banner_v2, keep_left, after_arrow, between={ev.west}{dbb.east}] at (ev_2.south -| ev.west) (b_2) {
+            $\mathcal{X}$ and $\mathcal{D}$ perform protocol \ref{fig: write item on the bulletin board protocol} to write $b_\mathrm{v}$ as the second item of the hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$ \\
+            $(b_\mathrm{v}, \rho_\mathrm{v}) \gets \mathtt{WriteOnBoard}(\mathcal{X}, m_\mathrm{v}, c_\mathrm{v}, p_\mathrm{v})$, threfore $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
             };
-        \node[below=of v_2] (bottom){};
+        \node[anchor=north] at (b_2.south -| v.center) (bottom){};
+
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (v_ik.south west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v_ik.west)--(dbb_ik.south east);
+
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+        \draw[dotted] (b_2.north west)--(b_2.north east);
+        \draw[dotted] (b_2.south west)--(b_2.south east);
         
-        \draw[dotted] (v_ik.south -| v.center)--(v_1.north -| v.center);
-        \draw[dotted] (v_1.south -| v.center)--(v_2.north -| v.center);
-        \draw[dotted] (v_2.south -| v.center)--(bottom.south -| v.center);
+        \draw[dotted] (dbb_ik.south -| v.center)--(v_1.north -| v.center);
+        \draw[dotted] (v_1.south -| v.center)--(b_1.north -| v.center);
+        \draw[dotted] (b_1.south -| v.center)--(bottom.south -| v.center);
+        % \draw[dotted] (b_1.south -| v.center)--(b_2.north -| v.center);
+        % \draw[dotted] (b_2.south -| v.center)--(bottom.south -| v.center);
         
         \draw[dotted] (a_1.south -| ev.center)--(ev_1.north -| ev.center);
-        \draw[dotted] (ev_1.south -| ev.center)--(bottom.south -| ev.center);
+        \draw[dotted] (ev_1.south -| ev.center)--(a_4.south east);
+        \draw[dotted] (a_5.south west)--(ev_2.north -| ev.center);
+        \draw[dotted] (ev_2.south -| ev.center)--(b_2.north -| ev.center);
+        \draw[dotted] (b_2.south -| ev.center)--(bottom.south -| ev.center);
         
-        \draw[dotted] (dbb_ik.south -| dbb.center)--(dbb_1.north -| dbb.center);
-        \draw[dotted] (dbb_1.south -| dbb.center)--(bottom.south -| dbb.center);
+        \draw[dotted] (a_2.south east)--(dbb_1.north -| dbb.center);
+        \draw[dotted] (dbb_1.south -| dbb.center)--(a_3.south east);
+        \draw[dotted] (b_1.south -| dbb.center)--(a_5.south east);
+        \draw[dotted] (b_2.south -| dbb.center)--(bottom.south -| dbb.center);
         }
     \end{tikzpicture}
-    \caption{Protocol for challenging a vote cryptogram (part 1a)}
-    \label{fig: protocol for challenging a vote cryptogram part 1a}
+    \caption{External verifier setup protocol}
+    \label{fig: external verifier setup protocol}
 \end{figure}
 
-\clearpage
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}[framed, node distance=0,
-            % every node/.style={draw},
-            ]{
-        
-        % Actors
-        \node[title_3, above, anchor=north east] (v) {
-            \textbf{Voter $\mathcal{V}_i$}};
-        \node[title_3, right=of v] (ev) {
-            \textbf{External Verifier $\mathcal{X}$}};
-        \node[title_3, right=of ev] (dbb) {
-            \textbf{Digital Ballot Box $\mathcal{D}$}};
-        
-        % internal knowledge
-        \node[internal_3, below=of v.south west, anchor=north west, text width={}] (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $h_\mathrm{bac}$, $h_\mathrm{vts}$, \\
-            $\alpha_\mathrm{spr} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{spr} \}$, \\ $b_\mathrm{vts}$
-            };
-        \node[internal_3, below=of ev] (ev_ik) {
-            internal knowledge: $Y_\mathcal{D}$, \\
-            $\alpha_\mathrm{vts} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{vts} \}$
-            };
-        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, \\
-            $\alpha_\mathrm{spr} = \alpha_\mathrm{cfg} \cup \{ b_\mathrm{vos}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bac}, b_\mathrm{spr} \}$, \\ $b_\mathrm{vts}$, $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$
-            };
-        
-        % All content
-        \node[below=of dbb_ik] (top){};
-        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (top.south -| dbb.center) (a_7) {
-            \phantom{$b_\mathrm{spr} = (\mathcal{V}_i)$}
-            };
-        \node[align=center, font=\small, anchor=north west] at (top.south -| ev.center) (a_7_content) {
-            $b_\mathrm{spr} = (m_\mathrm{spr}, \perp, \mathcal{V}_i, \sigma_\mathrm{spr}, t_\mathrm{spr}, h_\mathrm{bac}, h_\mathrm{spr})$, $\rho_\mathrm{spr}$
-            };
-        \node[process_3, keep_middle, after_arrow] at (a_7.south -| ev.center) (ev_2) {
-            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{bac} \cup \{ b_\mathrm{spr} \})$ \\
-            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{spr}; \sigma_\mathrm{spr} || h_\mathrm{spr})$ then: \\ [4pt]
-            $(x_\mathcal{X}, Y_\mathcal{X}) \gets \mathsf{KeyGen}()$, $m_\mathrm{v} \gets "verifier"$ \\
-            $\sigma_\mathrm{ver} \gets \mathsf{Sign}(x_\mathcal{X}; m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr})$
-            };
-        \node[new_arrow, towards_right, between={ev.center}{dbb.center}] at (ev_2.south -| ev.center) (a_8) {
-            $h_\mathrm{vts}$, $m_\mathrm{v}$, $Y_\mathcal{X}$, $\sigma_\mathrm{ver}$
-            };
-        \node[process_3, keep_right, after_arrow] at (a_8.south -| dbb.east) (dbb_2) {
-            verify that $\mathsf{SigVer} (Y_\mathcal{X}, \sigma_\mathrm{ver}; m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr})$ then: \\ [4pt]
-            $t_\mathrm{ver} \gets$ current time, $h_\mathrm{ver} \gets \mathcal{H}(m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr} || h_\mathrm{vts} || t_\mathrm{ver})$ \\
-            $b_\mathrm{ver} \gets (m_\mathrm{v}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$ \\
-            $\lambda \gets \lambda \cup \{ b_\mathrm{ver} \}$, $\rho_\mathrm{ver} \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathrm{ver} || h_\mathrm{ver})$
-            };
-        \node[new_arrow, towards_left, between={v.center}{dbb.center}] at (dbb_2.south -| dbb.center) (a_9) {
-            $b_\mathrm{ver} = (m_\mathrm{v}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$, $\rho_\mathrm{ver}$
-            };
-        \node[process_3, keep_left, after_arrow] at (a_9.south -| v.west) (v_3) {
-            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{spr} \cup \{ b_\mathrm{ver} \})$ \\
-            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{ver}; \sigma_\mathrm{ver} || h_\mathrm{ver})$
-            };
-        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (a_9.south -| dbb.center) (a_10) {
-            \phantom{$b_\mathrm{ver} = (Y_\mathcal{X})$}
-            };
-        \node[align=center, font=\small, anchor=north west] at (a_9.south -| ev.center) (a_10_content) {
-            $b_\mathrm{ver} = (m_\mathrm{v}, Y_\mathcal{X}, \mathcal{X}, \sigma_\mathrm{ver}, t_\mathrm{ver}, h_\mathrm{spr}, h_\mathrm{ver})$, $\rho_\mathrm{ver}$
-            };
-        \node[process_3, keep_middle, after_arrow] at (a_10.south -| ev.center) (ev_3) {
-            verify that $h_\mathrm{ver} = \mathcal{H}(m_\mathrm{v} || Y_\mathcal{X} || h_\mathrm{spr} || h_\mathrm{vts} || t_\mathrm{ver})$ \\
-            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{ver}; \sigma_\mathrm{ver} || h_\mathrm{ver})$
-            };
-        \node[new_arrow, towards_left, between={v.center}{ev.center}] at (ev_3.south -| ev.center) (a_11) {
-            $h'_\mathrm{ver} = h_\mathrm{ver}$
-            };
-        \node[process_3, keep_middle, after_arrow] at (a_11.south -| v.center) (v_4) {
-            verify that $h_\mathrm{ver} = h'_\mathrm{ver}$
-            };
-        \node[below=of v_4] (bottom){};
-        
-        % Arrows and lines
-        \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (top.north -| v.west)--(top.north -| dbb.east);
-        
-        \draw[dotted] (top.north -| v.center)--(v_3.north -| v.center);
-        \draw[dotted] (v_3.south -| v.center)--(v_4.north -| v.center);
-        \draw[dotted] (v_4.south -| v.center)--(bottom.south -| v.center);
-        
-        \draw[dotted] (top.north -| ev.center)--(ev_2.north -| ev.center);
-        \draw[dotted] (ev_2.south -| ev.center)--(ev_3.north -| ev.center);
-        \draw[dotted] (ev_3.south -| ev.center)--(bottom.south -| ev.center);
-        
-        \draw[dotted] (top.north -| dbb.center)--(dbb_2.north -| dbb.center);
-        \draw[dotted] (dbb_2.south -| dbb.center)--(bottom.south -| dbb.center);
-        }
-    \end{tikzpicture}
-    \caption{Protocol for challenging a vote cryptogram (part 1b)}
-    \label{fig: protocol for challenging a vote cryptogram part 1b}
-\end{figure}
-
-\clearpage
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
@@ -552,67 +471,73 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
         
         % internal knowledge
         \node[internal_3, below=of v] (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathcal{X}$, $h_\mathrm{bac}$, \\
-            $h_\mathrm{vts}$, $h_\mathrm{ver}$, $\alpha_\mathrm{ver} = \alpha_\mathrm{spr} \cup \{ b_\mathrm{ver} \}$, $b_\mathrm{ver}$, \\
-            $r_\mathrm{v}$, $s_\mathrm{v}$
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $r_\mathrm{v}$, $s_\mathrm{v}$, \\
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$
             };
         \node[internal_3, below=of ev] (ev_ik) {
-            internal knowledge: $x_\mathcal{X}$, $Y_\mathcal{D}$ \\
-            $\alpha_\mathrm{ver} = \alpha_\mathrm{bac} \cup \{ b_\mathrm{spr}, b_\mathrm{ver} \}$, $b_\mathrm{vts}$
+            internal knowledge: $x_\mathcal{X}$, $b_\mathrm{v}$
             };
-        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, $Y_\mathcal{X}$, \\
-            $\alpha_\mathrm{ver} = \alpha_\mathrm{spr} \cup \{ b_\mathrm{ver} \}$, $b_\mathrm{vts}$, $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$
+        \node[internal_3, below=of dbb] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{X}$, $r_\mathrm{d}$, $s_\mathrm{d}$, \\
+            $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
             };
         
         % All content
-        \node[below=of v_ik] (top){};
-        \node[process_3, keep_left] at (top.south -| v.west) (v_1) {
-            $k_\mathrm{v} \gets \mathsf{DHKDF}(x_i, Y_\mathcal{X})$ \\
-            $d_\mathrm{vco} \gets \mathsf{TxtEnc}(r_\mathrm{v} || s_\mathrm{v}, k_\mathrm{v})$ \\
-            $m_\mathrm{vco} \gets$ "voter encryption commitment opening" \\
-            $\sigma_\mathrm{vco} \gets \mathsf{Sign}(x_i; m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver})$
+        \node[arrow_v2, first, towards_left, between={v.center}{ev.center}] at (v_ik.south -| ev.center) (a_1) {
+            $h_\mathrm{v} = $ address of $b_\mathrm{v}$
             };
-        \node[new_arrow, towards_right, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_1) {
-            $i$, $m_\mathrm{vco}$, $d_\mathrm{vco}$, $\sigma_\mathrm{vco}$, $h_\mathrm{ver}$
+        \node[arrow_v2, towards_left, between={v.center}{dbb.center}] at (a_1.south -| dbb.center) (a_2) {
+            $b_\mathrm{v}$
             };
-        \node[process_3, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
-            verify that $\mathsf{SigVer} (Y_i, \sigma_\mathrm{vco}; m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver})$ then: \\ [4pt]
-            $t_\mathrm{vco} \gets$ current time, $h_\mathrm{vco} \gets \mathcal{H}(m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver} || h_\mathrm{ver} || t_\mathrm{vco})$ \\
-            $b_\mathrm{vco} \gets (m_\mathrm{vco}, d_\mathrm{vco}, \mathcal{V}_i, \sigma_\mathrm{vco}, t_\mathrm{vco}, h_\mathrm{ver}, h_\mathrm{vco})$ \\
-            $k_\mathrm{d} \gets \mathsf{DHKDF}(x_\mathcal{D}, Y_\mathcal{X})$, $d_\mathrm{sco} \gets \mathsf{TxtEnc}(r_\mathrm{d} || s_\mathrm{d}, k_\mathrm{d})$ \\
-            $m_\mathrm{sco} \gets$ "server encryption commitment opening" \\
-            $t_\mathrm{sco} \gets$ current time, $h_\mathrm{sco} \gets \mathcal{H}(m_\mathrm{sco} || d_\mathrm{vco} || h_\mathrm{vco} || h_\mathrm{vco} || t_\mathrm{sco})$ \\
-            $b_\mathrm{sco} \gets (m_\mathrm{sco}, d_\mathrm{sco}, \mathcal{D}, \sigma_\mathrm{sco}, t_\mathrm{sco}, h_\mathrm{vco}, h_\mathrm{sco})$ \\
-            $\lambda \gets \lambda \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \}$, $\rho_\mathrm{sco} \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_\mathrm{vco} || h_\mathrm{sco})$
+        \node[process_3, keep_left, after_arrow] at (a_2.south -| v.west) (v_1) {
+            $Y_\mathcal{X} = $ the content of $b_\mathrm{v}$, $h_\mathrm{vts} = $ the address of $b_\mathrm{vts}$ \\
+            verify $\mathsf{AncestryVer}(\{ b_\mathrm{v} \}, h_\mathrm{vts})$, $\mathsf{ItemVer}(b_\mathrm{v}, Y_\mathcal{X})$ and address of $b_\mathrm{v} = h_\mathrm{v}$ then: \\ [7pt]
+            $k_\mathrm{v} \gets \mathsf{DHKDF}(x_i, Y_\mathcal{X})$, $d_\mathrm{v} \gets \mathsf{TxtEnc}(r_\mathrm{v} || s_\mathrm{v}, k_\mathrm{v})$ \\
+            $c_\mathrm{vco} \gets d_\mathrm{v}$, $p_\mathrm{vco} \gets$ address of $b_\mathrm{v}$ \\
+            $m_\mathrm{vco} \gets$ "voter commitment opening"
             };
-        \node[new_arrow, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_2) {
-            $b_\mathrm{vco} = (m_\mathrm{vco}, d_\mathrm{vco}, \mathcal{V}_i, \sigma_\mathrm{vco}, t_\mathrm{vco}, h_\mathrm{ver}, h_\mathrm{vco})$, \\
-            $b_\mathrm{sco} = (m_\mathrm{sco}, d_\mathrm{sco}, \mathcal{D}, \sigma_\mathrm{sco}, t_\mathrm{sco}, h_\mathrm{vco}, h_\mathrm{sco})$, $\rho_\mathrm{sco}$
+        \node[banner_v2, keep_left, after_arrow, between={v.west}{dbb.east}] at (v_1.south -| v.west) (b_1) {
+            $\mathcal{V}_i$ and $\mathcal{D}$ perform protocol \ref{fig: write item on the bulletin board protocol} to write $b_\mathrm{vco}$ as third item of the hiddne track $\boldsymbol{b}^{b_\mathrm{bc}}$ \\
+            $(b_\mathrm{vco}, \rho_\mathrm{vco}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vco}, c_\mathrm{vco}, p_\mathrm{vco})$, therefore $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco} \}$
             };
-        \node[process_3, keep_left, after_arrow] at (a_2.south -| v.west) (v_2) {
-            verify that $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{sco}; \sigma_\mathrm{vco} || h_\mathrm{sco})$, \\
-            $h_\mathrm{vco} = \mathcal{H}(m_\mathrm{vco} || d_\mathrm{vco} || h_\mathrm{ver} || h_\mathrm{ver} || t_\mathrm{vco})$ and \\
-            $h_\mathrm{sco} = \mathcal{H}(m_\mathrm{sco} || d_\mathrm{sco} || h_\mathrm{vco} || h_\mathrm{vco} || t_\mathrm{sco})$
+        \node[process_v2, keep_right, after_arrow] at (b_1.south east) (dbb_1) {
+            $k_\mathrm{d} \gets \mathsf{DHKDF}(x_\mathcal{D}, Y_\mathcal{X})$, $d_\mathrm{d} \gets \mathsf{TxtEnc}(r_\mathrm{d} || s_\mathrm{d}, k_\mathrm{d})$ \\
+            $c_\mathrm{sco} \gets d_\mathrm{d}$, $p_\mathrm{sco} \gets$ address of $b_\mathrm{vco}$ \\
+            $m_\mathrm{sco} \gets$ "server commitment opening" \\ [7pt]
+            \scriptsize perform protocol \ref{fig: write item on the bulletin board protocol} to write $b_\mathrm{sco}$ as the forth item on the \\ [-2pt]
+            \scriptsize hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$, therefore $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco}, b_\mathrm{sco} \}$ \\ [-2pt]
+            \scriptsize $(b_\mathrm{sco}, \rho_\mathrm{sco}) \gets \mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sco}, c_\mathrm{sco}, p_\mathrm{sco})$
             };
-        \node[below=of v_2] (bottom){};
+        \node[arrow_v2, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_3) {
+            $b_\mathrm{vco}$, $b_\mathrm{sco}$
+            };
+        \node[process_v2, keep_left, after_arrow] at (a_3.south -| v.west) (v_2) {
+            verify $\mathsf{AncestryVer}(\{ b_\mathrm{vco}, b_\mathrm{sco} \}, h_\mathrm{v})$ and $\mathsf{ItemVer}(b_\mathrm{sco}, Y_\mathcal{D})$
+            };
+        \node[anchor=north] at (v_2.south -| v.center) (bottom){};
+
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (top.north -| v.west)--(top.north -| dbb.east);
+        \draw[dashed] (dbb_ik.south -| v_ik.west)--(dbb_ik.south east);
+
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
         
-        \draw[dotted] (top.north -| v.center)--(v_1.north -| v.center);
-        \draw[dotted] (v_1.south -| v.center)--(v_2.north -| v.center);
+        \draw[dotted] (v_ik.south -| v.center)--(v_1.north -| v.center);
+        \draw[dotted] (v_1.south -| v.center)--(b_1.north -| v.center);
+        \draw[dotted] (b_1.south -| v.center)--(v_2.north -| v.center);
         \draw[dotted] (v_2.south -| v.center)--(bottom.south -| v.center);
         
-        \draw[dotted] (top.north -| ev.center)--(bottom.south -| ev.center);
+        \draw[dotted] (v_ik.south -| ev.center)--(a_1.south east);
         
-        \draw[dotted] (top.north -| dbb.center)--(dbb_1.north -| dbb.center);
+        \draw[dotted] (dbb_ik.south -| dbb.center)--(a_2.south east);
+        \draw[dotted] (b_1.south -| dbb.center)--(dbb_1.north -| dbb.center);
         \draw[dotted] (dbb_1.south -| dbb.center)--(bottom.south -| dbb.center);
         }
     \end{tikzpicture}
-    \caption{Protocol for challenging a vote cryptogram (part 2a)}
-    \label{fig: protocol for challenging a vote cryptogram part 2a}
+    \caption{Commitment opening submission protocol}
+    \label{fig: commitment opening submisson protocol}
 \end{figure}
 
 \clearpage
@@ -632,62 +557,53 @@ The \textit{Voter} verifies that the received vote $V'$ matches with the intende
         
         % internal knowledge
         \node[internal_3, below=of v] (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathcal{X}$, $h_\mathrm{bac}$, \\
-            $h_\mathrm{vts}$, $h_\mathrm{ver}$, $\alpha_\mathrm{sco} = \alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \}$, $b_\mathrm{ver}$, \\
-            $r_\mathrm{v}$, $s_\mathrm{v}$, $V$
+            internal knowledge: $V$
             };
         \node[internal_3, below=of ev] (ev_ik) {
-            internal knowledge: $x_\mathcal{X}$, $Y_i$, $Y_\mathcal{D}$,  \\
-            $\alpha_\mathrm{ver}$, $b_\mathrm{vts}$, $c_\mathrm{v}$, $c_\mathrm{d}$, $Y_\mathrm{enc}$, $e = (R, C)$
+            internal knowledge: $x_\mathcal{X}$, $Y_i$, $Y_\mathcal{D}$, \\
+            $\alpha_\mathrm{v} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts}, b_\mathrm{v} \}$
             };
-        \node[internal_3, below=of dbb.south east, anchor=north east, text width={}] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $\boldsymbol{Y} = \{ Y_1, ..., Y_{n_\mathrm{v}} \}$, $Y_\mathcal{X}$, \\
-            $\alpha_\mathrm{sco} = \alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \}$, $\rho_\mathrm{sco}$, $b_\mathrm{vts}$, \\
-            $\lambda = \{ b_1, ..., b_{n_\mathrm{b}} \}$, $r_\mathrm{d}$, $s_\mathrm{d}$
+        \node[internal_3, below=of dbb] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, \\
+            $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco}, b_\mathrm{sco} \}$
             };
         
         % All content
-        \node[below=of v_ik] (top){};
-        \node[new_arrow, towards_left, between={ev.center}{dbb.center}] at (top.south -| dbb.center) (a_1) {
-            \phantom{$b_\mathrm{vco} = (\mathcal{V}_i)$} \\
-            \phantom{$b_\mathrm{sco} = (\mathcal{D})$, $\rho_\mathrm{sco}$}
-            };
-        \node[align=center, font=\small, anchor=north west] at (top.south -| ev.center) (a_1_content) {
-            $b_\mathrm{vco} = (m_\mathrm{vco}, d_\mathrm{vco}, \mathcal{V}_i, \sigma_\mathrm{vco}, t_\mathrm{vco}, h_\mathrm{ver}, h_\mathrm{vco})$, \\
-            $b_\mathrm{sco} = (m_\mathrm{sco}, d_\mathrm{sco}, \mathcal{D}, \sigma_\mathrm{sco}, t_\mathrm{sco}, h_\mathrm{vco}, h_\mathrm{sco})$, $\rho_\mathrm{sco}$
+        \node[arrow_v2, first, towards_left, between={ev.center}{dbb.center}, anchor=north west] at (dbb_ik.south -| ev.center) (a_1) {
+            $b_\mathrm{vco}$, $b_\mathrm{sco}$
             };
         \node[process_3, keep_middle, after_arrow] at (a_1.south -| ev.center) (ev_1) {
-            verify that $\mathsf{AncestryVer}(\alpha_\mathrm{ver} \cup \{ b_\mathrm{vco}, b_\mathrm{sco} \})$ \\
-            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_\mathrm{sco}; \sigma_\mathrm{vco} || h_\mathrm{sco})$ then: \\ [4pt]
-            $k_\mathrm{v} \gets \mathsf{DHKDF}(x_\mathcal{X}, Y_i)$, $(r_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{TxtDec}(d_\mathrm{vco}, k_\mathrm{v})$ \\
-            $k_\mathrm{d} \gets \mathsf{DHKDF}(x_\mathcal{X}, Y_\mathcal{D})$, $(r_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{TxtDec}(d_\mathrm{sco}, k_\mathrm{d})$ \\ [4pt]
+            verify $\mathsf{AncestryVer}(\{ b_\mathrm{vco}, b_\mathrm{sco} \}, h_\mathrm{v})$, \\
+            $\mathsf{ItemVer} (b_\mathrm{vco},Y_i)$ and $\mathsf{ItemVer} (b_\mathrm{sco},Y_\mathcal{D})$ then: \\ [7pt]
+            $d_\mathrm{v} = $ content of $b_\mathrm{vco}$, $d_\mathrm{d} = $ content of $b_\mathrm{sco}$ \\
+            $c_\mathrm{v} = $ content of $b_\mathrm{vec}$, $c_\mathrm{d} = $ content of $b_\mathrm{sec}$ \\
+            $k_\mathrm{v} \gets \mathsf{DHKDF}(x_\mathcal{X}, Y_i)$, $(r_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{TxtDec}(d_\mathrm{v}, k_\mathrm{v})$ \\
+            $k_\mathrm{d} \gets \mathsf{DHKDF}(x_\mathcal{X}, Y_\mathcal{D})$, $(r_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{TxtDec}(d_\mathrm{d}, k_\mathrm{d})$ \\ [7pt]
             verify that $\mathsf{ComVer}(c_\mathrm{v}, r_\mathrm{v}, s_\mathrm{v})$
-            and $\mathsf{ComVer}(c_\mathrm{d}, r_\mathrm{d}, s_\mathrm{d})$ then: \\ [4pt]
+            and $\mathsf{ComVer}(c_\mathrm{d}, r_\mathrm{d}, s_\mathrm{d})$ then: \\ [7pt]
             $r' \gets r_\mathrm{v} + r_\mathrm{d}$, $e' \gets (Y_\mathrm{enc}, C)$, $V' \gets \mathsf{Dec}(r', e')$
             };
-        \node[new_arrow, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_2) {
+        \node[arrow_v2, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_2) {
             $V'$
             };
         \node[process_3, keep_middle, after_arrow] at (a_2.south -| v.center) (v_1) {
             verify that $V = V'$
             };
-        \node[below=of v_1] (bottom){};
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (v_ik.south west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
         
-        \draw[dotted] (top.north -| v.center)--(v_1.north -| v.center);
-        \draw[dotted] (v_1.south -| v.center)--(bottom.south -| v.center);
+        \draw[dotted] (dbb_ik.south -| v.center)--(v_1.north -| v.center);
         
-        \draw[dotted] (top.north -| ev.center)--(ev_1.north -| ev.center);
+        \draw[dotted] (a_1.south west)--(ev_1.north -| ev.center);
         \draw[dotted] (ev_1.south -| ev.center)--(a_2.south -| ev.center);
         
-        \draw[dotted] (top.north -| dbb.center)--(bottom.south -| dbb.center);
+        \draw[dotted] (dbb_ik.south -| dbb.center)--(a_1.south east);
         }
     \end{tikzpicture}
-    \caption{Protocol for challenging a vote cryptogram (part 2b)}
-    \label{fig: protocol for challenging a vote cryptogram part 2b}
+    \caption{Unpacking the encrypted ballot protocol}
+    \label{fig: unpacking the encrypted ballot protocol}
 \end{figure}
 \clearpage
 \end{landscape}
