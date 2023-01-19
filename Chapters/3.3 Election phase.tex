@@ -1,6 +1,7 @@
 \subsection{Election phase} \label{sec: election phase}
 The election phase lasts from the start date until the end date of a voting round. During this time, any voter $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ can cast a valid digital ballot by performing the following steps:
 \begin{itemize}
+    \item get a list with all configuration items of the bulletin board $\alpha_\mathrm{cnf}$ from the digital ballot box,
     \item authenticate and get authorized to cast a digital ballot on the bulletin board as described in \cref{sec: voter authentication procedure},
     \item select vote choices and prepare them for encryption as described in \cref{sec: mapping vote options on the elliptic curve},
     \item encrypt the ballot following the process from \cref{sec: vote cryptogram generation process},
@@ -24,7 +25,7 @@ Then, the voting application generates a key pair $(x_i, Y_i) \gets \mathsf{KeyG
 
 If the voter authorizer service can validate all identity tokens and the voter is eligible, i.e. $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$, then it will authorize the use of the public key $Y_i$ for the voter $\mathcal{V}_i$. This is done by the voter authorizer $\mathcal{A}$ interacting with the digital ballot box $\mathcal{D}$ in the protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ to write a voter session item $b_\mathrm{vs}$ on the bulletin board as the next item, according to the rules specified in \cref{app: bulletin board item types}, where $m_\mathrm{vs} =$ "voter session", the parent $p_\mathrm{vs}$ is the address of the latest configuration item and the content $c_\mathrm{vs}$ consists of the voter identifier, the public key $Y_i$, and the authentication fingerprint which is the hash value of all identity tokens received form the voter. 
 
-The voter authorizer returns to the voter the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
+The voter authorizer returns to the voter the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. The voting application checks the item according to the validations of protocol \ref{pro: write on board}. Additionally, it checks that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e. $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
 
 The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and all related identity tokens for the purpose of the private auditing process in the post-election phase as described in \cref{sec: private auditing process}. This link is stored privately by the voter authorizer service due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
 
@@ -38,33 +39,34 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
             ]{
         
         % Actors
-        \node[title_3, text width=191, above, anchor=north east] (v) {
+        \node[title_3, above, anchor=north east] (v) {
             \textbf{Voter $\mathcal{V}_i$}};
-        \node[title_3, text width=187, right=of v] (va) {
+        \node[title_3, right=of v] (va) {
             \textbf{Voter Authorizer $\mathcal{A}$}};
-        \node[title_3, text width=141, right=of va] (ip) {
+        \node[title_3, right=of va] (ip) {
             \textbf{Identity Provider $\mathcal{I}_j$}};
         
         % internal knowledge
-        \node[internal_3, text width=191, below=of v] (v_ik) {
-            internal knowledge: $Y_\mathcal{A}$, $Y_\mathcal{D}$, $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$
+        \node[internal_3, below=of v] (v_ik) {
+            internal knowledge: $Y_\mathcal{A}$, $Y_\mathcal{D}$, \\
+            $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$, $\alpha_\mathrm{cnf}$
             };
-        \node[internal_3, text width=187, below=of va] (va_ik) {
-            internal knowledge: $x_\mathcal{A}$, $\boldsymbol{\mathcal{V}}$, $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$
+        \node[internal_3, below=of va] (va_ik) {
+            internal knowledge: $x_\mathcal{A}$, $\boldsymbol{\mathcal{V}}$, \\
+            $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$, $\alpha_\mathrm{cnf}$
             };
-        \node[internal_3, text width=141, below=of ip] (ip_ik) {
+        \node[internal_3, below=of ip] (ip_ik) {
             internal knowledge: $x_{\mathcal{I}_j}$
             };
         
         % All content
-        \node[below=of v_ik] (top){};
-        \node[arrow_v2, towards_right, between={v.center}{ip.center}] at (top.south -| v.center) (a_1) {
+        \node[arrow_v2, towards_right, first, between={v.center}{ip.center}] at (v_ik.south -| v.center) (a_1) {
             authenticate as $\mathcal{V}_i$
             };
         \node[process_v2, keep_middle, after_arrow] at (a_1.south -| ip.center) (ip_1) {
             $\sigma_{\mathrm{id}, j} \gets \mathsf{Sign}(x_{\mathcal{I}_j}; \mathcal{V}_i)$
             };
-        \node[arrow_v2, towards_left, between={v.center}{ip.center}] at (ip_1.south -| ip.center) (a_2) {
+        \node[arrow_v2, towards_left, after_arrow, between={v.center}{ip.center}, anchor=south east] at (ip_1.south -| ip.center) (a_2) {
             $\sigma_{\mathrm{id}, j}$
             };
         \node[process_v2, keep_left, after_arrow] at (a_2.south -| v.west) (v_1) {
@@ -76,13 +78,13 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
         \node[process_v2, keep_middle, after_arrow] at (b_1.south -| v.center) (v_2) {
             $(x_i, Y_i) \gets \mathsf{KeyGen}()$
             };
-        \node[arrow_v2, towards_right, between={v.center}{va.center}] at (v_2.south -| v.center) (a_3) {
+        \node[arrow_v2, towards_right, after_arrow, between={v.center}{va.center}, anchor=south west] at (v_2.south -| v.center) (a_3) {
             $Y_i, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$
             };
-        \node[process_v2, keep_middle, after_arrow] at (a_3.south -| va.center) (va_1) {
+        \node[process_v2, keep_left, after_arrow] at (a_3.south -| va.west) (va_1) {
             verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [5pt]
             $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$, $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \phi)$ \\
-            $m_\mathrm{vs} \gets$ "voter session", $p_\mathrm{vs} \gets$ the address of the latest config item \\ [5pt]
+            $m_\mathrm{vs} \gets$ "voter session", $p_\mathrm{vs} \gets$ the address of the latest item from $\alpha_\mathrm{cnf}$ \\ [5pt]
             \scriptsize $\mathcal{A}$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{vs}$ as the next item of the bulletin board \\ [-2pt]
             \scriptsize $(b_\mathrm{vs}, \rho_\mathrm{vs}) \gets \mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ \\ [5pt]
             internally store the tuple for auditing: $(\mathcal{V}_i, \phi, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \})$
@@ -91,6 +93,7 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
             $b_\mathrm{vs}$
             };
         \node[process_v2, keep_left, after_arrow] at (a_4.south -| v.west) (v_3) {
+            $h_\mathrm{cnf} \gets $ the address of the latest item in $\alpha_\mathrm{cnf}$ \\
             verify $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, $\mathsf{ItemVer}(b_\mathrm{vs}, Y_\mathcal{A})$ \\
             and that $c_\mathrm{vs} = (\mathcal{V}_i, Y_i, \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}}))$
             };
@@ -147,7 +150,8 @@ During the vote cryptogram generation process, the voting application collaborat
         
         % internal knowledge
         \node[internal, below=of v] (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $b_\mathrm{vs}$
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
+            $\alpha_\mathrm{vs} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs} \}$
             };
         \node[internal, below=of dbb] (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, \\
@@ -216,7 +220,7 @@ During the vote cryptogram generation process, the voting application collaborat
         % internal knowledge
         \node[internal, below=of v] (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathrm{enc}$, \\
-            $b_\mathrm{vec}$, $b_\mathrm{sec}$, $M$, $r_\mathrm{v}$, $e_\mathrm{d}$
+            $\alpha_\mathrm{sec} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vec}, b_\mathrm{sec} \}$, $M$, $r_\mathrm{v}$, $e_\mathrm{d}$
             };
         \node[internal, below=of dbb] (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, $r_\mathrm{d}$, \\
@@ -440,14 +444,17 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
         % internal knowledge
         \node[internal_3, below=of v] (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, $r_\mathrm{v}$, $s_\mathrm{v}$, \\
-            $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$
+            $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$, \\
+            $\alpha_\mathrm{vts} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{vts} \}$, $\alpha_\mathrm{sr} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{sr} \}$
             };
         \node[internal_3, below=of ev] (ev_ik) {
-            internal knowledge: $x_\mathcal{X}$, $b_\mathrm{v}$
+            internal knowledge: $x_\mathcal{X}$, \\
+            $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$, \\
+            $\alpha_\mathrm{v} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{vts}, b_\mathrm{v} \}$, $\alpha_\mathrm{sr} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{sr} \}$
             };
         \node[internal_3, below=of dbb] (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{X}$, $r_\mathrm{d}$, $s_\mathrm{d}$, \\
-            $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
+            $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
             };
         
         % All content
@@ -476,7 +483,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             \scriptsize hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$, therefore $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco}, b_\mathrm{sco} \}$ \\ [-2pt]
             \scriptsize $(b_\mathrm{sco}, \rho_\mathrm{sco}) \gets \mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sco}, c_\mathrm{sco}, p_\mathrm{sco})$
             };
-        \node[arrow_v2, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| dbb.center) (a_3) {
+        \node[arrow_v2, towards_left, after_arrow, between={v.center}{dbb.center}, anchor=south east] at (dbb_1.south -| dbb.center) (a_3) {
             $b_\mathrm{vco}$, $b_\mathrm{sco}$
             };
         \node[process_v2, keep_left, after_arrow] at (a_3.south -| v.west) (v_2) {
@@ -486,7 +493,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v_ik.west)--(dbb_ik.south east);
+        \draw[dashed] (v_ik.south west)--(v_ik.south -| dbb.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
@@ -498,7 +505,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
         
         \draw[densely dotted] (v_ik.south -| ev.center)--(a_1.south east);
         
-        \draw[densely dotted] (dbb_ik.south -| dbb.center)--(a_2.south east);
+        \draw[densely dotted] (v_ik.south -| dbb.center)--(a_2.south east);
         \draw[densely dotted] (b_1.south -| dbb.center)--(dbb_1.north -| dbb.center);
         \draw[densely dotted] (dbb_1.south -| dbb.center)--(bottom.south -| dbb.center);
         }
@@ -532,7 +539,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             };
         \node[internal_3, below=of dbb] (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, \\
-            $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco}, b_\mathrm{sco} \}$
+            $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco}, b_\mathrm{sco} \}$
             };
         
         % All content
@@ -577,48 +584,24 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
 \end{landscape}
 
 
-
-
-
-
-
-
-
 \clearpage
-\color{orange}
-\subsubsection{Not used - to be moved or removed}
-\begin{enumerate}
-    \item The \textit{Voter} $\mathcal{V}_i$ asks the \textit{Digital Ballot Box} $\mathcal{D}$ for the latest election configuration items which presents the means of voter authentication and all contest options.
-    
-    \item \label{itm: cast vote} The \textit{Voter} $\mathcal{V}_i$ marks the vote cryptogram as "cast" on the bulletin board by posting a \textit{cast request} item to the \textit{Digital Ballot Box} $\mathcal{D}$ as described in \Cref{sec: vote confirmation receipt}. The process is illustrated in \Cref{fig: protocol for casting a submitted ballot}.
-    
-    \item The last response from the \textit{Digital Ballot Box} $\mathcal{D}$ that the \textit{Voter} $\mathcal{V}_i$ receives which certifies the acceptance of the \textit{cast request} item on the bulletin board is regarded as a vote receipt. The \textit{Voter} should store this receipt, as it can be used at any time to verify that the vote is registered by the \textit{Digital Ballot Box} as described in \Cref{sec: vote is registered as cast}.
-\end{enumerate}
-\color{black}
+\subsubsection{Vote confirmation receipt} \label{sec: vote confirmation receipt}
+After encrypting a ballot, the voter $\mathcal{V}_i$ can choose whether to test or cast it. After choosing cast the ballot, the voter receives a receipt from the digital ballot box that confirms that the ballot has been registered as cast on hte public bulletin board. 
 
+The voter has to follow the protocol from \cref{fig: ballot casting protocol} where the voting application interacts with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{cr}, c_\mathrm{cr}, p_\mathrm{cr})$ (protocol \ref{pro: write on board}) in order to append the cast request item $b_\mathrm{cr}$ on the board, where $m_\mathrm{cr} =$ "cast request", the content $c_\mathrm{cr}$ is empty and the parrent $p_\mathrm{cr}$ is the address of the ballot cryptograms item $b_\mathrm{bc}$.
 
+After publishing the cast request item on the bulletin board, the digital ballot box return to the voting app with the item $b_\mathrm{cr}$ and its receipt $\rho_\mathrm{cr}$. The voting app checks the item according to validations of protocol \ref{pro: write on board} and if valid, the voting application presents the receipt $\rho_\mathrm{cr}$ together with $\sigma_\mathrm{cr}$ and $h_\mathrm{cr}$ to the voter.
 
+The voter stores the tuple as the vote confirmation receipt (i.e. proof of the ballot being cast on the bulletin board). The voter can use it at any time to check that the vote is registered on the bulletin board as described in \cref{sec: vote is registered as cast}.
 
-
-
-
-
-\clearpage
-\subsubsection{Vote Confirmation Receipt} \label{sec: vote confirmation receipt}
-Once the vote cryptogram $e_i$ has been registered, the \textit{Voter} $\mathcal{V}_i$ receives back from the \textit{Digital Ballot Box} $\mathcal{D}$ a confirmation receipt in form of a Schnorr signature (\Cref{alg: sign}) \( \rho_i = \mathbf{Sign}_{x_\mathrm{sign}} (\sigma_i || h_{\mathrm{b},i}) \), together with the new board hash value $h_{\mathrm{b},i}$, the previous board hash value $h_{\mathrm{b},i-1}$ and the registration time stamp $t_{\mathrm{r},i}$. Recall from \Cref{sec: pre-election phase} that $x_\mathrm{sign}$ is the \textit{Digital Ballot Box} $\mathcal{D}$'s signing key.
-
-The receipt certifies that the vote cryptogram has been registered on the bulletin board at exactly version $h_{\mathrm{b},i}$. The \textit{Voter} $\mathcal{V}_i$ can use this receipt to verify, at any time, that her vote is included on the board, and that the history of the board has not changed by validating the hash value. 
-
-If the previous board hash value $h_{\mathrm{b},i-1}$ does not match with the acknowledged hash $h_{\mathrm{a},i}$, that means a "race" situation (described in the previous section) has happened and the current \textit{Voter} $\mathcal{V}_i$ has lost the race, i.e. while the current \textit{Voter} $\mathcal{V}_i$ was preparing her vote submission, another \textit{Voter} $\mathcal{V}_i$ has successfully managed to post another vote submission. This is a perfectly valid scenario that can occur in busy situations.
-
-Note that, if a \textit{Voter} $\mathcal{V}_i$ has a confirmation receipt that does not correspond with the current state of the bulletin board, that immediately reveals an attempt to break the integrity of the bulletin board and should be reported to the election authorities.
+Note that, if a voter $\mathcal{V}_i$ has a vote confirmation receipt $(\rho_\mathrm{cr}, \sigma_\mathrm{cr}, h_\mathrm{cr})$ that is valid (i.e. $\mathsf{SigVer}(Y_\mathcal{D}, \rho_\mathrm{cr}; \sigma_\mathrm{cr} || h_\mathrm{cr})$, where $Y_\mathcal{D}$ exists on the bulletin board $\boldsymbol{b}$) but does not correspond with the current state of the bulletin board (i.e. $h_\mathrm{cr}$ is not the address of any item of the bulletin board $\boldsymbol{b}$), that reveals that the integrity of the bulletin board has been broken and should be reported to the election officials.
 
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
             % every node/.style={draw}
             ]{
-            
+
         % Actors
         \node[title, above, anchor=north east] (v) {
             \textbf{Voter} $\mathcal{V}_i$};
@@ -626,51 +609,39 @@ Note that, if a \textit{Voter} $\mathcal{V}_i$ has a confirmation receipt that d
             \textbf{Digital Ballot Box} $\mathcal{D}$};
         
         % internal knowledge
-        \node[block, below=of v] (v1) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_i$, $Y_\mathcal{D}$, $p$ */
+        \node[internal, below=of v] (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
+            $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$
             };
-        \node[block, below=of dbb] (dbb1) {
-            /* internal knowledge: \\
-            \phantom{/}* $x_\mathcal{D}$, $\boldsymbol{Y} = \{Y_1, ..., Y_{n_\mathrm{v}}\}$, \\
-            \phantom{/}* $\boldsymbol{h} = \{h_1, ... h_{n_\mathrm{b}}\}$ */
+        \node[internal, below=of dbb] (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, \\
+            $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, where $\alpha_\mathrm{bc} \subset \boldsymbol{b}$
             };
-        \node[block, anchor=south west] at (dbb1.south -| v1.west) (v1-corner) {};
         
         %All content
-        \node[block, below=of v1-corner.south west, anchor=north west] (v2) {
-            $m \gets$ "cast" \\
-            $\sigma_i \gets \mathsf{Sign}(x_i; m || p)$
+        \node[process_v2, keep_left, first] at (dbb_ik.south -| v.west) (v_1) {
+            $c_\mathrm{cr} \gets \varnothing$, $p_\mathrm{cr} \gets$ the address of $b_\mathrm{bc}$ \\
+            $m_\mathrm{cr} \gets$ "cast request"
             };
-        \node[arrow, below=of v2.south, anchor=north west] (a1) {
-            $i$, $\sigma_i$, $m$, $p$
+        \node[banner_v2, keep_left, after_arrow, between={v.west}{dbb.east}] at (v_1.south -| v.west) (b_1) {
+            $\mathcal{V}_i$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{cr}$ as the $k^\mathrm{th}$ item of $\boldsymbol{b}$ \\
+            $(b_\mathrm{cr}, \rho_\mathrm{cr}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{cr}, c_\mathrm{cr}, p_\mathrm{cr})$, therefore $b_\mathrm{cr} \in \boldsymbol{b}$
             };
-        \node[block, anchor=north west] at (a1.south -| dbb1.west) (dbb2) {
-            verify that $m$ and $p$ are compatible \\
-            and $\mathsf{SigVer} (Y_i, \sigma_i; m || p)$ then: \\ [9pt]
-            $t_{n_\mathrm{b}+1} \gets$ current timestamp \\
-            $h_{n_\mathrm{b}+1} \gets \mathcal{H}(m || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\ [9pt]
-            /* store on the Bulletin Board as a \\
-            \phantom{/}* new item the tuple: \\
-            \phantom{/}* $(m, \varnothing, \mathcal{V}_i, \sigma_i, t_{n_\mathrm{b}+1}, p, h_{n_\mathrm{b}+1})$ */ \\ [9pt]
-            $\rho \gets \mathsf{Sign}(x_\mathcal{D}; \sigma_i || h_{n_\mathrm{b}+1})$
-            };
-        \node[arrow, anchor=north west] at (a1.west |- dbb2.south) (a2) {
-            $\rho$, $t_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}+1}$, $h_{n_\mathrm{b}}$
-            };
-        \node[block, anchor=north west] at (a2.south -| v2.west) (v3) {
-            verify that \\
-            $h_{n_\mathrm{b}+1} = \mathcal{H}(m || p || h_{n_\mathrm{b}} || t_{n_\mathrm{b}+1})$ \\
-            and $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma_i || h_{n_\mathrm{b}+1})$
+        \node[process_v2, keep_left, after_arrow] at (b_1.south -| v.west) (v_2) {
+            store $\rho_\mathrm{cr}$ as the vote receipt
             };
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (v1-corner.south west)--(dbb1.south east);
-        \draw[->] (a1.south west)--(a1.south east);
-        \draw[->] (a2.south east)--(a2.south west);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
+
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+        
+        \draw[densely dotted] (v_1.south -| v.center)--(b_1.north -| v.center);
+        \draw[densely dotted] (b_1.south -| v.center)--(v_2.north -| v.center);
         }
     \end{tikzpicture}
-    \caption{Protocol for casting a submitted ballot}
-    \label{fig: protocol for casting a submitted ballot}
+    \caption{Ballot casting protocol}
+    \label{fig: ballot casting protocol}
 \end{figure}
