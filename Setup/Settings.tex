@@ -10,6 +10,7 @@
   \hspace*{\mylen}#1\\}
   
 \SetKw{KwAnd}{and}
+\SetKw{KwOr}{or}
 \SetKw{KwBy}{by}
 \SetKw{KwForEach}{for each}
 \SetKw{Continue}{continue}
@@ -35,7 +36,6 @@
         text width=160*2+7,
         align=center
     },
-    title_3/.style={title, text width=173},
     block_3/.style={block, text width=173},
     arrow_3_next/.style={arrow, text width=130},
     arrow_3_skip/.style={arrow, text width=130+173},
@@ -58,15 +58,21 @@
 % internal node styles
 \tikzset{
   block_font/.style = {font=\small},
-  half_size/.style = {text width=160}
+  banner_font/.style = {font=\scriptsize},
+  half_size/.style = {text width=160},
+  third_size/.style = {text width=173},
+  block_background/.style = {fill=black!5}
 }
 
 % main types of nodes
 \tikzset{
   title/.style = {half_size, minimum height=20, align=center},
+  title_3/.style = {title, third_size},
   internal/.style = {half_size, align=left},
-  process_v2/.style = {block_font, align=left, draw, dotted, rounded corners},
-  arrow_v2/.style = {block_font, align=center}
+  internal_3/.style = {third_size, align=left},
+  process_v2/.style = {block_font, align=left, draw, dotted, rounded corners, block_background},
+  arrow_v2/.style = {block_font, align=center},
+  banner_v2/.style = {banner_font, align=center}
 }
 
 % other helpful node styles
@@ -79,24 +85,20 @@
   towards_right/.style = {anchor=north west, append after command={
     [->] (\tikzlastnode.south west)edge(\tikzlastnode.south east)[dashed]}},
   towards_left/.style = {anchor=north east, append after command={
-    [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}}
-}
-
-% between function for dynamic width of nodes
-\tikzset{
-    between/.style 2 args={
-        insert path={
-            \pgfextra{
-                \path (#1);
-                \pgfgetlastxy{\xa}{\ya} 
-                \path (#2);
-                \pgfgetlastxy{\xb}{\yb}   
-                \pgfpointdiff{\pgfpoint{\xa}{\ya}}{\pgfpoint{\xb}{\yb}}
-                \pgf@xa=\pgf@x
-            }
-        },
-        minimum width=\pgf@xa
-    }
+    [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}},
+  between/.style 2 args={
+      insert path={
+          \pgfextra{
+              \path (#1);
+              \pgfgetlastxy{\xa}{\ya} 
+              \path (#2);
+              \pgfgetlastxy{\xb}{\yb}   
+              \pgfpointdiff{\pgfpoint{\xa}{\ya}}{\pgfpoint{\xb}{\yb}}
+              \pgf@xa=\pgf@x
+          }
+      },
+      minimum width=\pgf@xa
+  }
 }
 
 \tikzset{
