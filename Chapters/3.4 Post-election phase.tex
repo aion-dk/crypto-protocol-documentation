@@ -1,41 +1,47 @@
-\clearpage
 \subsection{Post-election phase} \label{sec: post-election phase}
-After the voting time has finished, the election proceeds to the last phase which will generate the result of the election. Now, the Digital Ballot Box $\mathcal{D}$ does not accept any new vote cryptograms anymore. The list of votes remains publicly available for voters to check that their vote cryptogram is included (using their confirmation receipt) and for auditors to check that the hash values of the list are consistent (the integrity of the board is persistent).
+After the voting time has finished, the election proceeds to the last phase which will generate the result of the election. Now, the digital ballot box does not accept any new vote cryptograms anymore. The list of votes remains publicly available for voters to check that their vote cryptogram is included (using their confirmation receipt) and for auditors to check that the hash values of the list are consistent (the integrity of the board is persistent).
 
-The process starts by identifying all votes that are included in the tally. Then trustees have to collaborate in a result ceremony that consists of two processes that will first anonymize all the encrypted votes and then decrypt them. In order for decryption to work, there must be at least $t$ trustees participating in this process. Therefore, we define $\boldsymbol{\mathcal{T}'} \subset \boldsymbol{\mathcal{T}}$ as the set of trustees that participate in the result ceremony, with the cardinality of $|\boldsymbol{\mathcal{T}'}| = n_\mathrm{d}$ and $t \leq n_\mathrm{d} \leq n_\mathrm{t}$. Recall from \cref{sec: threshold ceremony} that $t$ is threshold value for trustees and $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$ is the set of all trustees. 
-
-During both mixing and decryption phases, the work performed by all trustees $\boldsymbol{\mathcal{T}'}$ is facilitated by an entity that we call the \textit{server} (as described in \cref{app: elgamal threshold cryptosystem}). When all cryptograms have been mixed and decrypted, votes are tallied and the result is published.
-
-The following chapters describe all the steps that take place in each sub process of the post-election phase.
+The process of computing a result consists of:
+\begin{itemize}
+    \item the election administrator requests a rezult to be computed by interacting with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ei}, c_\mathrm{ei}, p_\mathrm{ei})$ (protocol \ref{pro: write on board}) to publish an extraction intent item $b_\mathrm{ei}$ on the bulletin board, according to the rules from \cref{app: bulletin board item types},
+    \item the digital ballot box identifies all the valid ballots that are included in the tally, according to \cref{sec: cleansing procedure},
+    \item a subset of all trustees $\boldsymbol{\mathcal{T}'} \subset \boldsymbol{\mathcal{T}}$ collaborate in the mixing process in order to anonymize the encrypted votes, as described in \cref{sec: mixing phase}, where $|\boldsymbol{\mathcal{T}'}| = n_\mathrm{d}$ and $t \leq n_\mathrm{d} \leq n_\mathrm{t}$ (recall from \cref{sec: threshold ceremony} that $t$ is threshold value for trustees and $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$ is the set of all trustees),
+    \item the same subset of trustees collaborate in the decryption process (\cref{sec: decryption phase}) of the anonymized votes,
+    \item finally, the election administrator publishes the result in a verifiable manner as described in \cref{sec: result publication}.
+\end{itemize}
 
 
 \subsubsection{Cleansing procedure} \label{sec: cleansing procedure}
-The Digital Ballot Box $\mathcal{D}$ bundles a list of cryptograms that represent only the valid votes from the bulletin board. This is, essentially, the votes that will be decrypted and tallied as a result. It is considered a valid vote only the last vote submitted by each voter. All other votes are considered overwritten and, therefore, discarded.
+Triggered by the extraction intent item $b_\mathrm{ei}$ being published, the digital ballot box $\mathcal{D}$ bundles a list of cryptograms that represent only the valid votes from the ballot cryptograms items from the bulletin board. This is, essentially, the votes that will be decrypted and tallied as a result. It is considered a valid vote only the last ballot cryptograms item, followed by a cast request item for each voter. All other votes are considered overwritten and, therefore, discarded.
 
-The list of cryptograms is called \textit{the initial mixed board} and it is defined as $\boldsymbol{e}_0 = \{ e_1, ..., e_{n_\mathrm{e}} \}$, with each $e_i \in \mathbb{E}$, where $\mathbb{E}$ is the set of all possible cryptograms and $n_\mathrm{e}$ is the total number of cryptograms. The list $\boldsymbol{e}_0$ is stored in a file, published on the bulletin board by the Digital Ballot Box $\mathcal{D}$ and used as the input to the \textit{mixing phase}.
+The list of cryptograms is called \textit{the initial mixed board} and it is defined as $\boldsymbol{e}_0 = \{ e_1, ..., e_{n_\mathrm{e}} \}$, with each $e_i \in \mathbb{E}$, where $\mathbb{E}$ is the set of all possible cryptograms and $n_\mathrm{e}$ is the total number of cryptograms. The list $\boldsymbol{e}_0$ is contained in an extraction data item $b_\mathrm{ed}$ published on the bulletin board by the digital ballot box $\mathcal{D}$ by running $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{ed}, c_\mathrm{ed}, p_\mathrm{ed})$, where $m_\mathrm{ed} = $ "extraction data", the content $c_\mathrm{ed}$ is empty and the parent $p_\mathrm{ed}$ is the address of the extraction intent item $b_\mathrm{ei}$. The \textit{initial mixed board} $\boldsymbol{e}_0$ is used as the input to the mixing phase.
 
 The cleansing procedure is publicly auditable as both the list of vote cryptograms and the \textit{initial mixed board} are publicly available.
 
 
 \subsubsection{Mixing Phase} \label{sec: mixing phase}
-During the mixing phase, the list of cryptograms will change its appearance several times, being shuffled in an indistinguishable way. Each trustee \( \mathcal{T}_i \in \boldsymbol{\mathcal{T}'} \) applies its mixing algorithm in sequential order (the output from $\mathcal{T}_{i-1}$ will be used as input for $\mathcal{T}_i$). The first trustee applies its algorithm on \textit{the initial mixed board} and the output of the last trustee is used as \textit{the final mixed board}. The \textit{server} facilitates the mixing phase so, it decides the order of trustees.
+During the mixing phase, the list of cryptograms will change its appearance several times, being shuffled in an indistinguishable way. Each trustee \( \mathcal{T}_i \in \boldsymbol{\mathcal{T}'} \) applies its mixing algorithm in sequential order (the output from $\mathcal{T}_{i-1}$ is the input to $\mathcal{T}_i$). The first trustee applies its algorithm on \textit{the initial mixed board} and the output of the last trustee is used as \textit{the final mixed board}. The election administrator facilitates the mixing phase and decides the order of trustees.
 
-Formally, trustee $\mathcal{T}_i$ computes the mixed board of cryptograms by applying $\boldsymbol{e}_i \gets \mathsf{Shuffle}(Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{r}_i, \psi_i)$ (\cref{alg: shuffle}), where $Y_\mathrm{enc}$ is the encryption key, $\boldsymbol{r}_i \in \mathbb{Z}_q^{n_\mathrm{e}}$ and $\psi_i$ is a permutation of $n_\mathrm{e}$ elements. Next, as described in \cref{app: groth's argument of shuffle}, trustee $\mathcal{T}_i$ computes a proof of correct mixing $(PM_i, AS_i) \gets \mathsf{ProveMix}(\psi_i, Y_\mathrm{enc}, \boldsymbol{r}_i, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$ (\cref{alg: prove mix}). Then, trustee $\mathcal{T}_i$ submits back to the \textit{server} both the mixed board $\boldsymbol{e}_i$ and the mixing proof $(PM_i, AS_i)$.
+Formally, trustee $\mathcal{T}_i$ computes the mixed board of cryptograms by applying $\boldsymbol{e}_i \gets \mathsf{Shuffle}(Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{r}_i, \psi_i)$ (\cref{alg: shuffle}), where $Y_\mathrm{enc}$ is the encryption key, $\boldsymbol{r}_i \in \mathbb{Z}_q^{n_\mathrm{e}}$ and $\psi_i$ is a permutation of $n_\mathrm{e}$ elements. Next, as described in \cref{app: groth's argument of shuffle}, trustee $\mathcal{T}_i$ computes a proof of correct mixing $(PM_i, AS_i) \gets \mathsf{ProveMix}(\psi_i, Y_\mathrm{enc}, \boldsymbol{r}_i, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$ (\cref{alg: prove mix}). Then, trustee $\mathcal{T}_i$ submits to the election administrator the mixed board $\boldsymbol{e}_i$ and the mixing proof $(PM_i, AS_i)$.
 
 For a mixing step to be accepted, the validity of the mixing proof has to be checked by running $\mathsf{VerMix}(PM_i, AS_i, Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$ (\cref{alg: ver mix}). In case a proof fails, either that trustee recomputes the mixing step, or it is removed and the process continues without that trustee.
 
-Obviously, each trustee $\mathcal{T}_i$ knows the shuffling coefficients ($\boldsymbol{r}_i$ and $\psi_i$) of its own mixing algorithm and it is able to link the votes on the mixed board at step $i - 1$ (input board) with the ones on the mixing board at step $i$ (output board). However, $\mathcal{T}_i$ does not know the shuffling coefficients of the other trustees so it cannot create a full link between the votes on the final mixed board and the ones on the initial mixed board, unless all trustees are corrupt and collude against the election.
+Obviously, each trustee $\mathcal{T}_i$ knows the shuffling coefficients ($\boldsymbol{r}_i$ and $\psi_i$) of its own mixing algorithm and it is able to link the votes on the previous mixed board $\boldsymbol{e}_{i-1}$ with the ones on the mixing board at $i^\mathrm{th}$ step $\boldsymbol{e}_i$. However, $\mathcal{T}_i$ does not know the shuffling coefficients of the other trustees so it cannot create a full link between the votes on the \textit{final mixed board} and the ones on the \textit{initial mixed board}, unless all trustees are corrupt and collude against the election.
 
-Assuming there is at least one honest trustee that won't reveal its shuffling coefficients, then the \textit{final mixed board} of cryptograms represents the anonymized version of the \textit{initial mixed board} of cryptograms. The \textit{final mixed board} of cryptograms is used in the decryption phase to compute the election results.
+Assuming there is at least one honest trustee that will not reveal its shuffling coefficients, then the \textit{final mixed board} of cryptograms represents the anonymized version of the \textit{initial mixed board} of cryptograms. The \textit{final mixed board} of cryptograms is used in the decryption phase to compute the election results.
 
 
 \subsubsection{Decryption Phase} \label{sec: decryption phase}
-Because the link between a vote cryptogram and its voter has been broken during the mixing phase, it is safe now to decrypt all the cryptograms from the \textit{final mixed board} as it does not violate the secrecy of the election. Furthermore, decrypting this list of cryptograms would lead to accurate and correct results as it contains the exact same votes as the initial list of votes, fact proven by the mixing proofs.
+Because the link between a vote cryptogram and its voter has been broken during the mixing phase, it is safe now to decrypt all the cryptograms from the \textit{final mixed board} as it does not violate the secrecy of the election. Furthermore, decrypting this list of cryptograms would lead to accurate and correct results as it contains the exact same votes as the initial list of votes, fact proven by the mixing proofs. In this section, the \textit{final mixed board} is reffered to as $\boldsymbol{e}$.
 
 During the decryption phase, trustees have to collaborate again to perform the threshold decryption protocol as presented in \cref{fig: threshold decryption}. Each trustee \( \mathcal{T}_i \in \boldsymbol{\mathcal{T}'} \) gets the \textit{final mixed board} of cryptograms $\boldsymbol{e} = \{ e_1, ..., e_{n_\mathrm{e}} \}$ then computes partial decryptions of each cryptogram together with a proof of correct decryption by applying $(\boldsymbol{S}_i, PK_i) \gets \mathsf{PartiallyDecryptAndProve}(\boldsymbol{e}, sx_i)$ (\cref{alg: partially decrypt and prove}). Recall that, trustee $\mathcal{T}_i$ is in possession of its share of the decryption key $sx_i$ as it has been computed during the threshold ceremony (\cref{sec: threshold ceremony}).
 
-\begin{algorithm}[!h]
-\DontPrintSemicolon
+Then, trustee $\mathcal{T}_i$ submits the partial decryption $\boldsymbol{S}_i$ and the proof $PK_i$ to the election administrator service, which in \cref{fig: threshold decryption} is reffered to as \textit{the server}. The election administrator accepts the partial decryption if the proof validates according to $\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}_i, PK_i, sY_i)$ (\cref{alg: partial decryption ver}), where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ and it is computable as in \cref{app: elgamal threshold cryptosystem}.
+
+Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}}$ from all trustees in $\boldsymbol{\mathcal{T}'}$, the election administrator follows the protocol from \cref{fig: threshold decryption} and aggregates all partial decryptions for each cryptogram in $\boldsymbol{e}$ to finalize the decryption and extract the votes $\boldsymbol{V} = \{ V_1, ..., V_{n_\mathrm{e}} \} \gets \mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$ (\cref{alg: finalize decryption}). $\boldsymbol{V}$ represents the \textit{raw result} of the election, i.e. the full list of votes as elliptic curve points.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
     \caption{$\mathsf{PartiallyDecryptAndProve}(\boldsymbol{e}, sx)$}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
     \myinput{The share of decryption key $sx \in \mathbb{Z}_q$}
@@ -52,10 +58,8 @@ During the decryption phase, trustees have to collaborate again to perform the t
     \label{alg: partially decrypt and prove}
 \end{algorithm}
 
-Then, trustee $\mathcal{T}_i$ submits the partial decryption $\boldsymbol{S}_i$ and the proof $PK_i$ to the \textit{server}, which accepts the partial decryption if then proof validates according to the algorithm $\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}_i, PK_i, sY_i)$ (\cref{alg: partial decryption ver}), where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ and it is computable as described in \cref{app: elgamal threshold cryptosystem}.
-
-\begin{algorithm}[H]
-\DontPrintSemicolon
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
     \caption{$\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}, PK, sY)$}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
     \myinput{The list of partial decryptions $S = \{ S_1, ..., S_n \} \in \mathbb{P}^n$}
@@ -71,9 +75,7 @@ Then, trustee $\mathcal{T}_i$ submits the partial decryption $\boldsymbol{S}_i$ 
     \label{alg: partial decryption ver}
 \end{algorithm}
 
-Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}}$ from all trustees in $\boldsymbol{\mathcal{T}'}$, the \textit{server} follows the protocol from \cref{fig: threshold decryption} and aggregates all partial decryptions for each cryptogram in $\boldsymbol{e}$ to finalize the decryption and extract the votes $\boldsymbol{V} = \{ V_1, ..., V_{n_\mathrm{e}} \} \gets \mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$ (\cref{alg: finalize decryption}).
-
-\begin{algorithm}[!ht]
+\begin{algorithm}[ht]
 \DontPrintSemicolon
     \caption{$\mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{ e_1, ..., e_n \} \in \mathbb{E}^n$, with $e_j = (R_j, C_j)$}
@@ -89,17 +91,15 @@ Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\ma
     \label{alg: finalize decryption}
 \end{algorithm}
 
-At the end of the decryption phase we will be in possession of the \textit{raw result} of the election, i.e. the full list of votes in form of elliptic curve points.
-
 
 \subsubsection{Result Publication} \label{sec: result publication}
 The \textit{results module} is responsible for interpreting the \textit{raw result} and present the result of the election in a more readable way. The interpretation of the result is dependant on the election type (simple election, multiple election, STV, etc.).
 
 For simplicity, we will consider the simple election case, where voters had to choose one option from a predefined set of candidates, i.e. a vote is a plain text that represents a candidate name.
 
-First, all votes $V_i \in \boldsymbol{V}$ have to be decoded into bytes $\boldsymbol{b}_i \gets \mathsf{Point2Bytes}(V_i)$, then interpreted as text and finally mapped to one of the candidate names. If any of these steps fail, then the vote $V_i$ is considered invalid. Tallying the votes that each candidate received is considered trivial and out of scope for this document.
+First, all votes $V_i \in \boldsymbol{V}$ have to be decoded into bytes $\boldsymbol{b}_i \gets \mathsf{Point2Bytes}(V_i)$ (\cref{alg: point to bytes}), then interpreted as text and finally mapped to one of the candidate names. If any of these steps fail, then the vote $V_i$ is considered invalid. Tallying the votes that each candidate received is considered trivial and out of scope for this document.
 
-Finally, all data that has been computed in the result ceremony (both mixing and decryption phases) is collected by the Election Administrator $\mathcal{E}$, signed as a bulletin board event and submitted to the Digital Ballot Box $\mathcal{D}$ to be stored on the bulletin board. The content of this item consists of:
+Finally, all data that has been computed in the result ceremony (both mixing and decryption phases) is collected by the election administrator $\mathcal{E}$, and published on the bulletin board as the extraction confirmation item $b_\mathrm{ec}$ by performing $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ec}, c_\mathrm{ec}, p_\mathrm{ec})$ (protocol \ref{pro: write on board}), where $m_\mathrm{ec} = $ "extraction confirmation", the parent $p_\mathrm{ec}$ is the address of the extraction data item $b_\mathrm{ed}$  and the content $c_\mathrm{ec}$ consists of:
 \begin{itemize}
     \item a set of the following data from each trustee that participated in the result ceremony $\mathcal{T}_i \in \boldsymbol{\mathcal{T}'}$:
     \begin{itemize}
