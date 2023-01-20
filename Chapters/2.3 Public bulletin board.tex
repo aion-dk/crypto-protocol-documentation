@@ -99,8 +99,8 @@ This section describes the protocol that any writer needs to follow in order to 
         \node[process_v2, first, keep_left] at (w_ik.south -| w.west) (w_1) {
             $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$
             };
-        \node[arrow_v2, towards_right, between={w.center}{dbb.center}] at (w_1.south -| w.center) (a_1) {
-            $\sigma_i$, $m_i$, $c_i$, $p_i$
+        \node[arrow_v2, towards_right, after_arrow, between={w.center}{dbb.center}, anchor=south west] at (w_1.south -| w.center) (a_1) {
+            \hspace{20pt} $\sigma_i$, $m_i$, $c_i$, $p_i$
             };
         \node[process_v2, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
             verify that $m_i$, $c_i$ and $p_i$ comply to the \\
@@ -113,8 +113,8 @@ This section describes the protocol that any writer needs to follow in order to 
             $b_i \gets (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ \\
             $\boldsymbol{b} \gets \boldsymbol{b} \cup \{ b_i \}$
             };
-        \node[arrow_v2, towards_left, between={w.center}{dbb.center}] at (dbb.center |- dbb_1.south) (a_2) {
-            $\rho_i$, $t_i$, $h'_i$, $h_i$
+        \node[arrow_v2, towards_left, after_arrow, between={w.center}{dbb.center}, anchor=south east] at (dbb.center |- dbb_1.south) (a_2) {
+            $\rho_i$, $t_i$, $h'_i$, $h_i$ \hspace{70pt}
             };
         \node[process_v2, keep_left, after_arrow] at (a_2.south -| w.west) (w_2) {
             verify that $h_i = \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\

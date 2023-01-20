@@ -79,18 +79,18 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
             $(x_i, Y_i) \gets \mathsf{KeyGen}()$
             };
         \node[arrow_v2, towards_right, after_arrow, between={v.center}{va.center}, anchor=south west] at (v_2.south -| v.center) (a_3) {
-            $Y_i, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$
+            \hspace{30pt} $Y_i, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$
             };
         \node[process_v2, keep_left, after_arrow] at (a_3.south -| va.west) (va_1) {
-            verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [5pt]
+            verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [7pt]
             $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$, $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \phi)$ \\
-            $m_\mathrm{vs} \gets$ "voter session", $p_\mathrm{vs} \gets$ the address of the latest item from $\alpha_\mathrm{cnf}$ \\ [5pt]
+            $m_\mathrm{vs} \gets$ "voter session", $p_\mathrm{vs} \gets$ the address of the latest item from $\alpha_\mathrm{cnf}$ \\ [7pt]
             \scriptsize $\mathcal{A}$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{vs}$ as the next item of the bulletin board \\ [-2pt]
-            \scriptsize $(b_\mathrm{vs}, \rho_\mathrm{vs}) \gets \mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ \\ [5pt]
+            \scriptsize $(b_\mathrm{vs}, \rho_\mathrm{vs}) \gets \mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ \\ [7pt]
             internally store the tuple for auditing: $(\mathcal{V}_i, \phi, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \})$
             };
-        \node[arrow_v2, towards_left, between={v.center}{va.center}, anchor=north west] at (va_1.south -| v.center) (a_4) {
-            $b_\mathrm{vs}$
+        \node[arrow_v2, towards_left, after_arrow, between={v.center}{va.center}, anchor=south east] at (va_1.south -| va.center) (a_4) {
+            $b_\mathrm{vs}$ \hspace{70pt}
             };
         \node[process_v2, keep_left, after_arrow] at (a_4.south -| v.west) (v_3) {
             $h_\mathrm{cnf} \gets $ the address of the latest item in $\alpha_\mathrm{cnf}$ \\
@@ -235,8 +235,8 @@ During the vote cryptogram generation process, the voting application collaborat
             $c_\mathrm{bc} \gets e$, $p_\mathrm{bc} \gets$ address of $b_\mathrm{sec}$ \\
             $m_\mathrm{bc} \gets$ "ballot cryptograms"
             };
-        \node[arrow_v2, towards_right, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_1) {
-            $e = (R, C)$, $PK$
+        \node[arrow_v2, towards_right, after_arrow, anchor=south west, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_1) {
+            \hspace{40pt} $e = (R, C)$, $PK$
             };
         \node[process_v2, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
             verify that $\mathsf{DLVer}(PK, \{ G \}; \{ R - [r_\mathrm{d}]G \})$
@@ -359,7 +359,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             };
         
         % All content
-        \node[arrow_v2, towards_right, between={v.center}{ev.center}] at (dbb_ik.south -| v.center) (a_1) {
+        \node[arrow_v2, towards_right, first, between={v.center}{ev.center}] at (dbb_ik.south -| v.center) (a_1) {
             address of $b_\mathrm{vts}$
             };
         \node[arrow_v2, towards_right, between={ev.center}{dbb.center}, after_arrow] at (a_1.north -| ev.center) (a_2) {
@@ -373,8 +373,8 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             verify $\mathsf{AncestryVer}(\alpha_\mathrm{vts}, \varnothing)$ and $\mathsf{ItemVer}(b_j, Y_\mathcal{W})$ for each $b_j \in \alpha_\mathrm{vts}$, \\
             where $\mathcal{W} \in \{ \mathcal{D}, \mathcal{E}, \mathcal{A}, \mathcal{V}_i \}$ according to rules form \cref{app: bulletin board item types}
             };
-        \node[arrow_v2, towards_left, between={v.center}{ev.center}] at (ev_1.south -| ev.center) (a_4) {
-            "ballot found"
+        \node[arrow_v2, towards_left, after_arrow, between={v.center}{ev.center}, anchor=south east] at (ev_1.south -| ev.center) (a_4) {
+            "ballot found" \hspace{60pt}
             };
         \node[process_v2, keep_left, after_arrow] at (a_4.south -| v.west) (v_1) {
             $m_\mathrm{sr} \gets $ "spoil request", $c_\mathrm{sr} \gets \varnothing$, $p_\mathrm{sr} \gets$ address of $b_\mathrm{bc}$
@@ -461,8 +461,8 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
         \node[arrow_v2, first, towards_left, between={v.center}{ev.center}] at (v_ik.south -| ev.center) (a_1) {
             $h_\mathrm{v} = $ address of $b_\mathrm{v}$
             };
-        \node[arrow_v2, towards_left, between={v.center}{dbb.center}] at (a_1.south -| dbb.center) (a_2) {
-            $b_\mathrm{v}$
+        \node[arrow_v2, towards_left, after_arrow, between={v.center}{dbb.center}] at (a_1.north -| dbb.center) (a_2) {
+            \hspace{150pt} $b_\mathrm{v}$
             };
         \node[process_v2, keep_left, after_arrow] at (a_2.south -| v.west) (v_1) {
             $Y_\mathcal{X} = $ the content of $b_\mathrm{v}$, $h_\mathrm{vts} = $ the address of $b_\mathrm{vts}$ \\
@@ -484,7 +484,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             \scriptsize $(b_\mathrm{sco}, \rho_\mathrm{sco}) \gets \mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sco}, c_\mathrm{sco}, p_\mathrm{sco})$
             };
         \node[arrow_v2, towards_left, after_arrow, between={v.center}{dbb.center}, anchor=south east] at (dbb_1.south -| dbb.center) (a_3) {
-            $b_\mathrm{vco}$, $b_\mathrm{sco}$
+            $b_\mathrm{vco}$, $b_\mathrm{sco}$ \hspace{100pt}
             };
         \node[process_v2, keep_left, after_arrow] at (a_3.south -| v.west) (v_2) {
             verify $\mathsf{AncestryVer}(\{ b_\mathrm{vco}, b_\mathrm{sco} \}, h_\mathrm{v})$ and $\mathsf{ItemVer}(b_\mathrm{sco}, Y_\mathcal{D})$
