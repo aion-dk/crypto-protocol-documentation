@@ -182,7 +182,7 @@ Finally, each trustee $\mathcal{T}_i$ downloads from the server their encrypted 
             \textbf{Trustee $\mathcal{T}_i$}};
         
         %All content
-        \node[block, first, keep_left] at (s.south -| s.west) (s_1) {
+        \node[block, spaced, keep_left] at (s.south -| s.west) (s_1) {
             $\boldsymbol{Y} \gets \{ \}$, $\boldsymbol{P} \gets \{ \}$, $\boldsymbol{c} \gets \{ \}$
             };
         \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_1.south -| s.south) (a_1) {
@@ -318,7 +318,7 @@ Note that the \textit{Lagrange Interpolation Polynomial} can be computed only wh
             };
         
         %All content
-        \node[block, keep_middle, first] at (s_ik.south -| s.center) (s_1) {
+        \node[block, keep_middle, spaced] at (s_ik.south -| s.center) (s_1) {
             $\tau \gets \{\}$
             };
         \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_1.south -| s.center) (a_1) {

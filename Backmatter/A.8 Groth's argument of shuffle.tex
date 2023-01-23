@@ -53,7 +53,7 @@ Note that, in the description of the protocols, we abuse notation and define $\s
             };
         
         %All content
-        \node[block, keep_middle, first] at (p_ik.south -| v.center) (v_1) {
+        \node[block, keep_middle, spaced] at (p_ik.south -| v.center) (v_1) {
             $x \in_\mathrm{R} \mathbb{Z}_q$ \hspace{10pt}
             };
         \node[arrow, towards_left, immediate, between={p.center}{v.center}] at (v_1.south -| p.center) (a_1) {
@@ -143,7 +143,7 @@ Note that, in the description of the protocols, we abuse notation and define $\s
             };
         
         %All content
-        \node[block, first, keep_left] at (p_ik.south -| p.west) (p_1) {
+        \node[block, spaced, keep_left] at (p_ik.south -| p.west) (p_1) {
             $r_\mathrm{p} \in_\mathrm{R} \mathbb{Z}_q$, $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $\boldsymbol{r_\mathrm{e}} = \{r_{\mathrm{e},1}, ..., r_{\mathrm{e},\ell}\} \in_\mathrm{R} \mathbb{Z}_q^\ell$ \\
             $\boldsymbol{d} = \{d_1, ..., d_n\} \in_\mathrm{R} \mathbb{Z}_q^n$ \\
             $\boldsymbol{p} \gets \{\psi(1), ..., \psi(n)\}$ \\

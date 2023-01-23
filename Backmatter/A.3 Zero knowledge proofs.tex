@@ -40,7 +40,7 @@ we generate the proof $PK = (K, c, r)$ by following the protocol described in \c
             };
         
         %All content
-        \node[block, first, keep_left] at (p_ik.south -| p.west) (p_1) {
+        \node[block, spaced, keep_left] at (p_ik.south -| p.west) (p_1) {
             $k \in_\mathrm{R} \mathbb{Z}_q$ \\
             $z_i \gets \mathcal{H} (i || Y_1 || ... || Y_n)$, with $i \in \{ 1, ..., n \}$ \\
             $K \gets [k](G_0 + \sum\limits_{i=1}^n [z_i]G_i)$

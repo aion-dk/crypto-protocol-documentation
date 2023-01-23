@@ -96,7 +96,7 @@ This section describes the protocol that any writer needs to follow in order to 
             };
         
         % All content
-        \node[block, first, keep_left] at (w_ik.south -| w.west) (w_1) {
+        \node[block, spaced, keep_left] at (w_ik.south -| w.west) (w_1) {
             $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$
             };
         \node[arrow, towards_right, immediate, between={w.center}{dbb.center}] at (w_1.south -| w.center) (a_1) {
