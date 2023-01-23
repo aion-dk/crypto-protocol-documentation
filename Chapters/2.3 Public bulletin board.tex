@@ -99,10 +99,10 @@ This section describes the protocol that any writer needs to follow in order to 
         \node[block, first, keep_left] at (w_ik.south -| w.west) (w_1) {
             $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$
             };
-        \node[arrow, towards_right, after_arrow, between={w.center}{dbb.center}, anchor=south west] at (w_1.south -| w.center) (a_1) {
+        \node[arrow, towards_right, immediate, between={w.center}{dbb.center}] at (w_1.south -| w.center) (a_1) {
             \hspace{20pt} $\sigma_i$, $m_i$, $c_i$, $p_i$
             };
-        \node[block, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
+        \node[block, keep_right, spaced] at (a_1.south -| dbb.east) (dbb_1) {
             verify that $m_i$, $c_i$ and $p_i$ comply to the \\
             rules according to \cref{app: bulletin board item types} and \\
             $\mathsf{SigVer} (Y_\mathcal{W}, \sigma_i; m_i || c_i || p_i)$ then: \\ [7pt]
@@ -113,10 +113,10 @@ This section describes the protocol that any writer needs to follow in order to 
             $b_i \gets (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ \\
             $\boldsymbol{b} \gets \boldsymbol{b} \cup \{ b_i \}$
             };
-        \node[arrow, towards_left, after_arrow, between={w.center}{dbb.center}, anchor=south east] at (dbb.center |- dbb_1.south) (a_2) {
+        \node[arrow, towards_left, immediate, between={w.center}{dbb.center}] at (dbb_1.south -| w.center) (a_2) {
             $\rho_i$, $t_i$, $h'_i$, $h_i$ \hspace{70pt}
             };
-        \node[block, keep_left, after_arrow] at (a_2.south -| w.west) (w_2) {
+        \node[block, keep_left, spaced] at (a_2.south -| w.west) (w_2) {
             verify that $h_i = \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\
             and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_i; \sigma_i || h_i)$ then: \\ [7pt]
             $b_i \gets (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$

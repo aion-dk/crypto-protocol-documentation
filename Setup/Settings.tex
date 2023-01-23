@@ -41,20 +41,21 @@
   internal/.style = {half_size, align=left},
   internal_3/.style = {third_size, align=left},
   block/.style = {block_font, align=left, draw, dotted, rounded corners, block_background},
-  arrow/.style = {block_font, align=center},
+  arrow/.style = {block_font, align=center, anchor=north west},
   banner/.style = {banner_font, align=center}
 }
 
 % other helpful node styles
 \tikzset{
   first/.style={yshift=-4},
-  after_arrow/.style={yshift=-5},
+  spaced/.style={yshift=-5},
   keep_left/.style={anchor=north west},
   keep_middle/.style={anchor=north},
   keep_right/.style={anchor=north east},
-  towards_right/.style = {anchor=north west, append after command={
+  immediate/.style={spaced, anchor=south west},
+  towards_right/.style = {append after command={
     [->] (\tikzlastnode.south west)edge(\tikzlastnode.south east)}},
-  towards_left/.style = {anchor=north east, append after command={
+  towards_left/.style = {append after command={
     [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}},
   between/.style 2 args={
       insert path={

@@ -45,22 +45,22 @@ we generate the proof $PK = (K, c, r)$ by following the protocol described in \c
             $z_i \gets \mathcal{H} (i || Y_1 || ... || Y_n)$, with $i \in \{ 1, ..., n \}$ \\
             $K \gets [k](G_0 + \sum\limits_{i=1}^n [z_i]G_i)$
             };
-        \node[arrow, towards_right, after_arrow, between={p.center}{v.center}, anchor=south west] at (p_1.south -| p.center) (a_1) {
+        \node[arrow, towards_right, immediate, between={p.center}{v.center}] at (p_1.south -| p.center) (a_1) {
             \hspace{80pt} $K$
             };
-        \node[block, after_arrow, keep_middle] at (a_1.south -| v.center) (v_1) {
+        \node[block, spaced, keep_middle] at (a_1.south -| v.center) (v_1) {
             $c \in_\mathrm{R} \mathbb{Z}_q$
             };
-        \node[arrow, towards_left, after_arrow, between={p.center}{v.center}, anchor = south east] at (v_1.south -| v.center) (a_2) {
+        \node[arrow, towards_left, immediate, between={p.center}{v.center}] at (v_1.south -| p.center) (a_2) {
             $c$
             };
-        \node[block, after_arrow, keep_middle] at (a_2.south -| p.center) (p_2) {
+        \node[block, spaced, keep_middle] at (a_2.south -| p.center) (p_2) {
             $r \gets k + c \cdot x \pmod q$
             };
-        \node[arrow, towards_right, after_arrow, between={p.center}{v.center}, anchor=south west] at (p_2.south -| p.center) (a_3) {
+        \node[arrow, towards_right, immediate, between={p.center}{v.center}] at (p_2.south -| p.center) (a_3) {
             $r$
             };
-        \node[block, after_arrow, keep_right] at (a_3.south -| v.east) (v_2) {
+        \node[block, spaced, keep_right] at (a_3.south -| v.east) (v_2) {
             $z_i = \mathcal{H} (i || Y_1 || ... || Y_n)$, with $i \in \{ 1, ..., n \}$ \\ [7pt]
             verify that $[r](G_0 + \sum\limits_{i=1}^n [z_i]G_i) = K + [c](Y_0 + \sum\limits_{i=1}^n [z_i]Y_i)$
             };

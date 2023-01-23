@@ -185,58 +185,58 @@ Finally, each trustee $\mathcal{T}_i$ downloads from the server their encrypted 
         \node[block, first, keep_left] at (s.south -| s.west) (s_1) {
             $\boldsymbol{Y} \gets \{ \}$, $\boldsymbol{P} \gets \{ \}$, $\boldsymbol{c} \gets \{ \}$
             };
-        \node[arrow, towards_right, after_arrow, between={s.center}{t.center}, anchor=south west] at (s_1.south -| s.south) (a_1) {
+        \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_1.south -| s.south) (a_1) {
             \hspace{20pt} invitation
             };
-        \node[block, after_arrow, keep_middle] at (a_1.south -| t.center) (t_1) {
+        \node[block, spaced, keep_middle] at (a_1.south -| t.center) (t_1) {
             $(x_i, Y_i) \gets \mathsf{KeyGen}()$
             };
-        \node[arrow, towards_left, after_arrow, between={s.center}{t.center}, anchor=south east] at (t_1.south -| t.center) (a_2) {
+        \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_1.south -| s.center) (a_2) {
             $Y_i$ \hspace{20pt}
             };
-        \node[block, after_arrow, keep_middle] at (a_2.south -| s.center) (s_2) {
+        \node[block, spaced, keep_middle] at (a_2.south -| s.center) (s_2) {
             $\boldsymbol{Y} \gets \boldsymbol{Y} \cup \{Y_i\}$
             };
-        \node[banner, keep_left, after_arrow, between={s.west}{t.east}] at (s_2.south -| s.west) (b_1) {
+        \node[banner, keep_left, spaced, between={s.west}{t.east}] at (s_2.south -| s.west) (b_1) {
             when all $\mathcal{T}_i$ have published $Y_i$
             };
-        \node[block, keep_middle, after_arrow] at (b_1.south -| s.center) (s_3) {
+        \node[block, keep_middle, spaced] at (b_1.south -| s.center) (s_3) {
             set $t \in [\frac{2}{3}n, ..., n]$
             };
-        \node[arrow, towards_right, after_arrow, between={s.center}{t.center}, anchor=south west] at (s_3.south -| s.center) (a_3) {
+        \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_3.south -| s.center) (a_3) {
             \hspace{20pt} $t$, $\boldsymbol{Y} = \{Y_1, ..., Y_n\}$
             };
-        \node[block, keep_right, after_arrow] at (a_3.south -| t.east) (t_2) {
+        \node[block, keep_right, spaced] at (a_3.south -| t.east) (t_2) {
             $(p_{i, k}, P_{i, k}) \gets \mathsf{KeyGen}()$, with $k \in \{1, ..., t-1\}$ \\
             $f_i(a) = x_i + \sum\limits_{k=1}^{t-1} p_{i, k} \cdot a^k \pmod q$ \\
             $s_{i, j} \gets f_i(j)$, with $j \in \{1, ..., n\}$ \\
             $c_{i, j} \gets \mathsf{TxtEnc} (Y_j, s_{i, j})$
             };
-        \node[arrow, towards_left, after_arrow, between={s.center}{t.center}, anchor=south east] at (t_2.south -| t.center) (a_4) {
+        \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_2.south -| s.center) (a_4) {
             $P_{i, k}$, $c_{i, j}$ \hspace{100pt}
             };
-        \node[block, keep_left, after_arrow] at (a_4.south -| s.west) (s_4) {
+        \node[block, keep_left, spaced] at (a_4.south -| s.west) (s_4) {
             $\boldsymbol{P} \gets \boldsymbol{P} \cup \{P_{i, k}\}$, with $k \in \{1, ..., t-1\}$ \\
             $\boldsymbol{c} \gets \boldsymbol{c} \cup \{c_{i, j}\}$, with $j \in \{1, ..., n\}$
             };
-        \node[banner, keep_left, after_arrow, between={s.west}{t.east}] at (s_4.south -| s.west) (b_2) {
+        \node[banner, keep_left, spaced, between={s.west}{t.east}] at (s_4.south -| s.west) (b_2) {
             when all $\mathcal{T}_i$ have published $P_{i, k}$ and $c_{i, j}$
             };
         \node[arrow, towards_right, between={s.center}{t.center}] at (b_2.south -| s.south) (a_5) {
             $\boldsymbol{P} = \{P_{1, 1}, ..., P_{n, t-1}\}$, $\{c_{1, i}, ..., c_{n, i}\}$
             };
-        \node[block, keep_right, after_arrow] at (a_5.south -| t.east) (t_3) {
+        \node[block, keep_right, spaced] at (a_5.south -| t.east) (t_3) {
             $s_{j, i} \gets \mathsf{TxtDec} (x_i, c_{j, i})$, with $j \in \{1, ..., n\}$ \\ [7pt]
             verify that $[s_{j,i}]G = Y_j + \sum\limits_{k=1}^{t-1} [i^k]P_{j, k}$ then: \\ [7pt]
             $sx_i \gets \sum\limits_{j=1}^{n} s_{j, i} \pmod q$
             };
-        \node[arrow, towards_left, after_arrow, between={s.center}{t.center}, anchor=south east] at (t_3.south -| t.center) (a_6) {
+        \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_3.south -| s.center) (a_6) {
             validates \hspace{80pt}
             };
-        \node[banner, keep_left, after_arrow, between={s.west}{t.east}] at (a_6.south -| s.west) (b_3) {
+        \node[banner, keep_left, spaced, between={s.west}{t.east}] at (a_6.south -| s.west) (b_3) {
             when all $\mathcal{T}_i$ have validated
             };
-        \node[block, keep_middle, after_arrow] at (b_3.south -| s.center) (s_5) {
+        \node[block, keep_middle, spaced] at (b_3.south -| s.center) (s_5) {
             $Y \gets \sum\limits_{i=1}^{n} Y_i$
             };
         
@@ -321,24 +321,24 @@ Note that the \textit{Lagrange Interpolation Polynomial} can be computed only wh
         \node[block, keep_middle, first] at (s_ik.south -| s.center) (s_1) {
             $\tau \gets \{\}$
             };
-        \node[arrow, towards_right, after_arrow, between={s.center}{t.center}, anchor=south west] at (s_1.south -| s.center) (a_1) {
+        \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_1.south -| s.center) (a_1) {
             \hspace{10pt} $e = (R, C)$
             };
-        \node[block, keep_middle, after_arrow] at (a_1.south -| t.center) (t_1) {
+        \node[block, keep_middle, spaced] at (a_1.south -| t.center) (t_1) {
             $S_i \gets [sx_i]R$ \\
             $PK \gets \mathsf{DLProve} (sx_i, \{G, R\})$
             };
-        \node[arrow, towards_left, after_arrow, between={s.center}{t.center}, anchor=south east] at (t_1.south -| t.center) (a_2) {
+        \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_1.south -| s.center) (a_2) {
             $S_i$, $PK$ \hspace{50pt}
             };
-        \node[block, keep_left, after_arrow] at (a_2.south -| s.west) (s_2) {
+        \node[block, keep_left, spaced] at (a_2.south -| s.west) (s_2) {
             verify $\mathsf{DLVer} (PK, \{G, R\}, \{sY_i, S_i\})$ then: \\ [7pt]
             $\tau \gets \tau \cup \{i\}$
             };
-        \node[banner, keep_left, after_arrow, between={s.west}{t.east}] at (s_2.south -| s.west) (b_1) {
+        \node[banner, keep_left, spaced, between={s.west}{t.east}] at (s_2.south -| s.west) (b_1) {
             when enough $\mathcal{T}_i$ have published $S_i$, i.e. $|\tau| \geq t$
             };
-        \node[block, keep_left, after_arrow] at (b_1.south -| s.west) (s_3) {
+        \node[block, keep_left, spaced] at (b_1.south -| s.west) (s_3) {
             $\lambda(i) \gets \prod\limits_{j \in \tau, j \neq i} \frac{-j}{i-j} \pmod q$, with $i \in \tau$ \\
             $M \gets C - \sum_{i \in \tau} [\lambda(i)]S_i$
             };
