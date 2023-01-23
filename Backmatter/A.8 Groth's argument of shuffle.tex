@@ -1,6 +1,6 @@
 \clearpage
 \subsection{Groth's argument of shuffle} \label{app: groth's argument of shuffle}
-A \textit{cryptographic shuffle} (or mixing) is a process that, given as input a list of cryptograms, outputs another list of cryptograms such that each cryptogram from the input list is re-encrypted and permuted in a random new order, forming the output list. This can be further extended to \textit{mixing} a matrix of cryptograms, where all cryptograms are re-encrypted and rows are permuted in a new order. Formally, given a matrix of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\} \in \mathbb{E}^{n,\ell}$, with each $e_{i,j} = (R_{i,j}, C_{i,j})$, $i \in \{1, ..., n\}$ and $j \in \{1, ..., \ell\}$, a matrix of randomizers $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\} \in \mathbb{Z}_q^{n \times \ell}$ and a permutation $\psi:\{1, ..., n\} \gets \{1, ..., n\}$ from the set $\Psi_n$ of all permutations of $n$ elements, the shuffle algorithm outputs the matrix $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\} \gets \mathsf{Shuffle} (Y, \boldsymbol{e}; \boldsymbol{r}, \psi)$ (\Cref{alg: shuffle}) where each $e'_{i,j} = (R'_{i,j}, C'_{i,j}) \gets \mathsf{ReEnc} (Y, e_{k,j}; r_{i,j})$ for $k = \psi(i)$. 
+A \textit{cryptographic shuffle} (or mixing) is a process that, given as input a list of cryptograms, outputs another list of cryptograms such that each cryptogram from the input list is re-encrypted and permuted in a random new order, forming the output list. This can be further extended to \textit{mixing} a matrix of cryptograms, where all cryptograms are re-encrypted and rows are permuted in a new order. Formally, given a matrix of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\} \in \mathbb{E}^{n,\ell}$, with each $e_{i,j} = (R_{i,j}, C_{i,j})$, $i \in \{1, ..., n\}$ and $j \in \{1, ..., \ell\}$, a matrix of randomizers $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\} \in \mathbb{Z}_q^{n \times \ell}$ and a permutation $\psi:\{1, ..., n\} \gets \{1, ..., n\}$ from the set $\Psi_n$ of all permutations of $n$ elements, the shuffle algorithm outputs the matrix $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\} \gets \mathsf{Shuffle} (Y, \boldsymbol{e}; \boldsymbol{r}, \psi)$ (\cref{alg: shuffle}) where each $e'_{i,j} = (R'_{i,j}, C'_{i,j}) \gets \mathsf{ReEnc} (Y, e_{k,j}; r_{i,j})$ (\cref{alg: re enc}) for $k = \psi(i)$. 
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -25,7 +25,7 @@ The really interesting aspect of mixing is how to prove in zero knowledge that t
 
 The protocol for the Argument of Shuffle of Known Contents is presented in \Cref{fig: argument of shuffle of known contents protocol}. During this protocol, the \textit{Prover} convinces the \textit{Verifier} that $C$ is a commitment to a set of known messages $\boldsymbol{m} = \{m_1, ..., m_n\}$ that are shuffled by a secret permutation $\psi$. Note that, in this protocol, the \textit{Prover} does not reveal the permutation $\psi$.
 
-The main protocol for proving the correctness of a shuffle is illustrated in \Cref{fig: argument of shuffle of cryptograms protocol}. The \textit{Prover} convinces the \textit{Verifier} that the matrix of mixed cryptograms $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$ is equivalent to the initial matrix of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, where each cryptogram is re-encrypted and rows of the initial matrix are shuffled amongst each other. Note that, during mixing, the integrity of each row is preserved, i.e all columns of the matrix are shuffled by the same permutation. The protocol uses, as a building block, the protocol for the Argument of Shuffle of Known Contents, presented in \Cref{fig: argument of shuffle of known contents protocol}.
+The main protocol for proving the correctness of a shuffle is illustrated in \Cref{fig: argument of shuffle of cryptograms protocol}. The \textit{Prover} convinces the \textit{Verifier} that the matrix of mixed cryptograms $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$ is equivalent to the initial matrix of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, where each cryptogram is re-encrypted and rows of the initial matrix are shuffled amongst each other. Note that, during mixing, the integrity of each row is preserved, i.e all columns of the matrix are shuffled by the same permutation. The protocol uses, as a building block, the protocol for the Argument of Shuffle of Known Contents, presented in \cref{fig: argument of shuffle of known contents protocol}.
 
 Note that, in the description of the protocols, we abuse notation and define $\sum_{i=1}^n e_i = \mathsf{HomAdd}(e_1; \mathsf{HomAdd}(e_2; ... \mathsf{HomAdd}(e_{n-1}; e_n) ... ))$ as the homomorphic addition of multiple cryptograms, with each $e_i \in \mathbb{E}$.
 
@@ -42,26 +42,24 @@ Note that, in the description of the protocols, we abuse notation and define $\s
             \textbf{Verifier}};
         
         % internal knowledge
-        \node[block, below=of p] (p1) {
-            /* internal knowledge: \\
-            \phantom{/}* $\psi$, $r$, $\boldsymbol{m} = \{m_1, ..., m_n\}$, \\
-            \phantom{/}* $C = \mathsf{Com} (\{m_{\psi(1)}, ..., m_{\psi(n)}\}; r)$ \\
-            \phantom{/}*/
+        \node[internal, below=of p] (p_ik) {
+            internal knowledge: $\psi$, $r$, \\
+            $\boldsymbol{m} = \{m_1, ..., m_n\}$, \\
+            $C = \mathsf{Com} (\{m_{\psi(1)}, ..., m_{\psi(n)}\}; r)$
             };
-        \node[block, below=of v] (v1) {
-            /* internal knowledge: \\
-            \phantom{/}* $C$, $\boldsymbol{m} = \{m_1, ..., m_n\}$ */
+        \node[internal, below=of v] (v_ik) {
+            internal knowledge: $C$, \\
+            $\boldsymbol{m} = \{m_1, ..., m_n\}$
             };
-        \node[block, anchor=south east] at (p1.south -| v1.east) (v1-corner) {};
         
         %All content
-        \node[block, below=of v1-corner] (v2) {
-            $x \in_\mathrm{R} \mathbb{Z}_q$ \\
+        \node[block, keep_middle, first] at (p_ik.south -| v.center) (v_1) {
+            $x \in_\mathrm{R} \mathbb{Z}_q$ \hspace{10pt}
             };
-        \node[arrow, anchor=north west] at (p1.south |- v2.south) (a1) {
+        \node[arrow, towards_left, after_arrow, between={p.center}{v.center}, anchor=south east] at (v_1.south -| v.center) (a_1) {
             $x$
             };
-        \node[block, text width=250, anchor=north west] at (p1.west |- a1.south) (p2) {
+        \node[block, keep_left, after_arrow] at (a_1.south -| p.west) (p_1) {
             $r_\mathrm{a} \in_\mathrm{R} \mathbb{Z}_q$, $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ $r_\delta \in_\mathrm{R} \mathbb{Z}_q$ \\
             $\boldsymbol{d} = \{d_1, ..., d_n\} \in_\mathrm{R} \mathbb{Z}_q^n$ \\
             $\delta_1 \gets d_1$, $\{\delta_2, ..., \delta_{n-1}\} \in_\mathrm{R} \mathbb{Z}_q^{n-2}$, $\delta_n \gets 0$ \\
@@ -71,43 +69,48 @@ Note that, in the description of the protocols, we abuse notation and define $\s
             $\boldsymbol{u} \gets \{u_1, ..., u_{n-1}\}$, $\boldsymbol{v} \gets \{v_1, ..., v_{n-1}\}$ \\
             $C_\mathrm{d} \gets \mathsf{Com} (\boldsymbol{d}; r_\mathrm{d})$, $C_\delta \gets \mathsf{Com} (\boldsymbol{u}; r_\delta)$, $C_\mathrm{a} \gets \mathsf{Com} (\boldsymbol{v}; r_\mathrm{a})$
             };
-        \node[arrow, anchor=north west] at (p.south |- p2.south) (a2) {
+        \node[arrow, towards_right, between={p.center}{v.center}] at (p_1.south -| p.center) (a_2) {
             $C_\mathrm{d}$, $C_\delta$, $C_\mathrm{a}$
             };
-        \node[block, anchor=north west] at (a2.south -| v1.west) (v2) {
-            $e \in_\mathrm{R} \mathbb{Z}_q$ \\
+        \node[block, keep_middle, after_arrow] at (a_2.south -| v.center) (v_2) {
+            $e \in_\mathrm{R} \mathbb{Z}_q$
             };
-        \node[arrow, anchor=north west] at (p.south |- v2.south) (a3) {
-            $e$
+        \node[arrow, towards_left, after_arrow, between={p.center}{v.center}, anchor=south east] at (v_2.south -| v.center) (a_3) {
+            $e$ \hspace{10pt}
             };
-        \node[block, text width=300, anchor=north west] at (p2.west |- a3.south) (p3) {
+        \node[block, keep_left, after_arrow] at (a_3.south -| p.west) (p_2) {
             $z \gets e \cdot r + r_\mathrm{d} \pmod q$ \\
             $z_\delta \gets e \cdot r_\mathrm{a} + r_\delta \pmod q$ \\
             $f_i \gets e \cdot m_{\psi(i)} + d_i \pmod q$, with $i \in \{1, ..., n\}$ \\
             $f'_j \gets e \cdot (\delta_{j+1} - (m_{\psi(j+1} -x) \cdot \delta_j - a_j \cdot d_{j+1}) - \delta_j \cdot d_{j+1} \pmod q$, \\
             with $j \in \{1, ..., n-1\}$
             };
-        \node[arrow, anchor=north west] at (p.south |- p3.south) (a4) {
+        \node[arrow, towards_right, between={p.center}{v.center}] at (p_2.south -| p.center) (a_4) {
             $z$, $\boldsymbol{f} = \{f_1, ..., f_n\}$, \\
             $z_\delta$, $\boldsymbol{f'} = \{f'_1, ..., f'_{n-1}\}$
             };
-        \node[block, text width=173, anchor=north east] at (a4.south -| v3.east) (v4) {
+        \node[block, keep_right, after_arrow] at (a_4.south -| v.east) (v_3) {
             $\phi_1 \gets f_1 - e\cdot x \pmod q$ \\
             $\phi_i \gets \dfrac{\phi_{i-1} \cdot (f_i - e \cdot x) + f'_{i-1}}{e} \pmod q$, \\
-            with $i \in \{2, ..., n\}$ \\ [9pt]
+            with $i \in \{2, ..., n\}$ \\ [7pt]
             verify that \\
-            $[e]C + C_\mathrm{d} = \mathsf{Com} (\boldsymbol{f}; z)$ \\
-            $[e]C_\mathrm{a} + C_\delta = \mathsf{Com} (\boldsymbol{f'}; z_\delta)$ \\
+            $[e]C + C_\mathrm{d} = \mathsf{Com} (\boldsymbol{f}; z)$, \\
+            $[e]C_\mathrm{a} + C_\delta = \mathsf{Com} (\boldsymbol{f'}; z_\delta)$ and \\
             $\phi_n = e \cdot \prod\limits_{i=1}^n (m_i - x) \pmod q$
             };
         
         % Arrows and lines
         \draw[dashed] (p.south west)--(v.south east);    
-        \draw[dashed] (p1.south west)--(v1-corner.south east);
-        \draw[->] (a1.south east)--(a1.south west);
-        \draw[->] (a2.south west)--(a2.south east);
-        \draw[->] (a3.south east)--(a3.south west);
-        \draw[->] (a4.south west)--(a4.south east);
+        \draw[dashed] (p_ik.south west)--(p_ik.south -| v_ik.east);
+
+        \draw[densely dotted] (p_ik.south -| p.center)--(p_1.north -| p.center);
+        \draw[densely dotted] (p_1.south -| p.center)--(p_2.north -| p.center);
+        \draw[densely dotted] (p_2.south -| p.center)--(a_4.south west);
+        
+        \draw[densely dotted] (v_1.south -| v.center)--(a_1.south east);
+        \draw[densely dotted] (a_2.south east)--(v_2.north -| v.center);
+        \draw[densely dotted] (v_2.south -| v.center)--(a_3.south east);
+        \draw[densely dotted] (a_4.south east)--(v_3.north -| v.center);
         }
     \end{tikzpicture}
     \caption{Argument of Shuffle of Known Contents}
@@ -122,66 +125,61 @@ Note that, in the description of the protocols, we abuse notation and define $\s
             ]{
             
         % Actors
-        \node[title, above, anchor=north east] (p) {
+        \node[title, text width=197, above, anchor=north east] (p) {
             \textbf{Prover}};
-        \node[title, right=of p] (v) {
+        \node[title, text width=123, right=of p] (v) {
             \textbf{Verifier}};
         
         % internal knowledge
-        \node[block, below=of p] (p1) {
-            /* internal knowledge: \\
-            \phantom{/}* $\psi$, $Y$, $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\}$,  \\
-            \phantom{/}* $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, \\
-            \phantom{/}* $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$ \\
-            \phantom{/}* with $e'_{i,j} = \mathsf{ReEnc} (Y, e_{\psi(i),j}; r_{i,j})$ \\
-            \phantom{/}*/
+        \node[internal, text width=197, below=of p] (p_ik) {
+            internal knowledge: $\psi$, $Y$, $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\}$, \\
+            $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$, \\
+            with $e'_{i,j} = \mathsf{ReEnc} (Y, e_{\psi(i),j}; r_{i,j})$
             };
-        \node[block, below=of v] (v1) {
-            /* internal knowledge: \\
-            \phantom{/}* $Y$, \\
-            \phantom{/}* $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, \\
-            \phantom{/}* $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$ */
+        \node[internal, text width=123, below=of v] (v_ik) {
+            internal knowledge: $Y$, \\
+            $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, \\
+            $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$
             };
-        \node[block, anchor=south east] at (p1.south -| v1.east) (v1-corner) {};
         
         %All content
-        \node[block, text width=300, anchor=north west] at (p.west |- p1.south) (p2) {
-            $r_\mathrm{p} \in_\mathrm{R} \mathbb{Z}_q$, $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ \\
-            $\boldsymbol{r_\mathrm{e}} = \{r_{\mathrm{e},1}, ..., r_{\mathrm{e},\ell}\} \in_\mathrm{R} \mathbb{Z}_q^\ell$ \\
+        \node[block, first, keep_left] at (p_ik.south -| p.west) (p_1) {
+            $r_\mathrm{p} \in_\mathrm{R} \mathbb{Z}_q$, $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $\boldsymbol{r_\mathrm{e}} = \{r_{\mathrm{e},1}, ..., r_{\mathrm{e},\ell}\} \in_\mathrm{R} \mathbb{Z}_q^\ell$ \\
             $\boldsymbol{d} = \{d_1, ..., d_n\} \in_\mathrm{R} \mathbb{Z}_q^n$ \\
             $\boldsymbol{p} \gets \{\psi(1), ..., \psi(n)\}$ \\
             $C \gets \mathsf{Com} (\boldsymbol{p}; r_\mathrm{p})$, $C_\mathrm{d} \gets \mathsf{Com} (\boldsymbol{d}; r_\mathrm{d})$ \\
             $\bar{e}_j^{\prime +} \gets \sum\limits_{i=1}^n \bar{e}'_{i,j}$, with $\bar{e}'_{i,j} \gets \mathsf{HomMul} (e'_{i,j}; d_i)$, with $j \in \{1, ..., \ell\}$ \\
             $e_{\mathrm{d},j} \gets \mathsf{ReEnc} (Y, \bar{e}_j^{\prime +};r_{\mathrm{e},j})$
             };
-        \node[arrow, anchor=north west] at (p.south |- p2.south) (a1) {
+        \node[arrow, towards_right, between={p.center}{v.center}] at (p_1.south -| p.center) (a_1) {
             $C$, $C_\mathrm{d}$, $\boldsymbol{e_\mathrm{d}} = \{e_{\mathrm{d},1}, ..., e_{\mathrm{d},\ell}\}$
             };
-        \node[block, anchor=north west] at (a1.south -| v1.west) (v2) {
-            $\boldsymbol{t} = \{t_1, ..., t_n\} \in_\mathrm{R} \mathbb{Z}_q^n$ \\
+        \node[block, keep_middle, after_arrow] at (a_1.south -| v.center) (v_1) {
+            $\boldsymbol{t} = \{t_1, ..., t_n\} \in_\mathrm{R} \mathbb{Z}_q^n$
             };
-        \node[arrow, anchor=north west] at (p.south |- v2.south) (a2) {
-            $\boldsymbol{t} = \{t_1, ..., t_n\}$
+        \node[arrow, towards_left, after_arrow, between={p.center}{v.center}, anchor=south east] at (v_1.south -| v.center) (a_2) {
+            $\boldsymbol{t} = \{t_1, ..., t_n\}$ \hspace{30pt}
             };
-        \node[block, text width=240, anchor=north west] at (p2.west |- a2.south) (p3) {
+        \node[block, keep_left, after_arrow] at (a_2.south -| p.west) (p_2) {
             $f_i \gets t_{\psi(i)} - d_i \pmod q$, with $i \in \{1, ..., n\}$ \\
             $z_j \gets r_{\mathrm{e},j} + \sum\limits_{i=1}^n t_{\psi(i)} \cdot r_{i,j} \pmod q$, with $j \in \{1, ..., \ell\}$
             };
-        \node[arrow, anchor=north west] at (p.south |- p3.south) (a3) {
+        \node[arrow, towards_right, between={p.center}{v.center}] at (p_2.south -| p.center) (a_3) {
             $\boldsymbol{f} = \{f_1, ..., f_n\}$, $\boldsymbol{z} = \{z_1, ..., z_\ell\}$
             };
-        \node[block, anchor=north east] at (a3.south -| v.east) (v3) {
-            $\lambda \in_\mathrm{R} \mathbb{Z}_q$ \\
+        \node[block, keep_middle, after_arrow] at (a_3.south -| v.center) (v_2) {
+            $\lambda \in_\mathrm{R} \mathbb{Z}_q$
             };
-        \node[arrow, anchor=north west] at (p.south |- v3.south) (a4) {
-            $\lambda$
+        \node[arrow, towards_left, after_arrow, between={p.center}{v.center}, anchor=south east] at (v_2.south -| v.center) (a_4) {
+            $\lambda$ \hspace{10pt}
             };
-        \node[banner, spaced, anchor=north west] at (a4.south -| p.west) (b1) {
-            \scriptsize run the protocol from \Cref{fig: argument of shuffle of known contents protocol} to prove knowledge that $C' = [\lambda]C + C_\mathrm{d} + \mathsf{Com} (\boldsymbol{f}; 0)$ is a commitment to messages $\boldsymbol{m} = \{\lambda \cdot i + t_i, ..., \lambda \cdot n + t_n\}$ shuffled by permutation $\psi$.
+        \node[banner, keep_left, after_arrow, between={p.west}{v.east}] at (a_4.south -| p.west) (b_1) {
+            run the protocol from \cref{fig: argument of shuffle of known contents protocol} to prove knowledge that $C' = [\lambda]C + C_\mathrm{d} + \mathsf{Com} (\boldsymbol{f}; 0)$ \\
+            is a commitment to messages $\boldsymbol{m} = \{ \lambda \cdot i + t_i, ..., \lambda \cdot n + t_n \}$ shuffled by permutation $\psi$.
             };
-        \node[block, spaced, text width=188, anchor=north east] at (b1.south -| v.east) (v4) {
+        \node[block, keep_right, after_arrow] at (b_1.south -| v.east) (v_3) {
             $\tilde{e}_j^+ \gets \sum\limits_{i=1}^n \tilde{e}_{i,j}$, with $\tilde{e}_{i,j} \gets \mathsf{HomMul} (e_{i,j}; t_i)$ \\
-            $\tilde{e}_j^{\prime +} \gets \sum\limits_{i=1}^n \tilde{e}'_{i,j}$, with $\tilde{e}'_{i,j} \gets \mathsf{HomMul} (e'_{i,j}; f_i)$ \\ [9pt]
+            $\tilde{e}_j^{\prime +} \gets \sum\limits_{i=1}^n \tilde{e}'_{i,j}$, with $\tilde{e}'_{i,j} \gets \mathsf{HomMul} (e'_{i,j}; f_i)$ \\ [7pt]
             verify that \\
             $\mathsf{HomAdd} (\tilde{e}_j^{\prime +}; e_{\mathrm{d},j}) = \mathsf{ReEnc} (Y, \tilde{e}_j^+; z_j)$, \\
             with $j \in \{1, ..., \ell\}$
@@ -189,13 +187,19 @@ Note that, in the description of the protocols, we abuse notation and define $\s
         
         % Arrows and lines
         \draw[dashed] (p.south west)--(v.south east);    
-        \draw[dashed] (p1.south west)--(v1-corner.south east);
-        \draw[dotted] (b1.north west)--(b1.north east);
-        \draw[dotted] (b1.south west)--(b1.south east);
-        \draw[->] (a1.south west)--(a1.south east);
-        \draw[->] (a2.south east)--(a2.south west);
-        \draw[->] (a3.south west)--(a3.south east);
-        \draw[->] (a4.south east)--(a4.south west);
+        \draw[dashed] (p_ik.south west)--(v_ik.south east);
+
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+
+        \draw[densely dotted] (p_1.south -| p.center)--(p_2.north -| p.center);
+        \draw[densely dotted] (p_2.south -| p.center)--(b_1.north -| p.center);
+
+        \draw[densely dotted] (a_1.south east)--(v_1.north -| v.center);
+        \draw[densely dotted] (v_1.south -| v.center)--(a_2.south east);
+        \draw[densely dotted] (a_3.south east)--(v_2.north -| v.center);
+        \draw[densely dotted] (v_2.south -| v.center)--(a_4.south east);
+        \draw[densely dotted] (b_1.south -| v.center)--(v_3.north -| v.center);
         }
     \end{tikzpicture}
     \caption{Argument of Shuffle of Cryptograms}
@@ -206,7 +210,7 @@ Jens Groth suggests in \cite{Groth05} that the protocols can be turned into non-
 
 Therefore, we transform each protocol into a set of two algorithms (one for generating a universally verifiable non-interactive proof and another for verifying it).
 
-Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$ by randomizers $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\}$ and permutation $\psi$ into the mixed cryptograms $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$, the \textit{Prover} generates the tuple (proof of mixing and argument of shuffle) $(PM, AS) \gets \mathsf{ProveMix}(\psi, Y, \boldsymbol{r}, \boldsymbol{e}, \boldsymbol{e'})$ (\Cref{alg: prove mix}), where $Y$ is the encryption key. Anybody can universally verify a proof of mixing by $\mathsf{VerMix}(PM, AS, Y, \boldsymbol{e}, \boldsymbol{e'})$ (\Cref{alg: ver mix}).
+Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$ by randomizers $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\}$ and permutation $\psi$ into the mixed cryptograms $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$, the \textit{Prover} generates the tuple (proof of mixing and argument of shuffle) $(PM, AS) \gets \mathsf{ProveMix}(\psi, Y, \boldsymbol{r}, \boldsymbol{e}, \boldsymbol{e'})$ (\cref{alg: prove mix}), where $Y$ is the encryption key. Anybody can universally verify a proof of mixing by $\mathsf{VerMix}(PM, AS, Y, \boldsymbol{e}, \boldsymbol{e'})$ (\cref{alg: ver mix}).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon

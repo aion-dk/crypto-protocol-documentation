@@ -4,9 +4,9 @@ A \textit{commitment scheme} consists of a tuple of algorithms ($\mathsf{Com}$, 
 
 An important part of the commitment scheme is the existence of multiple generators (one for each message in the list  $\boldsymbol{m}$) in the subgroup such that the discrete logarithm amongst any two of them is unknown. To support that, we define the algorithm $\mathsf{BaseGen}$ that outputs a new generator $H$ such that the value $x$ is unknown where $H = [x]G$.
 
-In order to commit to messages $\boldsymbol{m} = \{m_1, ..., m_n\}$ a writer computes the commitment $C \gets \mathsf{Com}(\boldsymbol{m}; r)$ (\ref{alg: com}), where $r \in_\mathrm{R} \mathbb{Z}_q$ is a randomizer. Algorithm $\mathsf{Com}$ computes internally a list of generators $\boldsymbol{G} = \{G_1, ..., G_n\}$ where each $G_i \gets \mathsf{BaseGen}(i)$ (\Cref{alg: base gen}), with $i \in \{1, ..., n\}$.
+In order to commit to messages $\boldsymbol{m} = \{m_1, ..., m_n\}$ a writer computes the commitment $C \gets \mathsf{Com}(\boldsymbol{m}; r)$ (\cref{alg: com}), where $r \in_\mathrm{R} \mathbb{Z}_q$ is a randomizer. Algorithm $\mathsf{Com}$ computes internally a list of generators $\boldsymbol{G} = \{G_1, ..., G_n\}$ where each $G_i \gets \mathsf{BaseGen}(i)$ (\cref{alg: base gen}), with $i \in \{1, ..., n\}$.
 
-In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values $\boldsymbol{m}$ and $r$. A verifier is convinced that the commitment $C$ opens to messages $\boldsymbol{m}$ by running $b \gets \mathsf{ComVer}(C, \boldsymbol{m}; r)$ (\Cref{alg: com ver}).
+In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values $\boldsymbol{m}$ and $r$. A verifier is convinced that the commitment $C$ opens to messages $\boldsymbol{m}$ by running $b \gets \mathsf{ComVer}(C, \boldsymbol{m}; r)$ (\cref{alg: com ver}).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon

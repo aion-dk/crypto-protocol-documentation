@@ -2,9 +2,9 @@
 \subsection{Schnorr digital signature}
 The \textit{Schnorr digital signature scheme}, introduced in \cite{Schnorr90}, consists of a triple of algorithms (\textsf{KeyGen}, \textsf{Sign}, \textsf{SigVer}), which are based on elliptic curve cryptographic primitive.
 
-A Schnorr key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\Cref{alg: key gen}), where $x$ is the random, private signing key and $Y$ is the corresponding public signature verification key.
+A Schnorr key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x$ is the random, private signing key and $Y$ is the corresponding public signature verification key.
 
-Only the owner of the signing key is able to generate a signature $\sigma = (c, s) \gets \mathsf{Sign} (x, m)$, on an arbitrary message $m \in \mathbb{B}^*$. In order to generate a signature, the signer follows \Cref{alg: sign}.
+Only the owner of the signing key is able to generate a signature $\sigma = (c, s) \gets \mathsf{Sign} (x, m)$, on an arbitrary message $m \in \mathbb{B}^*$. In order to generate a signature, the signer follows \cref{alg: sign}.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -22,7 +22,7 @@ Only the owner of the signing key is able to generate a signature $\sigma = (c, 
     \label{alg: sign}
 \end{algorithm}
 
-Given a signature $\sigma$ on a message $m$, anybody in the possession of the public verification key $Y$ is able to verify the validity of the signature $b \gets \mathsf{SigVer} (Y, \sigma; m)$, with $b \in \mathbb{B}$ which represents $true$ or $false$. The signature verification algorithm is described in \Cref{alg: sig ver}.
+Given a signature $\sigma$ on a message $m$, anybody in the possession of the public verification key $Y$ is able to verify the validity of the signature $b \gets \mathsf{SigVer} (Y, \sigma; m)$, with $b \in \mathbb{B}$ which represents $true$ or $false$. The signature verification algorithm is described in \cref{alg: sig ver}.
 
 \begin{algorithm}[H]
     \DontPrintSemicolon
