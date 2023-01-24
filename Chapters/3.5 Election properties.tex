@@ -8,58 +8,56 @@ When submitting a vote, the voter $\mathcal{V}_i$ digitally signs the vote submi
 
 One can notice that the printing authority $\mathcal{P}_j$ knows a part of the signing key of voter $\mathcal{V}_i$ but not enough. Therefore, we argue that Assembly Voting X has the \textit{eligibility property} on the assumption that there exist multiple printing authorities that do not communicate with each other during the election process.
 
-\paragraph{No revealing of partial results // fairness}
-By following the election protocol, it is guaranteed that:
-\begin{itemize}
-    \item the secrecy of the vote is preserved. No votes from the bulletin board are decrypted, therefore no connection between a vote and a voter can be made.
-    \item no partial results are computed during the election process. A result is calculated only once, after the election phase has finished. This prevents influencing of the subsequent voters throughout the election period.
-\end{itemize}
 
-All votes, that are posted on the bulletin board, are encrypted using the ElGamal cryptosystem based on elliptic curve cryptography (more details in \cref{app: mathematics} and \cref{app: elgamal cryptosystem}). Moreover, using a \textit{t out of n} threshold encryption scheme (\cref{sec: threshold ceremony}), we enforce that there is no single entity that can perform the decryption of any data from the public bulletin board, but instead, it is needed a group of minimum $t$ trustees to collaborate.
+\paragraph{Privacy:}
+By following the election protocol, no partial results are computed during the election process. A result is calculated only once, after the election phase has finished. This prevents influencing the subsequent voters throughout the election period.
 
-Therefore, we claim that Assembly Voting X has the \textit{confidentiality property} on the assumption that at least $t$ trustees are honest, with \( t > n / 2 \) and \( n > 2 \).
+All votes, that are posted on the bulletin board, are encrypted using the ElGamal cryptosystem based on elliptic curve cryptography (more details in \cref{app: mathematics} and \cref{app: elgamal cryptosystem}). Moreover, using a \textit{t out of n} threshold encryption scheme (\cref{sec: threshold ceremony}), it is enforced that there is no single entity that can perform the decryption of any data from the public bulletin board, but instead, a group of minimum $t$ trustees are required to collaborate in order to compute a result.
 
-One can argue that, because the bulletin board data is public, somebody could save all the data for long enough until the elliptic curve cryptosystem will be broken, and so will be able to decrypt all the data contrarily to our protocol. This fact demonstrates that our system does not comply to the \textit{everlasting confidentiality property}. We take note of this fact and we accept it.
+Therefore, we claim that Assembly Voting X reaches the \textit{provacy} property on the assumption that there are at least $t$ honest trustees, with $2/3 \cdot n \leq t \leq n$.
 
-\paragraph{Anonymity}
+One can argue that, because the bulletin board data is public, somebody could save all the data for long enough until the elliptic curve cryptosystem will be broken, and so will be able to decrypt all the data contrarily to our protocol. This fact demonstrates that our system does not comply to the \textit{everlasting privacy} property. We take note of this fact and we accept it.
+
+
+\paragraph{Anonymity:}
 This property is reached by implementing a mixnet of nodes (trustees) that sequentially shuffle the list of vote cryptograms in an indistinguishable way, before they get decrypted (\cref{sec: mixing phase}).
 
 Obviously, each trutsee knows the way it shuffled the list of cryptograms but it does not know how it was shuffled by the other trustees. Thus, it is important that trustees do not communicate with each other.
 
-We claim that Assembly Voting X is an \textit{anonymous voting system} on the assumption that there is a set of multiple trustess out of which at least one is honest.
+We claim that Assembly Voting X has the \textit{anonymous} property on the assumption that there is a set of multiple trustess out of which at least one is honest.
 
-\paragraph{Integrity}
-The integrity of the election is preserved in our system by publishing all events (vote submissions or system events) on the bulletin board. Moreover, the bulletin board has a \textit{blockchain-like} structure that guarantees that the history of the bulletin board never changes. Also, the voters act like miners of the blockchain whenever they submit a new vote cryptogram, by signing on the history of the blockchain.
 
-Every time a new vote submission is appended on the bulletin board, the voter receives a vote receipt $\rho_i$ that contains a pointer to the item on the bulletin board, called \textit{the board hash value} $h_{\mathrm{b}, i}$. This value is computed based on the previous \textit{board hash value} $h_{\mathrm{b}, i-1}$, which is computed based on the one before, and so on, until it reaches the \textit{genesis hash}, which is 0. This means that every time a voter checks his voter receipt, the entire bulletin board history is validated.
+\paragraph{Integrity:}
+The integrity of the election is preserved in our system by publishing all events (i.e. election cofiguration data or voting related data) on the bulletin board. Moreover, the bulletin board has a \textit{hash-chain} structure that guarantees that the history of the bulletin board never changes. Also, the voters certify the autenticity of the buleltin board whenever they submit a new vote cryptogram, by signing on the history of the bulletin board.
 
-We claim that Assembly Voting X achieves the \textit{integrity property} through the bulletin board construction.
+Every time a new item is appended on the bulletin board, the writer of that item receives a confirmation receipt $\rho_i$ that contains a pointer to the item on the bulletin board, called the address (or the board hash value) $h_i$. This value is computed based on the previous address $h_{i-1}$ (the address of the previous item), which is computed based on the one before, and so on, until it reaches the \textit{genesis} item, which uses value 00 as a previous address. This means that every time a voter checks his vote confirmation receipt (\ref{sec: vote confirmation receipt}), the entire bulletin board history is validated.
 
-\paragraph{Verifiability}
+We claim that Assembly Voting X achieves the \textit{integrity} property through the bulletin board construction.
+
+
+\paragraph{Verifiability:}
 There are two levels of verifiability that can be performed by different actors. Some steps are individually verifiable (i.e. only the voter that is currently performing this step can verify that the process is happening correctly), such as:
 \begin{itemize}
-    \item verify that the vote is cast as intended
-    \item verify that the vote is registered as cast
+    \item verify that the vote is cast as intended, by challenging the vote cryptogram as in \cref{sec: challenging a vote cryptogram}
+    \item verify that the vote is registered as cast, by checking the vote confirmation receipt as described in  \cref{sec: vote confirmation receipt}
 \end{itemize}
-The rest of the steps from the election protocol are publicly verifiable:
+
+Some aspects of the election protocol are publicly verifiable:
 \begin{itemize}
-    \item the threshold ceremony
-    \item the bulletin board history
-    \item the integrity and eligibility of each vote submission
-    \item the integrity of each system event
-    \item the correctness of the cleansing procedure, mixing phase and decryption phase (verification that votes are counted as registered)
+    \item the distribution of the decryption key during the threshold ceremony
+    \item the integrity of the bulletin board
+    \item the correctness of the cleansing procedure
+    \item the correctness of mixing and decryption phases, therefore verifying that all votes are counted as registered
 \end{itemize}
 
-We claim that Assembly Voting X is a \textit{verifiable election system}.
+One particular aspect is privately verifiable and made available only to the election officials. That is the eligibility verifiability of each submitted vote. The argument for it not being publicly available is that the verification is done based on some voter identification data, such as names or email addresses. Therefore, this is not publicly disclosed.
 
-% \subsection{Accountability}
-\paragraph{Receipt-freeness}
-During the \textit{vote cryptogram generation process} (described in \cref{sec: vote cryptogram generation process}), the voter receives from the \textit{Digital Ballot Box} $\mathcal{D}$ an empty cryptogram $e_0$ that he uses to generate his final vote cryptogram $e$ in order to encrypt his vote $M$. At the end of the process, the vote cryptogram $e$ would be equal to \( \mathsf{Enc} (Y_\mathrm{enc}, M, r_0 + r_1) \), where $r_0$ is known by the \textit{Digital Ballot Box} $\mathcal{D}$ and $r_1$ is known by the voter.
+Being able to verify that a vote is cast as intended, registered as cast and counted as registredm, we claim that Assembly Voting X is an \textit{end to end verifiable} election system.
 
-% The voter is convinced that $e_0$ is an empty cryptogram because of a interactive proof $PK_0$ generated between the voter and the \textit{Digital Ballot Box} $\mathcal{D}$.
 
-% The empty cryptogram $e_0$ and the proof $PK_0$ are relevant only for the communication amongst the voter and the \textit{Digital Ballot Box} $\mathcal{D}$, to make sure that none of them has the entire randomness value $r_0 + r_1$ that is used to generate the cryptogram $e$. Therefore, $e_0$ and $PK_0$ are not included on the bulletin board, thus not publicly available.
+\paragraph{Receipt-freeness:}
+During the vote cryptogram generation process (described in \cref{sec: vote cryptogram generation process}), the voter receives from the digital ballot box $\mathcal{D}$ an empty cryptogram $e_\mathrm{d}$. That is used to generate the voter's final vote cryptogram $e$ in order to encrypt the vote $V$. At the end of the process, the vote cryptogram $e$ would be equal to $\mathsf{Enc} (Y_\mathrm{enc}, V, r_\mathrm{v} + r_\mathrm{d})$, where $r_\mathrm{d}$ is known by the digital ballot box $\mathcal{D}$ and $r_\mathrm{v}$ is known by the voter.
 
-After the vote cryptogram $e$ has been accepted on the bulletin board, the voter is not able to produce valid cryptographic evidence that $e$ is an encryption of $M$ referencing only the data that is publicly available, as he is not in possession of value $r_0$. More details are described in \cref{app: proving the content of a cryptogram}.
+After the vote cryptogram $e$ has been accepted on the bulletin board, the voter is not able to produce valid cryptographic evidence that $e$ is an encryption of $V$ referencing only the data that is publicly available, as he is not in possession of value $r_\mathrm{d}$. More details are described in \cref{app: proving the content of a cryptogram}.
 
-Therefore, we claim that Assembly Voting X is a \textit{receipt-free} voting protocol.
+Therefore, we claim that Assembly Voting X has the \textit{receipt-freeness} property.
