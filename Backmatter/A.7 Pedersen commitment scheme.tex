@@ -11,7 +11,7 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{BaseGen} (i)$}
-    \KwData{An index $i$}
+    \KwData{An index $i \in \mathbb{N}$}
     
     $x \gets \mathcal{H}(G || i)$ \\
     \Repeat{$H$ is valid}{
@@ -35,7 +35,7 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
     \DontPrintSemicolon
     \caption{$\mathsf{Com} (\boldsymbol{m}; r)$}
     \KwData{The list of messages $\boldsymbol{m} = \{m_1, ..., m_n\} \in \mathbb{Z}_q^n$}
-    \myinput{The randomizer $r \in \mathbb{Z}_q$}
+    \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         $G_i \gets \mathsf{BaseGen} (i)$
@@ -51,8 +51,8 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
     \DontPrintSemicolon
     \caption{$\mathsf{ComVer} (C, \boldsymbol{m}; r)$}
     \KwData{The commitment $C \in \mathbb{P}$}
-    \myinput{The list of messages $\boldsymbol{m} = \{m_1, ..., m_n\} \in \mathbb{Z}_q^n$}
-    \myinput{The randomizer $r \in \mathbb{Z}_q$}
+    \KwMoreData{The list of messages $\boldsymbol{m} = \{m_1, ..., m_n\} \in \mathbb{Z}_q^n$}
+    \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         $G_i \gets \mathsf{BaseGen} (i)$

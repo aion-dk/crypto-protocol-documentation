@@ -622,8 +622,8 @@
 % \DontPrintSemicolon
 %     \caption{\( \mathbf{PartialDecryption}_{sx_i} (\boldsymbol{e}) \)}
 %     \KwData{The share of decryption key \( sx_i \in \mathbb{Z}_q \)}
-%     \myinput{The board of cryptograms \( \boldsymbol{e} = (e_1, ..., e_{n_\mathrm{e}}) \in \mathbb{E}^{n_\mathrm{e}}) \)}
-%     \myinput{\( e_j = (R_j, C_j), j \in \{ 1, ..., n_\mathrm{e} \} \)}
+%     \KwMoreData{The board of cryptograms \( \boldsymbol{e} = (e_1, ..., e_{n_\mathrm{e}}) \in \mathbb{E}^{n_\mathrm{e}}) \)}
+%     \KwMoreData{\( e_j = (R_j, C_j), j \in \{ 1, ..., n_\mathrm{e} \} \)}
 %     \For{\( j \gets 1 \) \KwTo $n_\mathrm{e}$ \KwBy $1$}{
 %         \( S_{i, j} \gets [sx_i]R_j \)}
 %     \( \boldsymbol{S_i} \gets (S_{i, 1}, ..., S_{i, n_\mathrm{e}}) \) \;
@@ -649,8 +649,8 @@
 % \DontPrintSemicolon
 %     \caption{\( \mathbf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S_1}, ..., \boldsymbol{S_{n_\mathrm{d}}}) \)}
 %     \KwData{The board of cryptograms \( \boldsymbol{e} = (e_1, ..., e_{n_\mathrm{e}}) \in \mathbb{E}^{n_\mathrm{e}} \)}
-%     \myinput{\( e_j = (R_j, C_j), j \in \{ 1, ..., n_\mathrm{e} \} \)}
-%     \myinput{The partial decryptions \( \boldsymbol{S_i} = (S_{i, 1}, ..., S_{i, n_\mathrm{e}}) \in E(\mathbb{F}_p)^{n_e}, i \in \boldsymbol{T} \)}
+%     \KwMoreData{\( e_j = (R_j, C_j), j \in \{ 1, ..., n_\mathrm{e} \} \)}
+%     \KwMoreData{The partial decryptions \( \boldsymbol{S_i} = (S_{i, 1}, ..., S_{i, n_\mathrm{e}}) \in E(\mathbb{F}_p)^{n_e}, i \in \boldsymbol{T} \)}
 %     \For{\( j \gets 1 \) \KwTo $n_\mathrm{e}$ \KwBy $1$}{
 %         \( V_j \gets C_j - \sum_{i \in \boldsymbol{T}} [\lambda(i)]S_{i,j} \) \tcp*{\( \lambda(i) \) computed as in figure \ref{fig: threshold decryption}}
 %         }

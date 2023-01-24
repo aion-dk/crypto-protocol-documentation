@@ -1,14 +1,11 @@
+\setlength{\algomargin}{1em}
 \newlength\mylen
-\newcommand\myinput[1]{%
-  \settowidth\mylen{\KwData{}}%
-  \setlength\hangindent{\mylen}%
-  \hspace*{\mylen}#1\\}
-
-\newcommand\KwMoreData[1]{%
-  \settowidth\mylen{\KwData{}}%
-  \setlength\hangindent{\mylen}%
-  \hspace*{\mylen}#1\\}
-  
+\newcommand\KwMoreData[1]{
+  \settowidth\mylen{\KwData{}}
+  \setlength\hangindent{\mylen}
+  \hspace*{\mylen}#1 \\
+  }
+\SetAlFnt{\small}
 \SetKw{KwAnd}{and}
 \SetKw{KwOr}{or}
 \SetKw{KwBy}{by}

@@ -131,7 +131,7 @@ In our system, when an elliptic curve point has to be stored in the database, or
     \caption{$\mathsf{RecoverY} (x, f)$}
     \label{alg: recover y}
     \KwData{The field element $x \in \mathbb{F}_p$}
-    \myinput{The flag $f \in \{ 02, 03 \}$}
+    \KwMoreData{The flag $f \in \{ 02, 03 \}$}
     $\{ y_1, y_2 \} \gets \sqrt{x^3 + a \cdot x + b} \pmod p$ \;
     \If{$\{ y_1, y_2 \} \notin \mathbb{Z}$}{
         \Return{failure}

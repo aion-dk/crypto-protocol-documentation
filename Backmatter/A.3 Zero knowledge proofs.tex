@@ -89,7 +89,7 @@ A public verifier accepts the proof if the algorithm $\mathsf{DLVer}(PK, \boldsy
     \DontPrintSemicolon
     \caption{$\mathsf{DLProve} (x, \boldsymbol{G})$}
     \KwData{The private key $x \in \mathbb{Z}_q$}
-    \myinput{The list of generators $\boldsymbol{G} = \{G_0, G_1, ..., G_n\} \in \mathbb{P}^{n+1}$}
+    \KwMoreData{The list of generators $\boldsymbol{G} = \{G_0, G_1, ..., G_n\} \in \mathbb{P}^{n+1}$}
     
     $k \in_\mathrm{R} \mathbb{Z}_q$ \;
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
@@ -108,8 +108,8 @@ A public verifier accepts the proof if the algorithm $\mathsf{DLVer}(PK, \boldsy
     \DontPrintSemicolon
     \caption{$\mathsf{DLVer}(PK, \boldsymbol{G}; \boldsymbol{Y})$}
     \KwData{The proof $PK = (K, c, r) \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
-    \myinput{The list of generators $\boldsymbol{G} = \{G_0, G_1, ..., G_n\} \in \mathbb{P}^{n+1}$}
-    \myinput{The list of public keys $\boldsymbol{Y} = \{Y_0, Y_1, ..., Y_n\} \in \mathbb{P}^{n+1}$}
+    \KwMoreData{The list of generators $\boldsymbol{G} = \{G_0, G_1, ..., G_n\} \in \mathbb{P}^{n+1}$}
+    \KwMoreData{The list of public keys $\boldsymbol{Y} = \{Y_0, Y_1, ..., Y_n\} \in \mathbb{P}^{n+1}$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         $z_i \gets \mathcal{H} (i || Y_1 || ... || Y_n)$

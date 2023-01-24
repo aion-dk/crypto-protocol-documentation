@@ -11,9 +11,9 @@ Instead, the voter is able to lie about her vote and generate fake evidence to s
     \caption{\( \mathbf{VoteLie} (PK_0, M, M') \)}
     % \KwData{The encryption key \( Y_\mathrm{enc} \in E(\mathbb{F}_p) \)}
     \KwData{Proof of empty crypto \( PK_0 = (K_\mathrm{G}, K_\mathrm{Y}, c, z) \in E(\mathbb{F}_p)^2 \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
-    \myinput{The original vote \( M \in E(\mathbb{F}_p) \)}
-    \myinput{The fake vote \( M' \in E(\mathbb{F}_p) \)}
-    % \myinput{The empty cryptogram \( e_0 = (R_0, C_0) \in \mathbb{E} \)}
+    \KwMoreData{The original vote \( M \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The fake vote \( M' \in E(\mathbb{F}_p) \)}
+    % \KwMoreData{The empty cryptogram \( e_0 = (R_0, C_0) \in \mathbb{E} \)}
     % \tcc{fabricate fake evidence that cryptogram \( e_\mathrm{f} = (R_0, C_0 + M - M') \) is empty}
     % \( C_\mathrm{f} \gets C_0 + M - M' \) \;
     % \( z_\mathrm{f} \gets \mathcal{H}(1 || C_\mathrm{f}) \) \;

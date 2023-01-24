@@ -232,7 +232,7 @@ To generate a \textit{non-interactive proof}, the protocol from figure \ref{fig:
 \DontPrintSemicolon
     \caption{\( \mathbf{Prove}_G (x) \)}
     \KwData{The base generator \( G \in E(\mathbb{F}_p) \)}
-    \myinput{The private key \( x \in \mathbb{Z}_q \)}
+    \KwMoreData{The private key \( x \in \mathbb{Z}_q \)}
     \( k \in_\mathrm{R} \mathbb{Z}_q \)\;
     \( K \gets [k]G \)\;
     \( Y \gets [x]G \)\;
@@ -248,8 +248,8 @@ To generate a \textit{non-interactive proof}, the protocol from figure \ref{fig:
 \DontPrintSemicolon
     \caption{\( \mathbf{Verify}_G (PK, Y) \)}
     \KwData{The base generator \( G \in E(\mathbb{F}_p) \)}
-    \myinput{The proof \( PK = (K, c, r) \in E(\mathbb{F}_p) \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
-    \myinput{The public key \( Y \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The proof \( PK = (K, c, r) \in E(\mathbb{F}_p) \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
+    \KwMoreData{The public key \( Y \in E(\mathbb{F}_p) \)}
     \eIf{\( c = \mathcal{H}(G || K || Y) \) \KwAnd \( [r]G = K + [c]Y \)}{
         \( b \gets 1 \) \tcp*{proof is valid}
         }{
@@ -325,8 +325,8 @@ Again, to generate the discrete logarithm equality proof in a \textit{non-intera
 \DontPrintSemicolon
     \caption{\( \mathbf{ProveEquality}_{G, H} (x) \)}
     \KwData{The first base generator \( G \in E(\mathbb{F}_p) \)}
-    \myinput{The second base generator \( H \in E(\mathbb{F}_p) \)}
-    \myinput{The private key \( x \in \mathbb{Z}_q \)}
+    \KwMoreData{The second base generator \( H \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The private key \( x \in \mathbb{Z}_q \)}
     \( k \in_\mathrm{R} \mathbb{Z}_q \)\;
     \( K_\mathrm{G} \gets [k]G \)\;
     \( K_\mathrm{H} \gets [k]H \)\;
@@ -345,10 +345,10 @@ Again, to generate the discrete logarithm equality proof in a \textit{non-intera
 \DontPrintSemicolon
     \caption{\( \mathbf{VerifyEquality}_{G, H} (PK, Y, P) \)}
     \KwData{The first base generator \( G \in E(\mathbb{F}_p) \)}
-    \myinput{The second base generator \( H \in E(\mathbb{F}_p) \)}
-    \myinput{The proof \( PK = (\boldsymbol{K}, c, r) \in E(\mathbb{F}_p)^2 \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
-    \myinput{The first public key \( Y \in E(\mathbb{F}_p) \)}
-    \myinput{The second public key \( P \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The second base generator \( H \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The proof \( PK = (\boldsymbol{K}, c, r) \in E(\mathbb{F}_p)^2 \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
+    \KwMoreData{The first public key \( Y \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The second public key \( P \in E(\mathbb{F}_p) \)}
     \eIf{\( c = \mathcal{H}(G || H || K_\mathrm{G} || K_\mathrm{H} || Y || P) \) \\ \KwAnd \( [r]G = K_\mathrm{G} + [c]Y \) \\ \KwAnd \( [r]H = K_\mathrm{H} + [c]P \)}{
         \( b \gets 1 \) \tcp*{proof is valid}
         }{
@@ -432,7 +432,7 @@ The same as in the discrete logarithm equality case, the proof of multiple discr
 \DontPrintSemicolon
     \caption{\( \mathbf{ProveMultiple}_{\boldsymbol{G}} (x) \)}
     \KwData{The list of generators \( \boldsymbol{G} = (G_0, G_1, ..., G_n) \in E(\mathbb{F}_p)^{n+1} \)}
-    \myinput{The private key \( x \in \mathbb{Z}_q \)}
+    \KwMoreData{The private key \( x \in \mathbb{Z}_q \)}
     \( k \in_\mathrm{R} \mathbb{Z}_q \)\;
     % \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
     %     \( Y_i \gets [x]G_i \)}
@@ -454,8 +454,8 @@ The verifier accepts the proof if the algorithm $\mathbf{Verify}_{\boldsymbol{G}
 \DontPrintSemicolon
     \caption{\( \mathbf{VerifyMultiple}_{\boldsymbol{G}} (PK, \boldsymbol{Y}) \)}
     \KwData{The list of generators \( \boldsymbol{G} = (G_0, G_1, ..., G_n) \in E(\mathbb{F}_p)^{n+1} \)}
-    \myinput{The proof \( PK = (K, c, r) \in E(\mathbb{F}_p) \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
-    \myinput{The list of public keys \( \boldsymbol{Y} = (Y_0, Y_1, ..., Y_n) \in E(\mathbb{F}_p)^{n+1} \)}
+    \KwMoreData{The proof \( PK = (K, c, r) \in E(\mathbb{F}_p) \times \mathbb{Z}_q \times \mathbb{Z}_q \)}
+    \KwMoreData{The list of public keys \( \boldsymbol{Y} = (Y_0, Y_1, ..., Y_n) \in E(\mathbb{F}_p)^{n+1} \)}
     \( h \gets \mathcal{H} (Y_1 || ... || Y_n) \)\;
     \For{\( i \gets 1 \) \KwTo $n$ \KwBy $1$}{
         \( z_i \gets \mathcal{H} (i || h) \)}
@@ -504,8 +504,8 @@ The encryption algorithm \( e = (R, C) \leftarrow \mathbf{Enc}_Y (M, r) \) (algo
 \DontPrintSemicolon
     \caption{\( \mathbf{Enc}_Y (M, r) \)}
     \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
-    \myinput{The message \( M \in E(\mathbb{F}_p) \)}
-    \myinput{The randomizer \( r \in \mathbb{Z}_q \)}
+    \KwMoreData{The message \( M \in E(\mathbb{F}_p) \)}
+    \KwMoreData{The randomizer \( r \in \mathbb{Z}_q \)}
     \( R \gets [r]G \)\;
     \( S \gets [r]Y \)\;
     \( C \gets S + M \)\;
@@ -519,7 +519,7 @@ The encryption algorithm \( e = (R, C) \leftarrow \mathbf{Enc}_Y (M, r) \) (algo
 \DontPrintSemicolon
     \caption{\( \mathbf{Dec}_x (e) \)}
     \KwData{The decryption key \( x \in \mathbb{Z}_q \)}
-    \myinput{The cryptogram \( e = (R, C) \in \mathbb{E} \)}
+    \KwMoreData{The cryptogram \( e = (R, C) \in \mathbb{E} \)}
     \( S \gets [x]R \)\;
     \( M \gets C - S \)\;
     \Return{\( M \)} \tcp*{\( M \in E(\mathbb{F}_p) \)}
@@ -533,8 +533,8 @@ Special encryption and decryption algorithms exist in case the message to be enc
 \DontPrintSemicolon
     \caption{\( \mathbf{EncScalar}_Y (m, r) \)}
     \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
-    \myinput{The message \( m \in \mathbb{Z}_q \)}
-    \myinput{The randomizer \( r \in \mathbb{Z}_q \)}
+    \KwMoreData{The message \( m \in \mathbb{Z}_q \)}
+    \KwMoreData{The randomizer \( r \in \mathbb{Z}_q \)}
     \( R \gets [r]G \)\;
     \( S \gets [r]Y \)\;
     \( s \gets \mathcal{H} (S) \)\;
@@ -549,7 +549,7 @@ Special encryption and decryption algorithms exist in case the message to be enc
 \DontPrintSemicolon
     \caption{\( \mathbf{DecScalar}_x (e) \)}
     \KwData{The decryption key \( x \in \mathbb{Z}_q \)}
-    \myinput{The cryptogram \( e = (R, c) \in E(\mathbb{F}_p) \times \mathbb{Z}_q \)}
+    \KwMoreData{The cryptogram \( e = (R, c) \in E(\mathbb{F}_p) \times \mathbb{Z}_q \)}
     \( S \gets [x]R \)\;
     \( s \gets \mathcal{H} (S) \)\;
     \( m \gets c \cdot s^{-1} \pmod q \)\;
@@ -616,7 +616,7 @@ The resulting encryption of the homomorphic addition of two cryptograms is \( e'
 \DontPrintSemicolon
     \caption{\( \mathbf{AddEnc} (e_1, e_2) \)}
     \KwData{The first cryptogram \( e_1 = (R_1, C_1) \in \mathbb{E} \)}
-    \myinput{The second cryptogram \( e_2 = (R_2, C_2) \in \mathbb{E} \)}
+    \KwMoreData{The second cryptogram \( e_2 = (R_2, C_2) \in \mathbb{E} \)}
     \( R' \gets R_1 + R_2 \)\;
     \( C' \gets C_1 + C_2 \)\;
     \( e' \gets (R', C') \)\;
@@ -631,8 +631,8 @@ Following the procedure above, we can \textit{re-encrypt} a given encryption \( 
 \DontPrintSemicolon
     \caption{\( \mathbf{ReEnc}_Y (e, r') \)}
     \KwData{The encryption key \( Y \in E(\mathbb{F}_p) \)}
-    \myinput{The initial cryptogram \( e = (R, C) \in \mathbb{E} \)}
-    \myinput{The new randomizer \( r' \in \mathbb{Z}_q \)}
+    \KwMoreData{The initial cryptogram \( e = (R, C) \in \mathbb{E} \)}
+    \KwMoreData{The new randomizer \( r' \in \mathbb{Z}_q \)}
     \( e_2 \gets \mathbf{Enc}_Y (\mathcal{O}, r') \) \tcp*{algorithm \ref{alg: enc}}
     \( e' \gets \mathbf{AddEnc} (e, e_2) \) \tcp*{algorithm \ref{alg: add enc}}
     \Return{\( e' \)} \tcp*{\( e' \in \mathbb{E} \)}
@@ -898,7 +898,7 @@ Only the owner of the signing key is able to generate a signature \( \sigma = (c
 \DontPrintSemicolon
     \caption{\( \mathbf{Sign}_x (m) \)}
     \KwData{The signing key \( x \in \mathbb{Z}_q \)}
-    \myinput{The message to be signed \( m \in \mathbb{B}^* \)}
+    \KwMoreData{The message to be signed \( m \in \mathbb{B}^* \)}
     \( r \in_\mathrm{R} \mathbb{Z}_q \) \\
     \( K \gets [r]G \) \\
     \( c \gets \mathcal{H}(K || m) \) \\
@@ -925,8 +925,8 @@ Given a signature $\sigma$ on a message $m$, anybody in the possession of the pu
 \DontPrintSemicolon
     \caption{\( \mathbf{VerifySignature}_Y (\sigma, m) \)}
     \KwData{The verification key \( Y \in E(\mathbb{F}_p) \)}
-    \myinput{The signature \( \sigma = (c, s) \in \mathbb{Z}_q \times \mathbb{Z}_q \)}
-    \myinput{The signed message \( m \in \mathbb{B}^* \)}
+    \KwMoreData{The signature \( \sigma = (c, s) \in \mathbb{Z}_q \times \mathbb{Z}_q \)}
+    \KwMoreData{The signed message \( m \in \mathbb{B}^* \)}
     \( K \gets [s]G + [c]Y \) \\
     \eIf{\( c = \mathcal{H}(K || m) \)}{
         \( b \gets 1 \) \tcp*{signature is valid}

@@ -10,7 +10,7 @@ Only the owner of the signing key is able to generate a signature $\sigma = (c, 
     \DontPrintSemicolon
     \caption{$\mathsf{Sign} (x, m)$}
     \KwData{The signing key $x \in \mathbb{Z}_q$}
-    \myinput{The message to be signed $m \in \mathbb{B}^*$}
+    \KwMoreData{The message to be signed $m \in \mathbb{B}^*$}
     
     $r \in_\mathrm{R} \mathbb{Z}_q$ \\
     $K \gets [r]G$ \\
@@ -28,8 +28,8 @@ Given a signature $\sigma$ on a message $m$, anybody in the possession of the pu
     \DontPrintSemicolon
     \caption{$\mathsf{SigVer} (Y, \sigma; m)$}
     \KwData{The signature verification key $Y \in \mathbb{P}$}
-    \myinput{The signature $\sigma = (c, s) \in \mathbb{Z}_q \times \mathbb{Z}_q$}
-    \myinput{The signed message $m \in \mathbb{B}^*$}
+    \KwMoreData{The signature $\sigma = (c, s) \in \mathbb{Z}_q \times \mathbb{Z}_q$}
+    \KwMoreData{The signed message $m \in \mathbb{B}^*$}
     
     $K \gets [s]G + [c]Y$ \\
     \eIf{$c = \mathcal{H}(K || m)$}{

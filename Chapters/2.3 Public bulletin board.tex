@@ -26,9 +26,8 @@ Because of the two properties of the bulletin board, we define two auditing algo
     \DontPrintSemicolon
     \caption{$\mathsf{AncestryVer}(\boldsymbol{b}, h_0)$}
     \KwData{The ancestry of board items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, with}
-    \myinput{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where}
-    \myinput{$i \in \{ 1, ..., n \}$}
-    \myinput{The address of the parent of the ancestry $h_0 \in \mathbb{B}^{256}$}
+    \KwMoreData{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where $i \in \{ 1, ..., n \}$}
+    \KwMoreData{The address of the parent of the ancestry $h_0 \in \mathbb{B}^{256}$}
 
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         \If{$h_i \neq \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\
@@ -44,9 +43,8 @@ Because of the two properties of the bulletin board, we define two auditing algo
     \DontPrintSemicolon
     \caption{$\mathsf{HistoryVer}(\boldsymbol{b}, h_0)$}
     \KwData{The history of board items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, with}
-    \myinput{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where}
-    \myinput{$i \in \{ 1, ..., n \}$}
-    \myinput{The address of the previous item in the history $h_0 \in \mathbb{B}^{256}$}
+    \KwMoreData{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where $i \in \{ 1, ..., n \}$}
+    \KwMoreData{The address of the previous item in the history $h_0 \in \mathbb{B}^{256}$}
 
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         \If{$h_i \neq \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\
@@ -157,7 +155,7 @@ We define $\mathsf{ItemVer}(b, Y_\mathcal{W})$ (\cref{alg: item ver}) as a publi
     \DontPrintSemicolon
     \caption{$\mathsf{ItemVer}(b, Y_\mathcal{W})$}
     \KwData{The board item $b = (m, c, \mathcal{W}, \sigma, t, p, h', h)$}
-    \myinput{The public key of the writer $Y_\mathcal{W}$}
+    \KwMoreData{The public key of the writer $Y_\mathcal{W}$}
 
     \eIf{$h = \mathcal{H}(m || c || p || h' || t)$ \\ 
     \KwAnd $\mathsf{SigVer} (Y_\mathcal{W}, \sigma; m || c || p)$}{

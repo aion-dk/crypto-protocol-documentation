@@ -22,8 +22,8 @@ For convenience of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P
     \DontPrintSemicolon
     \caption{$\mathsf{Enc} (Y, M; r)$}
     \KwData{The encryption key $Y \in \mathbb{P}$}
-    \myinput{The message $M \in \mathbb{P}$}
-    \myinput{The randomizer $r \in \mathbb{Z}_q$}
+    \KwMoreData{The message $M \in \mathbb{P}$}
+    \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     $R \gets [r]G$ \;
     $S \gets [r]Y$ \;
@@ -38,7 +38,7 @@ For convenience of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P
     \DontPrintSemicolon
     \caption{$\mathsf{Dec} (x, e)$}
     \KwData{The decryption key $x \in \mathbb{Z}_q$}
-    \myinput{The cryptogram $e = (R, C) \in \mathbb{E}$}
+    \KwMoreData{The cryptogram $e = (R, C) \in \mathbb{E}$}
     
     $S \gets [x]R$ \;
     $M \gets C - S$ \;
@@ -61,7 +61,7 @@ To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encrypti
     \DontPrintSemicolon
     \caption{$\mathsf{TxtEnc} (Y, m)$}
     \KwData{The encryption key $Y \in \mathbb{P}$}
-    \myinput{The message $m \in \mathbb{B}^*$}
+    \KwMoreData{The message $m \in \mathbb{B}^*$}
     
     $(r, R) \gets \mathsf{KeyGen}()$ \tcp*{\cref{alg: key gen}}
     $S \gets [r]Y$ \;
@@ -77,7 +77,7 @@ To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encrypti
     \DontPrintSemicolon
     \caption{$\mathsf{TxtDec} (x, e)$}
     \KwData{The decryption key $x \in \mathbb{Z}_q$}
-    \myinput{The encryption $e = (R, c) \in \mathbb{P} \times \mathbb{B}^*$}
+    \KwMoreData{The encryption $e = (R, c) \in \mathbb{P} \times \mathbb{B}^*$}
     
     $S \gets [x]R$ \;
     $k \gets \mathcal{H} (S || R)$ \;
@@ -100,7 +100,7 @@ The resulting encryption of the homomorphic addition of two cryptograms is $e' =
     \DontPrintSemicolon
     \caption{$\mathsf{HomAdd}(e_1; e_2)$}
     \KwData{The first cryptogram $e_1 = (R_1, C_1) \in \mathbb{E}$}
-    \myinput{The second cryptogram $e_2 = (R_2, C_2) \in \mathbb{E}$}
+    \KwMoreData{The second cryptogram $e_2 = (R_2, C_2) \in \mathbb{E}$}
     
     $R' \gets R_1 + R_2$ \;
     $C' \gets C_1 + C_2$ \;
@@ -116,8 +116,8 @@ Following the procedure above, we can \textit{re-encrypt} a given cryptogram $e 
     \DontPrintSemicolon
     \caption{$\mathsf{ReEnc} (Y, e; r')$}
     \KwData{The encryption key $Y \in \mathbb{P}$}
-    \myinput{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
-    \myinput{The new randomizer $r' \in \mathbb{Z}_q$}
+    \KwMoreData{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
+    \KwMoreData{The new randomizer $r' \in \mathbb{Z}_q$}
     
     $e_2 \gets \mathsf{Enc}(Y, \mathcal{O}; r')$ \tcp*{\cref{alg: enc}}
     $e' \gets \mathsf{HomAdd} (e, e_2)$ \tcp*{\cref{alg: hom add}}
@@ -138,7 +138,7 @@ The resulting encryption of the homomorphic multiplication of a cryptogram is $e
     \DontPrintSemicolon
     \caption{$\mathsf{HomMul} (e; n)$}
     \KwData{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
-    \myinput{The multiplication factor $n \in \mathbb{Z}$}
+    \KwMoreData{The multiplication factor $n \in \mathbb{Z}$}
     
     $R' \gets [n]R$ \;
     $C' \gets [n]C$ \;
