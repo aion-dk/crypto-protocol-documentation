@@ -63,7 +63,7 @@ To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encrypti
     \KwData{The encryption key $Y \in \mathbb{P}$}
     \myinput{The message $m \in \mathbb{B}^*$}
     
-    $(r, R) \gets \mathsf{KeyGen}()$ \tcp*{\Cref{alg: key gen}}
+    $(r, R) \gets \mathsf{KeyGen}()$ \tcp*{\cref{alg: key gen}}
     $S \gets [r]Y$ \;
     $k \gets \mathcal{H} (S || R)$ \;
     $c \gets \mathsf{AESEnc} (k, m)$ \;
@@ -94,7 +94,7 @@ Elgamal encryption based on elliptic curve cryptographic primitive is a \textit{
 \mathsf{Enc}(Y, M_1; r_1) + \mathsf{Enc}(Y, M_2; r_2) = \mathsf{Enc}(Y, M_1 + M_2; r_1 + r_2)
 \]
 
-The resulting encryption of the homomorphic addition of two cryptograms is $e' = (R', C') \gets \mathsf{HomAdd} (e_1; e_2)$ (\Cref{alg: hom add}).
+The resulting encryption of the homomorphic addition of two cryptograms is $e' = (R', C') \gets \mathsf{HomAdd} (e_1; e_2)$ (\cref{alg: hom add}).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -119,8 +119,8 @@ Following the procedure above, we can \textit{re-encrypt} a given cryptogram $e 
     \myinput{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
     \myinput{The new randomizer $r' \in \mathbb{Z}_q$}
     
-    $e_2 \gets \mathsf{Enc}(Y, \mathcal{O}; r')$ \tcp*{\Cref{alg: enc}}
-    $e' \gets \mathsf{HomAdd} (e, e_2)$ \tcp*{\Cref{alg: hom add}}
+    $e_2 \gets \mathsf{Enc}(Y, \mathcal{O}; r')$ \tcp*{\cref{alg: enc}}
+    $e' \gets \mathsf{HomAdd} (e, e_2)$ \tcp*{\cref{alg: hom add}}
     \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
     
     \label{alg: re enc}

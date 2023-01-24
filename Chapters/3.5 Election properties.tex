@@ -22,7 +22,7 @@ Therefore, we claim that Assembly Voting X has the \textit{confidentiality prope
 One can argue that, because the bulletin board data is public, somebody could save all the data for long enough until the elliptic curve cryptosystem will be broken, and so will be able to decrypt all the data contrarily to our protocol. This fact demonstrates that our system does not comply to the \textit{everlasting confidentiality property}. We take note of this fact and we accept it.
 
 \paragraph{Anonymity}
-This property is reached by implementing a mixnet of nodes (trustees) that sequentially shuffle the list of vote cryptograms in an indistinguishable way, before they get decrypted (section \ref{sec: mixing phase}).
+This property is reached by implementing a mixnet of nodes (trustees) that sequentially shuffle the list of vote cryptograms in an indistinguishable way, before they get decrypted (\cref{sec: mixing phase}).
 
 Obviously, each trutsee knows the way it shuffled the list of cryptograms but it does not know how it was shuffled by the other trustees. Thus, it is important that trustees do not communicate with each other.
 
@@ -60,6 +60,6 @@ During the \textit{vote cryptogram generation process} (described in \cref{sec: 
 
 % The empty cryptogram $e_0$ and the proof $PK_0$ are relevant only for the communication amongst the voter and the \textit{Digital Ballot Box} $\mathcal{D}$, to make sure that none of them has the entire randomness value $r_0 + r_1$ that is used to generate the cryptogram $e$. Therefore, $e_0$ and $PK_0$ are not included on the bulletin board, thus not publicly available.
 
-After the vote cryptogram $e$ has been accepted on the bulletin board, the voter is not able to produce valid cryptographic evidence that $e$ is an encryption of $M$ referencing only the data that is publicly available, as he is not in possession of value $r_0$. More details are described in section \ref{app: proving the content of a cryptogram}.
+After the vote cryptogram $e$ has been accepted on the bulletin board, the voter is not able to produce valid cryptographic evidence that $e$ is an encryption of $M$ referencing only the data that is publicly available, as he is not in possession of value $r_0$. More details are described in \cref{app: proving the content of a cryptogram}.
 
 Therefore, we claim that Assembly Voting X is a \textit{receipt-free} voting protocol.

@@ -12,7 +12,7 @@ A \textit{cryptographic shuffle} (or mixing) is a process that, given as input a
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$ }{
         \For{$j \gets 1$ \KwTo $\ell$ \KwBy $1$ }{
-            $e'_{i,j} \gets \mathsf{ReEnc} (Y, e_{\psi(i),j}; r_{i,j})$ \tcp*{\Cref{alg: re enc}}
+            $e'_{i,j} \gets \mathsf{ReEnc} (Y, e_{\psi(i),j}; r_{i,j})$ \tcp*{\cref{alg: re enc}}
             }
         }
     $\boldsymbol{e'} \gets \{e'_{1,1}, ..., e'_{n,\ell}\}$ \;
@@ -23,9 +23,9 @@ A \textit{cryptographic shuffle} (or mixing) is a process that, given as input a
 
 The really interesting aspect of mixing is how to prove in zero knowledge that the shuffling calculations were done correctly and that no content of the cryptograms has been changed. Our mixing proof is based on an algorithm presented by Jens Groth in \cite{Groth05}. The proof uses as a building block an \textit{Argument for Shuffle of Known Contents} which is based on proving the knowledge of opening a commitment to a permutation of a set of known messages. The strategy of Groth's algorithm is to reduce the problem of proving that $\boldsymbol{e'}$ is the shuffled list of re-encrypted cryptograms $\boldsymbol{e}$ to the problem of proving the shuffling of some known messages where the same permutation $\psi$ is applied.
 
-The protocol for the Argument of Shuffle of Known Contents is presented in \Cref{fig: argument of shuffle of known contents protocol}. During this protocol, the \textit{Prover} convinces the \textit{Verifier} that $C$ is a commitment to a set of known messages $\boldsymbol{m} = \{m_1, ..., m_n\}$ that are shuffled by a secret permutation $\psi$. Note that, in this protocol, the \textit{Prover} does not reveal the permutation $\psi$.
+The protocol for the Argument of Shuffle of Known Contents is presented in \cref{fig: argument of shuffle of known contents protocol}. During this protocol, the \textit{Prover} convinces the \textit{Verifier} that $C$ is a commitment to a set of known messages $\boldsymbol{m} = \{m_1, ..., m_n\}$ that are shuffled by a secret permutation $\psi$. Note that, in this protocol, the \textit{Prover} does not reveal the permutation $\psi$.
 
-The main protocol for proving the correctness of a shuffle is illustrated in \Cref{fig: argument of shuffle of cryptograms protocol}. The \textit{Prover} convinces the \textit{Verifier} that the matrix of mixed cryptograms $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$ is equivalent to the initial matrix of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, where each cryptogram is re-encrypted and rows of the initial matrix are shuffled amongst each other. Note that, during mixing, the integrity of each row is preserved, i.e all columns of the matrix are shuffled by the same permutation. The protocol uses, as a building block, the protocol for the Argument of Shuffle of Known Contents, presented in \cref{fig: argument of shuffle of known contents protocol}.
+The main protocol for proving the correctness of a shuffle is illustrated in \cref{fig: argument of shuffle of cryptograms protocol}. The \textit{Prover} convinces the \textit{Verifier} that the matrix of mixed cryptograms $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$ is equivalent to the initial matrix of cryptograms $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, where each cryptogram is re-encrypted and rows of the initial matrix are shuffled amongst each other. Note that, during mixing, the integrity of each row is preserved, i.e all columns of the matrix are shuffled by the same permutation. The protocol uses, as a building block, the protocol for the Argument of Shuffle of Known Contents, presented in \cref{fig: argument of shuffle of known contents protocol}.
 
 Note that, in the description of the protocols, we abuse notation and define $\sum_{i=1}^n e_i = \mathsf{HomAdd}(e_1; \mathsf{HomAdd}(e_2; ... \mathsf{HomAdd}(e_{n-1}; e_n) ... ))$ as the homomorphic addition of multiple cryptograms, with each $e_i \in \mathbb{E}$.
 
@@ -291,14 +291,14 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{e_{1,
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$ }{
         $d_i \in_\mathrm{R} \mathbb{Z}_q$, $p_i \gets \psi(i)$ \;
         \For{$j \gets 1$ \KwTo $\ell$ \KwBy $1$ }{
-            $\bar{e}'_{i,j} \gets \mathsf{HomMul} (e'_{i,j}; d_i)$ \tcp*{\Cref{alg: hom mul}}
+            $\bar{e}'_{i,j} \gets \mathsf{HomMul} (e'_{i,j}; d_i)$ \tcp*{\cref{alg: hom mul}}
             }
         }
     $\boldsymbol{d} \gets \{d_1, ..., d_n\}$, $\boldsymbol{p} \gets \{p_1, ..., p_n\}$ \;
-    $C \gets \mathsf{Com} (\boldsymbol{p}; r_\mathrm{p})$, $C_\mathrm{d} \gets \mathsf{Com} (\boldsymbol{d}; r_\mathrm{d})$ \tcp*{\Cref{alg: com}}
+    $C \gets \mathsf{Com} (\boldsymbol{p}; r_\mathrm{p})$, $C_\mathrm{d} \gets \mathsf{Com} (\boldsymbol{d}; r_\mathrm{d})$ \tcp*{\cref{alg: com}}
     \For{$j \gets 1$ \KwTo $\ell$ \KwBy $1$ }{
         $r_{\mathrm{e},j} \in_\mathrm{R} \mathbb{Z}_q$ \;
-        $e_{\mathrm{d},j} \gets \mathsf{ReEnc} (Y, \bar{e}_j^{\prime +};r_{\mathrm{e},j})$, with $\bar{e}_j^{\prime +} \gets \sum\limits_{i=1}^n \bar{e}'_{i,j}$ \tcp*{\Cref{alg: re enc}}
+        $e_{\mathrm{d},j} \gets \mathsf{ReEnc} (Y, \bar{e}_j^{\prime +};r_{\mathrm{e},j})$, with $\bar{e}_j^{\prime +} \gets \sum\limits_{i=1}^n \bar{e}'_{i,j}$ \tcp*{\cref{alg: re enc}}
         }
     $\boldsymbol{e_\mathrm{d}} \gets \{e_{\mathrm{d},1}, ..., e_{\mathrm{d},\ell}\}$ \;
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$ }{
@@ -317,8 +317,8 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{e_{1,
         $m'_i \gets \lambda \cdot \psi(i) + t_{\psi(i)}$
         }
     $\boldsymbol{m'} \gets \{m'_1, ..., m'_n\}$, $r' \gets \lambda + r_\mathrm{d} \pmod{q}$ \;
-    $C' \gets \mathsf{Com}(\boldsymbol{m'}; r')$ \tcp*{\Cref{alg: com}}
-    $AS \gets \mathsf{ProveASKC}(\psi; r'; \boldsymbol{m'}; C')$ \tcp*{\Cref{alg: prove askc}}
+    $C' \gets \mathsf{Com}(\boldsymbol{m'}; r')$ \tcp*{\cref{alg: com}}
+    $AS \gets \mathsf{ProveASKC}(\psi; r'; \boldsymbol{m'}; C')$ \tcp*{\cref{alg: prove askc}}
     $PM \gets (C, C_\mathrm{d}, \boldsymbol{e_\mathrm{d}}, \boldsymbol{t}, \boldsymbol{f}, \boldsymbol{z}, \lambda)$
     
     \Return{$(PM, AS)$} \tcp*{
@@ -340,8 +340,8 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{e_{1,
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$ }{
         \For{$j \gets 1$ \KwTo $\ell$ \KwBy $1$ }{
-            $\tilde{e}_{i,j} \gets \mathsf{HomMul}(e_{i,j}; t_i)$ \tcp*{\Cref{alg: hom mul}}
-            $\tilde{e}'_{i,j} \gets \mathsf{HomMul}(e'_{i,j}; f_i)$ \tcp*{\Cref{alg: hom mul}}
+            $\tilde{e}_{i,j} \gets \mathsf{HomMul}(e_{i,j}; t_i)$ \tcp*{\cref{alg: hom mul}}
+            $\tilde{e}'_{i,j} \gets \mathsf{HomMul}(e'_{i,j}; f_i)$ \tcp*{\cref{alg: hom mul}}
         }
         $m_i \gets \lambda \cdot i + t_i \pmod q$
         }
@@ -350,12 +350,12 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{e_{1,
         $\tilde{e}_j^{\prime +} \gets \sum\limits_{i=1}^n \tilde{e}'_{i,j}$ \;
         }
     $C' \gets [\lambda]C + C_\mathrm{d} + \mathsf{Com}(\boldsymbol{f}; 0)$ \;
-    $\boldsymbol{m} \gets \{m_1, ..., m_n\}$ \tcp*{\Cref{alg: com}}
+    $\boldsymbol{m} \gets \{m_1, ..., m_n\}$ \tcp*{\cref{alg: com}}
     \eIf{$t_i = \mathcal{H}(\boldsymbol{e} || \boldsymbol{e'} || C || C_\mathrm{d} || \boldsymbol{e_\mathrm{d}} || i)$, where $i \in \{1, ..., n\}$ \\
     \KwAnd $\lambda = \mathcal{H}(\boldsymbol{e} || \boldsymbol{e'} || C || C_\mathrm{d} || \boldsymbol{e_\mathrm{d}} || \boldsymbol{f} || \boldsymbol{z})$ \\
     \KwAnd $\mathsf{HomAdd}(\tilde{e}_j^{\prime +}; e_{\mathrm{d},j}) = \mathsf{ReEnc}(Y, \tilde{e}_j^+; z_j)$
     , where $j \in \{1, ..., \ell\}$ \\
-    \KwAnd $\mathsf{VerASKC}(AS; \boldsymbol{m}; C')$ \tcp*{\Cref{alg: ver askc}}}{
+    \KwAnd $\mathsf{VerASKC}(AS; \boldsymbol{m}; C')$ \tcp*{\cref{alg: ver askc}}}{
         $b \gets 1$ \tcp*{proof is valid}
         }{
         $b \gets 0$ \tcp*{proof is invalid}

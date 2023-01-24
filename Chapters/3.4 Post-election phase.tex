@@ -82,7 +82,7 @@ Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\ma
     \myinput{The partial decryptions $\boldsymbol{S}_i = \{ S_{i, 1}, ..., S_{i, n} \} \in \mathbb{P}^n$, where $\mathcal{T}_i \in \boldsymbol{\mathcal{T'}}$}
     
     \For{$j \gets 1$ \KwTo $n$ \KwBy $1$}{
-        $V_j \gets C_j - \sum_{i \in \boldsymbol{\mathcal{T}'}} [\lambda(i)]S_{i,j}$ \tcp*{$\lambda(i)$ computed as in figure \ref{fig: threshold decryption}}
+        $V_j \gets C_j - \sum_{i \in \boldsymbol{\mathcal{T}'}} [\lambda(i)]S_{i,j}$ \tcp*{$\lambda(i)$ computed as in \cref{fig: threshold decryption}}
         }
     $\boldsymbol{V} \gets \{ V_1, ..., V_n \}$ \;
     
