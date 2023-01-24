@@ -231,7 +231,7 @@ Finally, each trustee $\mathcal{T}_i$ downloads from the server their encrypted 
             $sx_i \gets \sum\limits_{j=1}^{n} s_{j, i} \pmod q$
             };
         \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_3.south -| s.center) (a_6) {
-            validates \hspace{80pt}
+            validation \hspace{80pt}
             };
         \node[banner, keep_left, spaced, between={s.west}{t.east}] at (a_6.south -| s.west) (b_3) {
             when all $\mathcal{T}_i$ have validated
@@ -309,11 +309,11 @@ Note that the \textit{Lagrange Interpolation Polynomial} can be computed only wh
             \textbf{Trustee $\mathcal{T}_i$}};
             
         % internal knowledge
-        \node[internal, below=of s] (s_ik) {
+        \node[ik] at (s.south) (s_ik) {
             internal knowledge: $e = (R, C)$, \\
             $\{sY_1, ..., sY_n\}$
             };
-        \node[internal, below=of t] (t_ik) {
+        \node[ik] at (t.south) (t_ik) {
             internal knowledge: $sx_i$
             };
         
@@ -324,12 +324,12 @@ Note that the \textit{Lagrange Interpolation Polynomial} can be computed only wh
         \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_1.south -| s.center) (a_1) {
             \hspace{10pt} $e = (R, C)$
             };
-        \node[block, keep_middle, spaced] at (a_1.south -| t.center) (t_1) {
+        \node[block, keep_right, spaced] at (a_1.south -| t.east) (t_1) {
             $S_i \gets [sx_i]R$ \\
             $PK \gets \mathsf{DLProve} (sx_i, \{G, R\})$
             };
         \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_1.south -| s.center) (a_2) {
-            $S_i$, $PK$ \hspace{50pt}
+            $S_i$, $PK$ \hspace{30pt}
             };
         \node[block, keep_left, spaced] at (a_2.south -| s.west) (s_2) {
             verify $\mathsf{DLVer} (PK, \{G, R\}, \{sY_i, S_i\})$ then: \\ [7pt]
@@ -345,7 +345,7 @@ Note that the \textit{Lagrange Interpolation Polynomial} can be computed only wh
         
         % Arrows and lines
         \draw[dashed] (s.south west)--(t.south east);
-        \draw[dashed] (s_ik.south west)--(s_ik.south -| t_ik.east);
+        \draw[dashed] (s_ik.south -| s.west)--(s_ik.south -| t.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);

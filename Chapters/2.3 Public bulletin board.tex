@@ -75,8 +75,7 @@ This section describes the protocol that any writer needs to follow in order to 
 
 \begin{figure}[ht]
     \centering
-    \begin{tikzpicture}[framed,
-            node distance=0,
+    \begin{tikzpicture}[framed, node distance=0,
             % every node/.style={draw}
             ]{
             
@@ -87,12 +86,13 @@ This section describes the protocol that any writer needs to follow in order to 
             \textbf{Digital Ballot Box} $\mathcal{D}$};
         
         % internal knowledge
-        \node[internal, below=of w] (w_ik) {
+        \node[ik] at (w.south) (w_ik) {
             internal knowledge: $x_\mathcal{W}$, $Y_\mathcal{D}$, \\
             $m_i$, $c_i$, $p_i$
             };
-        \node[internal, below=of dbb] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{W}$, \\ $\boldsymbol{b} = \{b_1, ..., b_{i-1}\}$
+        \node[ik] at (dbb.south) (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{W}$, \\
+            $\boldsymbol{b} = \{b_1, ..., b_{i-1}\}$
             };
         
         % All content
@@ -124,7 +124,7 @@ This section describes the protocol that any writer needs to follow in order to 
         
         % Arrows and lines
         \draw[dashed] (w.south west)--(dbb.south east);    
-        \draw[dashed] (w_ik.south west)--(dbb_ik.south east);
+        \draw[dashed] (w_ik.south -| w.west)--(w_ik.south -| dbb.east);
 
         \draw[densely dotted] (w_1.south -| w.center)--(w_2.north -| w.center);
 

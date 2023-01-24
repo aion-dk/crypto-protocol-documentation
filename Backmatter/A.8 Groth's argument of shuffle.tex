@@ -42,12 +42,11 @@ Note that, in the description of the protocols, we abuse notation and define $\s
             \textbf{Verifier}};
         
         % internal knowledge
-        \node[internal, below=of p] (p_ik) {
-            internal knowledge: $\psi$, $r$, \\
-            $\boldsymbol{m} = \{m_1, ..., m_n\}$, \\
+        \node[ik, keep_left] at (p.south west) (p_ik) {
+            internal knowledge: $\psi$, $r$, $\boldsymbol{m} = \{m_1, ..., m_n\}$, \\
             $C = \mathsf{Com} (\{m_{\psi(1)}, ..., m_{\psi(n)}\}; r)$
             };
-        \node[internal, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $C$, \\
             $\boldsymbol{m} = \{m_1, ..., m_n\}$
             };
@@ -101,7 +100,7 @@ Note that, in the description of the protocols, we abuse notation and define $\s
         
         % Arrows and lines
         \draw[dashed] (p.south west)--(v.south east);    
-        \draw[dashed] (p_ik.south west)--(p_ik.south -| v_ik.east);
+        \draw[dashed] (p_ik.south west)--(p_ik.south -| v.east);
 
         \draw[densely dotted] (p_ik.south -| p.center)--(p_1.north -| p.center);
         \draw[densely dotted] (p_1.south -| p.center)--(p_2.north -| p.center);
@@ -120,23 +119,22 @@ Note that, in the description of the protocols, we abuse notation and define $\s
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
-            spaced/.style={yshift=-10},
             % every node/.style={draw}
             ]{
             
         % Actors
-        \node[title, text width=197, above, anchor=north east] (p) {
+        \node[title, above, anchor=north east] (p) {
             \textbf{Prover}};
-        \node[title, text width=123, right=of p] (v) {
+        \node[title, right=of p] (v) {
             \textbf{Verifier}};
         
         % internal knowledge
-        \node[internal, text width=197, below=of p] (p_ik) {
+        \node[ik, keep_left] at (p.south west) (p_ik) {
             internal knowledge: $\psi$, $Y$, $\boldsymbol{r} = \{r_{1,1}, ..., r_{n,\ell}\}$, \\
             $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$, \\
             with $e'_{i,j} = \mathsf{ReEnc} (Y, e_{\psi(i),j}; r_{i,j})$
             };
-        \node[internal, text width=123, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $Y$, \\
             $\boldsymbol{e} = \{e_{1,1}, ..., e_{n,\ell}\}$, \\
             $\boldsymbol{e'} = \{e'_{1,1}, ..., e'_{n,\ell}\}$
@@ -187,7 +185,7 @@ Note that, in the description of the protocols, we abuse notation and define $\s
         
         % Arrows and lines
         \draw[dashed] (p.south west)--(v.south east);    
-        \draw[dashed] (p_ik.south west)--(v_ik.south east);
+        \draw[dashed] (p_ik.south west)--(p_ik.south -| v.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);

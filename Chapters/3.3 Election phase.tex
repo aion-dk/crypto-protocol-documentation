@@ -33,8 +33,8 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
 \begin{landscape}
 \begin{figure}[ht]
     \centering
-    \begin{tikzpicture}[framed,
-            node distance=0,
+    \begin{tikzpicture}[framed, node distance=0,
+            spaced/.style={yshift=-5},
             % every node/.style={draw},
             ]{
         
@@ -47,15 +47,15 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
             \textbf{Identity Provider $\mathcal{I}_j$}};
         
         % internal knowledge
-        \node[internal_3, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $Y_\mathcal{A}$, $Y_\mathcal{D}$, \\
             $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$, $\alpha_\mathrm{cnf}$
             };
-        \node[internal_3, below=of va] (va_ik) {
+        \node[ik] at (va.south) (va_ik) {
             internal knowledge: $x_\mathcal{A}$, $\boldsymbol{\mathcal{V}}$, \\
             $\{ Y_{\mathcal{I}_1}, ..., Y_{\mathcal{I}_{n_\mathrm{i}}} \}$, $\alpha_\mathrm{cnf}$
             };
-        \node[internal_3, below=of ip] (ip_ik) {
+        \node[ik] at (ip.south) (ip_ik) {
             internal knowledge: $x_{\mathcal{I}_j}$
             };
         
@@ -100,12 +100,12 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(ip.south east);    
-        \draw[dashed] (v_ik.west |- va_ik.south)--(ip_ik.east |- va_ik.south);
+        \draw[dashed] (v_ik.south -| v.west)--(v_ik.south -| ip.east);
         
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
         
-        \draw[densely dotted] (v_ik.south)--(v_1.north -| v.center);
+        \draw[densely dotted] (v_ik.south -| v.center)--(v_1.north -| v.center);
         \draw[densely dotted] (v_1.south -| v.center)--(b_1.north -| v.center);
         \draw[densely dotted] (b_1.south -| v.center)--(v_2.north -| v.center);
         \draw[densely dotted] (v_2.south -| v.center)--(v_3.north -| v.center);
@@ -137,8 +137,7 @@ During the vote cryptogram generation process, the voting application collaborat
 
 \begin{figure}[ht]
     \centering
-    \begin{tikzpicture}[framed,
-            node distance=0,
+    \begin{tikzpicture}[framed, node distance=0,
             % every node/.style={draw}
             ]{
             
@@ -149,26 +148,26 @@ During the vote cryptogram generation process, the voting application collaborat
             \textbf{Digital Ballot Box $\mathcal{D}$}};
         
         % internal knowledge
-        \node[internal, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
             $\alpha_\mathrm{vs} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs} \}$
             };
-        \node[internal, below=of dbb] (dbb_ik) {
+        \node[ik] at (dbb.south) (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, \\
             $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$
             };
         
         %All content
-        \node[block, keep_left, spaced] at (dbb_ik.south -| v_ik.west) (v_1) {
+        \node[block, keep_left, spaced] at (dbb_ik.south -| v.west) (v_1) {
             $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ \\
             $c_\mathrm{vec} \gets \mathsf{Com}(r_\mathrm{v}, s_\mathrm{v})$, $p_\mathrm{vec} \gets$ the address of $b_\mathrm{vs}$ \\
             $m_\mathrm{vec} \gets$ "voter encryption commitment"
             };
-        \node[banner, keep_left, spaced, between={v.west}{dbb.east}] at (v_1.south west) (b_1) {
+        \node[banner, keep_left, spaced, between={v.west}{dbb.east}] at (v_1.south -| v.west) (b_1) {
             $\mathcal{V}_i$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{vec}$ as the $k^\mathrm{th}$ item of $\boldsymbol{b}$ \\
             $(b_\mathrm{vec}, \rho_\mathrm{vec}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vec}, c_\mathrm{vec}, p_\mathrm{vec})$, therefore $b_\mathrm{vec} \in \boldsymbol{b}$
             };
-        \node[block, keep_right, spaced] at (b_1.south east) (dbb_1) {
+        \node[block, keep_right, spaced] at (b_1.south -| dbb.east) (dbb_1) {
             $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ \\
             $c_\mathrm{sec} \gets \mathsf{Com}(r_\mathrm{d}, s_\mathrm{d})$, $p_\mathrm{sec} \gets$ the address of $b_\mathrm{vec}$ \\
             $m_\mathrm{sec} \gets$ "server encryption commitment" \\ [7pt]
@@ -188,7 +187,7 @@ During the vote cryptogram generation process, the voting application collaborat
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south -| dbb.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
@@ -218,17 +217,17 @@ During the vote cryptogram generation process, the voting application collaborat
             \textbf{Digital Ballot Box $\mathcal{D}$}};
         
         % internal knowledge
-        \node[internal, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathrm{enc}$, \\
             $\alpha_\mathrm{sec} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vec}, b_\mathrm{sec} \}$, $M$, $r_\mathrm{v}$, $e_\mathrm{d}$
             };
-        \node[internal, below=of dbb] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, $r_\mathrm{d}$, \\
-            $\boldsymbol{b'} = \{ b_1, ..., b_{k'-1} \}$
+        \node[ik] at (dbb.south) (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, \\
+            $\boldsymbol{b'} = \{ b_1, ..., b_{k'-1} \}$, $r_\mathrm{d}$
             };
         
         %All content
-        \node[block, spaced, keep_left] at (v_ik.south west) (v_1) {
+        \node[block, spaced, keep_left] at (v_ik.south -| v.west) (v_1) {
             $e_\mathrm{v} \gets \mathsf{Enc}(Y_\mathrm{enc}, M; r_\mathrm{v})$ \\
             $e \gets \mathsf{HomAdd}(e_\mathrm{d}, e_\mathrm{v})$ \\
             $PK \gets \mathsf{DLProve}(r_\mathrm{v}, \{ G \})$ \\
@@ -265,7 +264,7 @@ During the vote cryptogram generation process, the voting application collaborat
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south -| dbb.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
@@ -334,26 +333,27 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed, node distance=0,
+            spaced/.style={yshift=-6},
             % every node/.style={draw},
             ]{
         
         % Actors
         \node[title_3, above, anchor=north east] (v) {
             \textbf{Voter $\mathcal{V}_i$}};
-        \node[title_3, text width=135, right=of v] (ev) {
+        \node[title_3, right=of v] (ev) {
             \textbf{External Verifier $\mathcal{X}$}};
-        \node[title_3, text width=211, right=of ev] (dbb) {
+        \node[title_3, right=of ev] (dbb) {
             \textbf{Digital Ballot Box $\mathcal{D}$}};
 
         % internal knowledge
-        \node[internal_3, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
             $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$
             };
-        \node[internal_3, text width=135, below=of ev] (ev_ik) {
+        \node[ik] at (ev.south) (ev_ik) {
             no internal knowledge
             };
-        \node[internal_3, text width=211, below=of dbb] (dbb_ik) {
+        \node[ik, keep_right] at (dbb.south east) (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, \\
             $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts} \}$, where $\alpha_\mathrm{cnf}, \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \} \subset \boldsymbol{b}$
             };
@@ -374,7 +374,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             where $\mathcal{W} \in \{ \mathcal{D}, \mathcal{E}, \mathcal{A}, \mathcal{V}_i \}$ according to rules form \cref{app: bulletin board item types}
             };
         \node[arrow, towards_left, immediate, between={v.center}{ev.center}] at (ev_1.south -| v.center) (a_4) {
-            "ballot found" \hspace{60pt}
+            "ballot found" \hspace{80pt}
             };
         \node[block, keep_left, spaced] at (a_4.south -| v.west) (v_1) {
             $m_\mathrm{sr} \gets $ "spoil request", $c_\mathrm{sr} \gets \varnothing$, $p_\mathrm{sr} \gets$ address of $b_\mathrm{bc}$
@@ -397,11 +397,11 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             $\mathcal{X}$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{v}$ as the second item of the hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$ \\
             $(b_\mathrm{v}, \rho_\mathrm{v}) \gets \mathtt{WriteOnBoard}(\mathcal{X}, m_\mathrm{v}, c_\mathrm{v}, p_\mathrm{v})$, threfore $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
             };
-        \node[anchor=north] at (b_2.south -| v.center) (bottom){};
+        \node[immediate] at (b_2.south) (bottom){};
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v_ik.west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
@@ -442,19 +442,19 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             \textbf{Digital Ballot Box $\mathcal{D}$}};
         
         % internal knowledge
-        \node[internal_3, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, $r_\mathrm{v}$, $s_\mathrm{v}$, \\
             $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$, \\
             $\alpha_\mathrm{vts} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{vts} \}$, $\alpha_\mathrm{sr} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{sr} \}$
             };
-        \node[internal_3, below=of ev] (ev_ik) {
+        \node[ik] at (ev.south) (ev_ik) {
             internal knowledge: $x_\mathcal{X}$, \\
             $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$, \\
             $\alpha_\mathrm{v} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{vts}, b_\mathrm{v} \}$, $\alpha_\mathrm{sr} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{sr} \}$
             };
-        \node[internal_3, below=of dbb] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{X}$, $r_\mathrm{d}$, $s_\mathrm{d}$, \\
-            $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
+        \node[ik] at (dbb.south) (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{X}$, \\
+            $r_\mathrm{d}$, $s_\mathrm{d}$, $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
             };
         
         % All content
@@ -489,11 +489,11 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
         \node[block, keep_left, spaced] at (a_3.south -| v.west) (v_2) {
             verify $\mathsf{AncestryVer}(\{ b_\mathrm{vco}, b_\mathrm{sco} \}, h_\mathrm{v})$ and $\mathsf{ItemVer}(b_\mathrm{sco}, Y_\mathcal{D})$
             };
-        \node[anchor=north] at (v_2.south -| v.center) (bottom){};
+        \node[immediate] at (v_2.south) (bottom){};
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (v_ik.south west)--(v_ik.south -| dbb.east);
+        \draw[dashed] (v_ik.south -| v.west)--(v_ik.south -| dbb.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
@@ -530,14 +530,14 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
             \textbf{Digital Ballot Box $\mathcal{D}$}};
         
         % internal knowledge
-        \node[internal_3, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $V$
             };
-        \node[internal_3, below=of ev] (ev_ik) {
+        \node[ik] at (ev.south) (ev_ik) {
             internal knowledge: $x_\mathcal{X}$, $Y_i$, $Y_\mathcal{D}$, \\
             $\alpha_\mathrm{v} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts}, b_\mathrm{v} \}$
             };
-        \node[internal_3, below=of dbb] (dbb_ik) {
+        \node[ik] at (dbb.south) (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, \\
             $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco}, b_\mathrm{sco} \}$
             };
@@ -568,7 +568,7 @@ Finally, the external veryfier presents to the voter, the plain text vote $V'$, 
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south -| dbb.east);
         
         \draw[densely dotted] (dbb_ik.south -| v.center)--(v_1.north -| v.center);
         
@@ -609,11 +609,11 @@ Note that, if a voter $\mathcal{V}_i$ has a vote confirmation receipt $(\rho_\ma
             \textbf{Digital Ballot Box} $\mathcal{D}$};
         
         % internal knowledge
-        \node[internal, below=of v] (v_ik) {
+        \node[ik] at (v.south) (v_ik) {
             internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
             $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$
             };
-        \node[internal, below=of dbb] (dbb_ik) {
+        \node[ik] at (dbb.south) (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, \\
             $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, where $\alpha_\mathrm{bc} \subset \boldsymbol{b}$
             };
@@ -633,7 +633,7 @@ Note that, if a voter $\mathcal{V}_i$ has a vote confirmation receipt $(\rho_\ma
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south east);
+        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south -| dbb.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);

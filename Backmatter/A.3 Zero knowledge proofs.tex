@@ -30,12 +30,12 @@ we generate the proof $PK = (K, c, r)$ by following the protocol described in \c
             \textbf{Verifier}};
         
         % internal knowledge
-        \node[internal, below=of p] (p_ik) {
+        \node[ik] at (p.south) (p_ik) {
             internal knowledge: $x$, \\
             $\boldsymbol{G} = \{G_0, ..., G_n\}$, $\boldsymbol{Y} = \{Y_0, ..., Y_n\}$
             };
-        \node[internal, below=of v] (v_ik) {
-            internal knowledge:  \\
+        \node[ik] at (v.south) (v_ik) {
+            internal knowledge: \\
             $\boldsymbol{G} = \{G_0, ..., G_n\}$, $\boldsymbol{Y} = \{Y_0, ..., Y_n\}$
             };
         
@@ -67,7 +67,7 @@ we generate the proof $PK = (K, c, r)$ by following the protocol described in \c
         
         % Arrows and lines
         \draw[dashed] (p.south west)--(v.south east);    
-        \draw[dashed] (p_ik.south west)--(p_ik.south -| v_ik.east);
+        \draw[dashed] (p_ik.south -| p.west)--(p_ik.south -| v.east);
 
         \draw[densely dotted] (p_1.south -| p.center)--(p_2.north -| p.center);
         \draw[densely dotted] (p_2.south -| p.center)--(a_3.south west);
