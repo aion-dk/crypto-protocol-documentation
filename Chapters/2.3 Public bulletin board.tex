@@ -26,9 +26,8 @@ Because of the two properties of the bulletin board, we define two auditing algo
     \DontPrintSemicolon
     \caption{$\mathsf{AncestryVer}(\boldsymbol{b}, h_0)$}
     \KwData{The ancestry of board items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, with}
-    \myinput{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where}
-    \myinput{$i \in \{ 1, ..., n \}$}
-    \myinput{The address of the parent of the ancestry $h_0 \in \mathbb{B}^{256}$}
+    \KwMoreData{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where $i \in \{ 1, ..., n \}$}
+    \KwMoreData{The address of the parent of the ancestry $h_0 \in \mathbb{B}^{256}$}
 
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         \If{$h_i \neq \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\
@@ -44,9 +43,8 @@ Because of the two properties of the bulletin board, we define two auditing algo
     \DontPrintSemicolon
     \caption{$\mathsf{HistoryVer}(\boldsymbol{b}, h_0)$}
     \KwData{The history of board items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, with}
-    \myinput{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where}
-    \myinput{$i \in \{ 1, ..., n \}$}
-    \myinput{The address of the previous item in the history $h_0 \in \mathbb{B}^{256}$}
+    \KwMoreData{$b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ and $p_i, h'_i, h_i \in \mathbb{B}^{256}$, where $i \in \{ 1, ..., n \}$}
+    \KwMoreData{The address of the previous item in the history $h_0 \in \mathbb{B}^{256}$}
 
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         \If{$h_i \neq \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\
@@ -75,8 +73,7 @@ This section describes the protocol that any writer needs to follow in order to 
 
 \begin{figure}[ht]
     \centering
-    \begin{tikzpicture}[framed,
-            node distance=0,
+    \begin{tikzpicture}[framed, node distance=0,
             % every node/.style={draw}
             ]{
             
@@ -87,22 +84,23 @@ This section describes the protocol that any writer needs to follow in order to 
             \textbf{Digital Ballot Box} $\mathcal{D}$};
         
         % internal knowledge
-        \node[internal, below=of w] (w_ik) {
+        \node[ik] at (w.south) (w_ik) {
             internal knowledge: $x_\mathcal{W}$, $Y_\mathcal{D}$, \\
             $m_i$, $c_i$, $p_i$
             };
-        \node[internal, below=of dbb] (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{W}$, \\ $\boldsymbol{b} = \{b_1, ..., b_{i-1}\}$
+        \node[ik] at (dbb.south) (dbb_ik) {
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{W}$, \\
+            $\boldsymbol{b} = \{b_1, ..., b_{i-1}\}$
             };
         
         % All content
-        \node[process_v2, first, keep_left] at (w_ik.south -| w.west) (w_1) {
+        \node[block, spaced, keep_left] at (w_ik.south -| w.west) (w_1) {
             $\sigma_i \gets \mathsf{Sign}(x_\mathcal{W}; m_i || c_i || p_i)$
             };
-        \node[arrow_v2, towards_right, after_arrow, between={w.center}{dbb.center}, anchor=south west] at (w_1.south -| w.center) (a_1) {
+        \node[arrow, towards_right, immediate, between={w.center}{dbb.center}] at (w_1.south -| w.center) (a_1) {
             \hspace{20pt} $\sigma_i$, $m_i$, $c_i$, $p_i$
             };
-        \node[process_v2, keep_right, after_arrow] at (a_1.south -| dbb.east) (dbb_1) {
+        \node[block, keep_right, spaced] at (a_1.south -| dbb.east) (dbb_1) {
             verify that $m_i$, $c_i$ and $p_i$ comply to the \\
             rules according to \cref{app: bulletin board item types} and \\
             $\mathsf{SigVer} (Y_\mathcal{W}, \sigma_i; m_i || c_i || p_i)$ then: \\ [7pt]
@@ -113,10 +111,10 @@ This section describes the protocol that any writer needs to follow in order to 
             $b_i \gets (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$ \\
             $\boldsymbol{b} \gets \boldsymbol{b} \cup \{ b_i \}$
             };
-        \node[arrow_v2, towards_left, after_arrow, between={w.center}{dbb.center}, anchor=south east] at (dbb.center |- dbb_1.south) (a_2) {
+        \node[arrow, towards_left, immediate, between={w.center}{dbb.center}] at (dbb_1.south -| w.center) (a_2) {
             $\rho_i$, $t_i$, $h'_i$, $h_i$ \hspace{70pt}
             };
-        \node[process_v2, keep_left, after_arrow] at (a_2.south -| w.west) (w_2) {
+        \node[block, keep_left, spaced] at (a_2.south -| w.west) (w_2) {
             verify that $h_i = \mathcal{H}(m_i || c_i || p_i || h'_i || t_i)$ \\
             and $\mathsf{SigVer} (Y_\mathcal{D}, \rho_i; \sigma_i || h_i)$ then: \\ [7pt]
             $b_i \gets (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$
@@ -124,7 +122,7 @@ This section describes the protocol that any writer needs to follow in order to 
         
         % Arrows and lines
         \draw[dashed] (w.south west)--(dbb.south east);    
-        \draw[dashed] (w_ik.south west)--(dbb_ik.south east);
+        \draw[dashed] (w_ik.south -| w.west)--(w_ik.south -| dbb.east);
 
         \draw[densely dotted] (w_1.south -| w.center)--(w_2.north -| w.center);
 
@@ -157,7 +155,7 @@ We define $\mathsf{ItemVer}(b, Y_\mathcal{W})$ (\cref{alg: item ver}) as a publi
     \DontPrintSemicolon
     \caption{$\mathsf{ItemVer}(b, Y_\mathcal{W})$}
     \KwData{The board item $b = (m, c, \mathcal{W}, \sigma, t, p, h', h)$}
-    \myinput{The public key of the writer $Y_\mathcal{W}$}
+    \KwMoreData{The public key of the writer $Y_\mathcal{W}$}
 
     \eIf{$h = \mathcal{H}(m || c || p || h' || t)$ \\ 
     \KwAnd $\mathsf{SigVer} (Y_\mathcal{W}, \sigma; m || c || p)$}{

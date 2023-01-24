@@ -3,7 +3,7 @@
 
 
 \subsubsection{General description}
-The feature of continuous result extraction is the ability for the \textit{Election Administrator} $\mathcal{E}$ to extract submitted votes, before the election is over, and treat the extracted votes with the steps described in the post-election phase (\Cref{sec: post-election phase}) which includes cleansing, mixing, and decryption. It will exclude the publication of the decrypted votes as they should not be publicized. This can be done throughout the election as many times as necessary. 
+The feature of continuous result extraction is the ability for the \textit{Election Administrator} $\mathcal{E}$ to extract submitted votes, before the election is over, and treat the extracted votes with the steps described in the post-election phase (\cref{sec: post-election phase}) which includes cleansing, mixing, and decryption. It will exclude the publication of the decrypted votes as they should not be publicized. This can be done throughout the election as many times as necessary. 
 
 
 \subsubsection{Multiple ballots combined}
@@ -13,7 +13,7 @@ When combining multiple contents into a single ballot the number of voting optio
 
 
 \subsubsection{Minimum size of extraction to preserve anonymity}
-The feature of continuous extraction brings a big problem with it in form of anonymity sets. If a extraction would take place with every vote submitted the vote would become distinguishable as there would only be one vote and the mixing phase (\Cref{sec: mixing phase}) would become obsolete. Therefore this section will discuss the different vulnerabilities/exploits that are greatly increased with continuous extraction and recommendations will be given to the minimum amount of voters per extraction depending on the number of voting options. 
+The feature of continuous extraction brings a big problem with it in form of anonymity sets. If a extraction would take place with every vote submitted the vote would become distinguishable as there would only be one vote and the mixing phase (\cref{sec: mixing phase}) would become obsolete. Therefore this section will discuss the different vulnerabilities/exploits that are greatly increased with continuous extraction and recommendations will be given to the minimum amount of voters per extraction depending on the number of voting options. 
 
 Every calculation in this subsection is done with the assumption of voters voting randomly as we can not take into account what an arbitrary distribution would be and as it would be very individually for every election. % For the following tables the term 'voting option' means the number of unique voting options regardless of election style. In a candidate election a voter can vote for only one of the x candidates and there are therefore x voting options. In a multiple choice election there are multiple unique combinations for example in an election where 3 out of 5 options can be selected there are 10 different voting options. In a ranked election (multiple choice where order matters) there are even more combinations. In the same example where 3 out of 5 options can be picked but the ordering of those picks matter there are 60 unique voting options.
 
@@ -84,7 +84,7 @@ The continuous extraction feature adds more information to the bulletin board as
 
 \subsubsection{How it impacts our election properties}
 It violates the privacy and fairness principle as partial results are computed during the election. These are of course not publicly available but they are still processed and can therefore also potentially be leaked.
-The anonymity principle is threatened to be violated if the continuous extraction is not done carefully, as votes in small anonymity sets would be at risk of being distinguishable. The detailed description of these properties can be seen in \Cref{sec: requirements}.
+The anonymity principle is threatened to be violated if the continuous extraction is not done carefully, as votes in small anonymity sets would be at risk of being distinguishable. The detailed description of these properties can be seen in \cref{sec: requirements}.
 
 
 \subsubsection{Multiple voting anomaly}

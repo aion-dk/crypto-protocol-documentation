@@ -22,7 +22,7 @@ The cleansing procedure is publicly auditable as both the list of vote cryptogra
 \subsubsection{Mixing Phase} \label{sec: mixing phase}
 During the mixing phase, the list of cryptograms will change its appearance several times, being shuffled in an indistinguishable way. Each trustee \( \mathcal{T}_i \in \boldsymbol{\mathcal{T}'} \) applies its mixing algorithm in sequential order (the output from $\mathcal{T}_{i-1}$ is the input to $\mathcal{T}_i$). The first trustee applies its algorithm on \textit{the initial mixed board} and the output of the last trustee is used as \textit{the final mixed board}. The election administrator facilitates the mixing phase and decides the order of trustees.
 
-Formally, trustee $\mathcal{T}_i$ computes the mixed board of cryptograms by applying $\boldsymbol{e}_i \gets \mathsf{Shuffle}(Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{r}_i, \psi_i)$ (\cref{alg: shuffle}), where $Y_\mathrm{enc}$ is the encryption key, $\boldsymbol{r}_i \in \mathbb{Z}_q^{n_\mathrm{e}}$ and $\psi_i$ is a permutation of $n_\mathrm{e}$ elements. Next, as described in \cref{app: groth's argument of shuffle}, trustee $\mathcal{T}_i$ computes a proof of correct mixing $(PM_i, AS_i) \gets \mathsf{ProveMix}(\psi_i, Y_\mathrm{enc}, \boldsymbol{r}_i, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$ (\cref{alg: prove mix}). Then, trustee $\mathcal{T}_i$ submits to the election administrator the mixed board $\boldsymbol{e}_i$ and the mixing proof $(PM_i, AS_i)$.
+Formally, trustee $\mathcal{T}_i$ computes the mixed board of cryptograms by applying $\boldsymbol{e}_i \gets \mathsf{Shuffle}(Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{r}_i, \psi_i)$ (\cref{alg: shuffle}), where $Y_\mathrm{enc}$ is the encryption key, $\boldsymbol{r}_i \in_\mathrm{R} \mathbb{Z}_q^{n_\mathrm{e}}$ and $\psi_i$ is a permutation of $n_\mathrm{e}$ elements. Next, as described in \cref{app: groth's argument of shuffle}, trustee $\mathcal{T}_i$ computes a proof of correct mixing $(PM_i, AS_i) \gets \mathsf{ProveMix}(\psi_i, Y_\mathrm{enc}, \boldsymbol{r}_i, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$ (\cref{alg: prove mix}). Then, trustee $\mathcal{T}_i$ submits to the election administrator the mixed board $\boldsymbol{e}_i$ and the mixing proof $(PM_i, AS_i)$.
 
 For a mixing step to be accepted, the validity of the mixing proof has to be checked by running $\mathsf{VerMix}(PM_i, AS_i, Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$ (\cref{alg: ver mix}). In case a proof fails, either that trustee recomputes the mixing step, or it is removed and the process continues without that trustee.
 
@@ -44,7 +44,7 @@ Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\ma
     \DontPrintSemicolon
     \caption{$\mathsf{PartiallyDecryptAndProve}(\boldsymbol{e}, sx)$}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
-    \myinput{The share of decryption key $sx \in \mathbb{Z}_q$}
+    \KwMoreData{The share of decryption key $sx \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
         $S_i \gets [sx]R_i$
@@ -62,9 +62,9 @@ Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\ma
     \DontPrintSemicolon
     \caption{$\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}, PK, sY)$}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
-    \myinput{The list of partial decryptions $S = \{ S_1, ..., S_n \} \in \mathbb{P}^n$}
-    \myinput{The proof of correct decryption $PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
-    \myinput{The public share of decryption key $sY \in \mathbb{P}$}
+    \KwMoreData{The list of partial decryptions $S = \{ S_1, ..., S_n \} \in \mathbb{P}^n$}
+    \KwMoreData{The proof of correct decryption $PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
+    \KwMoreData{The public share of decryption key $sY \in \mathbb{P}$}
     
     $\boldsymbol{R}' \gets \{G, R_1, ..., R_n\}$ \;
     $\boldsymbol{S}' \gets \{sY, S_1, ..., S_n\}$ \;
@@ -79,10 +79,10 @@ Upon receiving partial decryptions $\boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\ma
 \DontPrintSemicolon
     \caption{$\mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{ e_1, ..., e_n \} \in \mathbb{E}^n$, with $e_j = (R_j, C_j)$}
-    \myinput{The partial decryptions $\boldsymbol{S}_i = \{ S_{i, 1}, ..., S_{i, n} \} \in \mathbb{P}^n$, where $\mathcal{T}_i \in \boldsymbol{\mathcal{T'}}$}
+    \KwMoreData{The partial decryptions $\boldsymbol{S}_i = \{ S_{i, 1}, ..., S_{i, n} \} \in \mathbb{P}^n$, where $\mathcal{T}_i \in \boldsymbol{\mathcal{T'}}$}
     
     \For{$j \gets 1$ \KwTo $n$ \KwBy $1$}{
-        $V_j \gets C_j - \sum_{i \in \boldsymbol{\mathcal{T}'}} [\lambda(i)]S_{i,j}$ \tcp*{$\lambda(i)$ computed as in figure \ref{fig: threshold decryption}}
+        $V_j \gets C_j - \sum_{i \in \boldsymbol{\mathcal{T}'}} [\lambda(i)]S_{i,j}$ \tcp*{$\lambda(i)$ computed as in \cref{fig: threshold decryption}}
         }
     $\boldsymbol{V} \gets \{ V_1, ..., V_n \}$ \;
     

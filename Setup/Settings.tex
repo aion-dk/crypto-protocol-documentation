@@ -1,14 +1,11 @@
+\setlength\algomargin{1em}
 \newlength\mylen
-\newcommand\myinput[1]{%
-  \settowidth\mylen{\KwData{}}%
-  \setlength\hangindent{\mylen}%
-  \hspace*{\mylen}#1\\}
-
-\newcommand\KwMoreData[1]{%
-  \settowidth\mylen{\KwData{}}%
-  \setlength\hangindent{\mylen}%
-  \hspace*{\mylen}#1\\}
-  
+\newcommand\KwMoreData[1]{
+  \settowidth\mylen{\KwData{}}
+  \setlength\hangindent{\mylen}
+  \hspace*{\mylen}#1 \\
+}
+\SetAlFnt{\small}
 \SetKw{KwAnd}{and}
 \SetKw{KwOr}{or}
 \SetKw{KwBy}{by}
@@ -23,37 +20,7 @@
 \newcount\multi@col@count
 \multi@col@width=0pt
 
-\tikzset{
-    block/.style={
-        text width=160,
-        align=left
-    },
-    arrow/.style={
-        text width=120,
-        align=center
-    },
-    banner/.style={
-        text width=160*2+7,
-        align=center
-    },
-    block_3/.style={block, text width=173},
-    arrow_3_next/.style={arrow, text width=130},
-    arrow_3_skip/.style={arrow, text width=130+173},
-    banner_3/.style={banner, text width=173*3+14},
-    title_4/.style={title, text width=128},
-    block_4/.style={block, text width=128},
-    arrow_4_next/.style={arrow, text width=96},
-    arrow_4_skip_1/.style={arrow, text width=96+128},
-    arrow_4_skip_2/.style={arrow, text width=96+2*128},
-    banner_4/.style={banner, text width=128*4+21}
-}
 
-\tikzset{
-    new_block_3/.style={align=left, font=\small},
-    internal_3/.style={new_block_3, text width=173},
-    process_3/.style={new_block_3, text width={}, draw, dotted, rounded corners},
-    new_arrow/.style={align=center, font=\small},
-}
 
 % internal node styles
 \tikzset{
@@ -68,23 +35,22 @@
 \tikzset{
   title/.style = {half_size, minimum height=20, align=center},
   title_3/.style = {title, third_size},
-  internal/.style = {half_size, align=left},
-  internal_3/.style = {third_size, align=left},
-  process_v2/.style = {block_font, align=left, draw, dotted, rounded corners, block_background},
-  arrow_v2/.style = {block_font, align=center},
-  banner_v2/.style = {banner_font, align=center}
+  ik/.style = {block_font, align=center, anchor=north},
+  block/.style = {block_font, align=left, draw, dotted, rounded corners, block_background},
+  arrow/.style = {block_font, align=center, anchor=north west},
+  banner/.style = {banner_font, align=center}
 }
 
 % other helpful node styles
 \tikzset{
-  first/.style={yshift=-4},
-  after_arrow/.style={yshift=-5},
+  spaced/.style={yshift=-7},
   keep_left/.style={anchor=north west},
   keep_middle/.style={anchor=north},
   keep_right/.style={anchor=north east},
-  towards_right/.style = {anchor=north west, append after command={
+  immediate/.style={spaced, anchor=south west},
+  towards_right/.style = {append after command={
     [->] (\tikzlastnode.south west)edge(\tikzlastnode.south east)}},
-  towards_left/.style = {anchor=north east, append after command={
+  towards_left/.style = {append after command={
     [->] (\tikzlastnode.south east)edge(\tikzlastnode.south west)}},
   between/.style 2 args={
       insert path={
