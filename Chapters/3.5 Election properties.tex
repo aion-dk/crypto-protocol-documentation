@@ -54,7 +54,7 @@ We claim that Assembly Voting X is a \textit{verifiable election system}.
 
 % \subsection{Accountability}
 \paragraph{Receipt-freeness}
-During the \textit{vote cryptogram generation process} (described in \cref{sec: vote cryptogram generation process}), the voter receives from the \textit{Digital Ballot Box} $\mathcal{D}$ an empty cryptogram $e_0$ that he uses to generate his final vote cryptogram $e$ in order to encrypt his vote $M$. At the end of the process, the vote cryptogram $e$ would be equal to \( \mathbf{Enc}_{Y_\mathrm{enc}} (M, r_0 + r_1) \), where $r_0$ is known by the \textit{Digital Ballot Box} $\mathcal{D}$ and $r_1$ is known by the voter.
+During the \textit{vote cryptogram generation process} (described in \cref{sec: vote cryptogram generation process}), the voter receives from the \textit{Digital Ballot Box} $\mathcal{D}$ an empty cryptogram $e_0$ that he uses to generate his final vote cryptogram $e$ in order to encrypt his vote $M$. At the end of the process, the vote cryptogram $e$ would be equal to \( \mathsf{Enc} (Y_\mathrm{enc}, M, r_0 + r_1) \), where $r_0$ is known by the \textit{Digital Ballot Box} $\mathcal{D}$ and $r_1$ is known by the voter.
 
 % The voter is convinced that $e_0$ is an empty cryptogram because of a interactive proof $PK_0$ generated between the voter and the \textit{Digital Ballot Box} $\mathcal{D}$.
 
