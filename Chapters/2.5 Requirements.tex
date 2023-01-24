@@ -1,61 +1,48 @@
 \subsection{Requirements} \label{sec: requirements}
-%In this section the different election properties (Mobility, Eligibility, Fairness, confidentiality, Privacy, Integrity, Verifiability, and Receipt-freeness) will be thoroughly explained, under what context the are reached, and categorized either as functional or non-functional requirements
-In this section the different requirements will be split into three different kinds: functional, non-functional, and security requirements.
+The requirements that Assembly Voting X must fulfill are split into the following three categories: functional, non-functional, and security requirements.
 
 
 \subsubsection{Functional Requirements} \label{sec: functional requirements}
-Functional requirements in context of this documentation are requirements in regards to the cryptographic choices made that are in some way measurable or defines the functionality of the system. %Since most choices in this documentation are inherently non-functional there is only a single functional requirement, mobility.
+Functional requirements relate to properties of the election system that voters, or users in general (including election officials, candidates or auditors), can actively choose to perform. These properties are in some way measurable. Assembly Voting X has the following functional requirements:
 
 \begin{itemize}
-    \item Election types supported:
+    \item election types supported:
     \begin{itemize}
-        \item Referendum: Direct vote on a proposal or issue
-        \item Candidates: The voter can vote on a candidate from list of possible options
-        \item Ranked election: The voter orders the voting options in a ranked list
-        \item Multiple choice: The voter can select multiple voting options
+        \item referendum: direct vote on a proposal or issue,
+        \item candidate election: one vote on a candidate from a predefined list,
+        \item multiple choice: a selection of multiple vote options,
+        \item ranked election: an ordered selection of multiple vote options,
     \end{itemize}
-    \item Verifying the ballot is cast as intended: the ability for the voter to 'challenge' his/her encrypted ballot to see that it contains what is expected. This is done via the Benaloh Challenge
-    \item Confirming selected options: after selecting the desired voting options an overview of the selected options on ballots are shown.
-    \item Correct mistakes: Before submitting a voter can go back and correct his/her choices.
-    \item Multiple voting: A voter can vote multiple times where as only the newest submitted vote will be counted in the final tally.
-    \item Individual verification with a wide variety of options: If the voter registration mode chosen (\cref{sec: voter registration modes}) is 'on-demand' the voters have to verify themselves using any trusted third party application.
-    %For both pre-election and on-demand voter registration mode a voter can receive election codes or verify themselves with any trusted third party application. 
-    \item Full audit at the end of the election: at the end of the election every post on the bulletin board is verified to ensure that no illegitimate items are present. 
+    \item verification mechanisms for voters to check that the encrypted ballot contains what they expect,
+    \item possibility to confirm selected options after voting by an overview of the complete ballot,
+    \item possibility to correct mistakes before submitting an encrypted ballot,
+    \item ability for overwrite your vote, i.e. a voter can vote multiple times while only the latest submitted vote will be counted in the final tally,
+    \item ability to check the status of your ballot after submission,
+    \item public auditability of the election process throughout the election period.
 \end{itemize}
 
 
 \subsubsection{Non-functional Requirements} \label{sec: non-functional requirements}
-Non-functional requirements in this documentation are requirements that are not falsifiable and not related to security/privacy principles.
+Non-functional requirements describe properties of the election system that impact the user experience while interacting with the system. 
 
-\paragraph{Mobility}
-The voter can use any device (PC, laptop, tablet, smart phone), that he/she has, to connect to the election system. The voter does not need to be in a special location (e.g. polling station) in order to vote. Instead, the voter can participate in the voting process being located in any place, that he/she considers secure and private, and that has an internet connection. 
+\paragraph{Mobility} is the property that enables voters to use any device (PC, laptop, tablet, smart phone) in their possesion, to connect to the election system. They do not need to be in a special location (e.g. polling station) in order to vote. Instead, they can participate in the voting process being located in any place, that they consider private, and that has an internet connection.
 
-We claim \textit{mobility} as a property of Assembly Voting X.
+\paragraph{Vote \& go} entails that voters are only required to be present during voting phase. Results can be computed without the presence of voters.
 
-\paragraph{Vote \& go}
-Voters are only required to be present during voting, results can be computed without the presence of voters.
+\paragraph{Transparency} implies that election data is available for auditing through a public bulletin board.
 
 
 \subsubsection{Security Requirements} \label{sec: security requirements}
+Security requirements describe properties of the election system that contribute to the quality and reliability of an election result. This section briefly describes the properties, while the explanation of how these propeties are achieved is presented in \cref{sec: election properties}.
 
-The different security requirements will be briefly explained below. How they are achieved can be read in \cref{sec: election properties}.
+\paragraph{Eligibility} property is defined as the fact that only a limited number of predefined voters are allowed to cast a valid vote. 
 
-\paragraph{Eligibility}
-\textit{Eligibility} is defined as the fact that only a limited number of predefined voters are allowed to cast a valid vote. 
+\paragraph{Privacy} property implies that no entity can read a partial result or any votes before it is intended. This is to prevent influencing of the subsequent voters throughout the election period. Voters could be swayed to vote differently than their initial decision if the current results were publicized.
 
-\paragraph{No revealing of partial results // fairness}
-The fairness property implies that no entity can read a partial result or any votes before it is intended. This is to prevent influencing of the subsequent voters throughout the election period. Voters could be swayed to vote differently than their initial decision if the current results were publicized. The later voters could also in cases have more weight to them as they could be the deciding votes between which candidate win.
+\paragraph{Anonymity} property implies that no single entity can determine the way a particular voter voted.
 
-\paragraph{Anonymity}
-The privacy property implies the fact that nobody knows the connection between a voter identity and its decrypted vote from the final \textit{raw result} list of votes.
+\paragraph{Integrity of voting data} is the property that implies detection mechanisms of whether any votes recorded on the bulletin board during the election phase have been modified or deleted.
 
-\paragraph{Integrity of votes}
-We define the \textit{integrity} of an election as the ability to verify whether any votes recorded on the bulletin board during the election has been modified or deleted.
+\paragraph{Verifiability} property describes that all steps of the election protocol are verifiable by following some auditing process.
 
-\paragraph{Verifiability}
-All steps of the election protocol are verifiable (for in dept explanation of what is verifiable see \cref{sec: auditing process}).
-
-% \subsection{Accountability}
-\paragraph{Receipt-freeness}
-
-We define the \textit{receipt-free} property as the fact that a voter is not able to prove to a third party the way he voted, after he submitted his vote cryptogram.
+\paragraph{Receipt-freeness} property is defined as the fact that voters are not able to prove to a third party the way they voted, after they submitted the encrypted ballot.
