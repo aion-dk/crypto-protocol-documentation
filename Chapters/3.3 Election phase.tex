@@ -14,11 +14,11 @@ The election phase lasts from the start date until the end date of a voting roun
 A voter $\mathcal{V}_i$ is considered authorized to cast a digital ballot when it is in possession of a secret signing key $x_i$ that corresponds to an eligible public key $Y_i$ from the bulletin board. This is achieved differently depending on the voter authentication mode.
 
 
-\paragraph{When pre-election voter authentication mode}\mbox{}\\
+\paragraph{When credential-based voter authentication mode}\mbox{}\\
 Each voter $\mathcal{V}_i$ has to input in the voting application all credentials received from the Printing Authorities $x_{i, j}$, with $j \in \{ 1, ..., n_\mathrm{p} \}$. The application combines all credentials to form the voter's secret signing key $x_i = \sum_{j=1}^{n_\mathrm{p}} x_{i, j} \pmod q$. The associated public key $Y_i$ has been computed and included on the bulletin board in the pre-election phase.
 
 
-\paragraph{When on-demand voter athentication mode}\mbox{}\\
+\paragraph{When identity-based voter athentication mode}\mbox{}\\
 Each voter $\mathcal{V}_i$ has to follow the protocol from \cref{fig: voter authentication protocol} in order to get authorized to cast a digital ballot on the bulletin board. Specifically, the voter must authenticate and get identity tokens $\sigma_{\mathrm{id}, j}$ from all of the idenitity providers $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ that have been configured by the voter authorizer in the pre-election phase.
 
 Then, the voting application generates a key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and forwards all identity tokens $\{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$ and the public key $Y_i$ to the voter authorizer service $\mathcal{A}$ proving the identity of the voter $\mathcal{V}_i$.

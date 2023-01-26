@@ -191,7 +191,7 @@ The full list of item types and rules can be studied in \cref{app: bulletin boar
     
     \item The \textit{actor config} is an item that introduces a new actor on the bulletin board. The new actor is defined by a role and a public key. The roles that actors can have are: the \textit{Voter Authorizer} $\mathcal{A}$, with its public key $Y_\mathcal{A}$ and the \textit{Ballot Adjudicator} $\mathcal{B}$ with its public key $Y_\mathcal{B}$.
 
-    \item The \textit{voter authorization configuration} is the item describing the way voters have to authenticate in order to get authorized to vote. The item defines the \textit{voter authorization mode} and, if applicable (i.e. when \textit{voter authorization mode} is \textbf{on-demand}), the configuration of all Idenitity Providers $\{\mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$, where $n_\mathrm{i}$ is the number of providers.
+    \item The \textit{voter authorization configuration} is the item describing the way voters have to authenticate in order to get authorized to vote. The item defines the \textit{voter authorization mode} and, if applicable (i.e. when \textit{voter authorization mode} is \textbf{identity-based}), the configuration of all Idenitity Providers $\{\mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$, where $n_\mathrm{i}$ is the number of providers.
     
     \item The \textit{voting round} is an item describing what contests are enabled to vote on at the time. The item also defines how long the election phase lasts (i.e. start date and end date). Multiple voting rounds can be enabled at the same time or they can follow each other sequentially.
 \end{enumerate}

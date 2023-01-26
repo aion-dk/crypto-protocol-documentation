@@ -4,13 +4,13 @@
 \paragraph{Eligibility:}
 During the election phase, only a predefined set of voters are allowed to cast a ballot on the bulletin board. The list of eligible voters $\boldsymbol{\mathcal{V}} = \{ \mathcal{V}_1, ..., \mathcal{V}_{n_\mathrm{v}} \}$ is defined, during the pre-election phase, in the voter authorizer service, which authorizes the use of a public key $Y_i$ correlated with voter identity $\mathcal{V}_i$. The authorization of public key is done by publishing a voter session item on the bulletin board, after a successful authentication of voter $\mathcal{V}_i$. This is achieved differently, depending on the voter authentication mode that has been configured during the pre-election phase. The two voter authentication modes are described in \cref{sec: voter registration modes}.
 
-When voter authentication mode is \textbf{on-demand}, voters successfully authenticates to the voter authorizer the moment they manage to authenticate to all identity providers $\boldsymbol{\mathcal{I}} = \{ \mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}} \}$, where $n_\mathrm{i}$ is the number of identity providers. That means, in order to falsly aquire an authorized public key (to cast a vote with), one must forge successful authentication with all identity providers $\boldsymbol{\mathcal{I}}$.
+When voter authentication mode is \textbf{identity-based}, voters successfully authenticates to the voter authorizer the moment they manage to authenticate to all identity providers $\boldsymbol{\mathcal{I}} = \{ \mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}} \}$, where $n_\mathrm{i}$ is the number of identity providers. That means, in order to falsly aquire an authorized public key (to cast a vote with), one must forge successful authentication with all identity providers $\boldsymbol{\mathcal{I}}$.
 
-Therefore, when voter authentication mode is \textbf{on-demand}, Assembly Voting X has the eligibility property on the assumption that there is at least one honest identity provider.
+Therefore, when voter authentication mode is \textbf{identity-based}, Assembly Voting X has the eligibility property on the assumption that there is at least one honest identity provider.
 
 In case, an election is configured to use only one identity provider (i.e. $n_\mathrm{i} = 1$), then that identity provider, could, in fact, authenticate and cast a vote on behalf of any voter. Therefore, in case voter authentication is provided by a single identity provider, that must be assumed trustworthy.
 
-When voter authentication mode is \textbf{pre-election}, ...
+When voter authentication mode is \textbf{credential-based}, ...
 
 % During the pre-election phase (\cref{sec: pre-election phase}), the election administrators define the list of eligible voters $\boldsymbol{\mathcal{V}} = \{ \mathcal{V}_1, ..., \mathcal{V}_{n_\mathrm{v}} \}$, where $n_\mathrm{v}$ is the total number of voters, and the list of printing authorities $\boldsymbol{\mathcal{P}} = \{ \mathcal{P}_1, ..., \mathcal{P}_{n_\mathrm{p}} \}$, where $n_\mathrm{p}$ is the total number of printing authorities.
 
