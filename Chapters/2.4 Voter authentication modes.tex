@@ -9,7 +9,7 @@ For this mode, the voter authorizer configures a set of printing authorities $\b
 
 All credentials are converted into private-public key pairs (as described in \cref{sec: voter credential distribution process}) by all printing authorities, which then return to the voter authorizer all public keys of all voters. The voter authorizer aggregates all public keys for each voter to form their \textit{authentication public key}. 
 
-When trying to authenticate to the voter authorizer, a voter must prove possession of the \textit{authentication private key}, which can be achieved by aggregating all credentials received from all printing authorities. If the proof validates, the voter authorizer $\mathcal{A}$ authorizes voter $\mathcal{V}_i$ to interact with the digital ballot box for casting a ballot. The entire authorization process is decribed in \cref{sec: voter authorization procedure}.
+When trying to authenticate to the voter authorizer, a voter must generate a \textit{proof of credentials}, which can be achieved by aggregating all credentials received from all printing authorities. If the proof validates, the voter authorizer $\mathcal{A}$ authorizes voter $\mathcal{V}_i$ to interact with the digital ballot box for casting a ballot. The entire authorization process is decribed in \cref{sec: voter authorization procedure}.
 
 
 \subsubsection{Identity-based mode} \label{sec: identity-based mode}
