@@ -11,15 +11,15 @@ The Election Administrator $\mathcal{E}$ owns a key pair $(x_\mathcal{E}, Y_\mat
 \subsubsection{Voter}
 There exists a list of eligible voters, each denoted $\mathcal{V}_i$, with \( i \in \{ 1, ..., n_\mathrm{v} \} \), where $n_\mathrm{v}$ is the total number of voters.  A voter is a human being that is allowed to cast a valid vote in this election. A voter needs to have access to a computer that has an internet connection. Voters are the ones to generate vote cryptograms.
 
-In \textbf{credential-based} voter authentication mode (see \cref{sec: voter authentication modes}), voters are responsible for protecting their credentials $x_{i,j}$ received from all printing authorities or the single credential in the case that only one printing authority is used.
+In \textbf{credential-based} voter authentication mode (see \cref{sec: voter authentication modes}), voters are responsible for protecting their credentials $c_{i,j}$ received from all credentials authorities. Moreover, they need to protect their private key $x_i$ while a voting session is active.
 
 In \textbf{identity-based} voter authentication mode voters are responsible for protecting their private key $x_i$ while a voting session is active.
 
 
-\subsubsection{Printing Authority}
-The Printing Authority role is relevant only in the \textbf{credential-based} voter authentication mode, which is described in \cref{sec: credential-based mode}.
+\subsubsection{Credentials Authority}
+The Credentials Authority role is relevant only in the \textbf{credential-based} voter authentication mode, which is described in \cref{sec: credential-based mode}.
     
-There is a set of printing authorities, each noted as $\mathcal{P}_i$, with \( i \in \{ 1, ..., n_\mathrm{p} \} \), where $n_\mathrm{p}$ is the total number of printing authorities. A printing authority is an institution, consisting of humans and software processes. Each of them is responsible for generating voter credentials and distribute them privately to the voters. It is recommended that each printing authority should use a different communication channel for distributing credentials (e.g. e-mail, post, SMS). Printing Authorities must delete the voter credentials after they have been distributed.
+There is a set of credentials authorities, each noted as $\mathcal{C}_i$, with \( i \in \{ 1, ..., n_\mathrm{c} \} \), where $n_\mathrm{c}$ is the total number of credentials authorities. A credentials authority is an institution, consisting of humans and software processes. Each of them is responsible for generating voter credentials and distribute them privately to the voters. It is recommended that each credentials authority should use a different communication channel for distributing credentials (e.g. e-mail, post, SMS). Credentials Authorities must delete the voter credentials after they have been distributed.
 
 
 \subsubsection{Trustee}
