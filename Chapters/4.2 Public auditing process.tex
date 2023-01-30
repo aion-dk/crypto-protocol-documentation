@@ -35,7 +35,7 @@ Any public auditor is able to verify the cleansing procedure as both the bulleti
 
 
 \subsubsection{Verification of mixing procedure}
-During and after the mixing phase, any public auditor is able to verify the mixing procedure of each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}'}$, where $\boldsymbol{\mathcal{T}'}$ is the set of trustees that participate in the mixing phase. The mixing verification algoroithm is \( \mathbf{VerifyShuffle}_{Y_\mathrm{enc}} (PK_i, \boldsymbol{e_{i-1}}, \boldsymbol{e_i}) \) (\cref{alg: ver askc}), where $PK_i$ is the proof of correct mixing, $\boldsymbol{e_i}$ is the mixed board of cryptograms and $\boldsymbol{e_{i-1}}$ is the previous mixed board of cryptograms.
+During and after the mixing phase, any public auditor is able to verify the mixing procedure of each trustee $\mathcal{T}_i$ with $i \in \tau$, where $\tau$ is the subset of trustees that participated in the mixing phase. The mixing verification algoroithm is \( \mathbf{VerifyShuffle}_{Y_\mathrm{enc}} (PK_i, \boldsymbol{e_{i-1}}, \boldsymbol{e_i}) \) (\cref{alg: ver askc}), where $PK_i$ is the proof of correct mixing, $\boldsymbol{e_i}$ is the mixed board of cryptograms and $\boldsymbol{e_{i-1}}$ is the previous mixed board of cryptograms.
 
 Note that $\boldsymbol{e_0} = \{ e_1, ..., e_{n_\mathrm{e}} \}$ is the initial, \textbf{cleansed} board of vote cryptograms as registered by the voters, where $n_\mathrm{e}$ is the total number of cryptograms. 
 
