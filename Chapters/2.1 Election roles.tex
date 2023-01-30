@@ -9,7 +9,7 @@ The Election Administrator $\mathcal{E}$ owns a key pair $(x_\mathcal{E}, Y_\mat
 
 
 \subsubsection{Voter}
-There exists a list of eligible voters, each denoted $\mathcal{V}_i$, with \( i \in \{ 1, ..., n_\mathrm{v} \} \), where $n_\mathrm{v}$ is the total number of voters.  A voter is a human being that is allowed to cast a valid vote in this election. A voter needs to have access to a computer that has an internet connection. Voters are the ones to generate vote cryptograms.
+There exists a list of eligible voters, each denoted $\mathcal{V}_i$, with $i \in \{ 1, ..., n_\mathrm{v} \}$, where $n_\mathrm{v}$ is the total number of voters.  A voter is a human being that is allowed to cast a valid vote in this election. A voter needs to have access to a computer that has an internet connection. Voters are the ones to generate vote cryptograms.
 
 In \textbf{credential-based} voter authentication mode (see \cref{sec: voter authentication modes}), voters are responsible for protecting their credentials $c_{i,j}$ received from all credentials authorities. Moreover, they need to protect their private key $x_i$ while a voting session is active.
 
@@ -19,11 +19,11 @@ In \textbf{identity-based} voter authentication mode voters are responsible for 
 \subsubsection{Credentials Authority}
 The Credentials Authority role is relevant only in the \textbf{credential-based} voter authentication mode, which is described in \cref{sec: credential-based mode}.
     
-There is a set of credentials authorities, each noted as $\mathcal{C}_i$, with \( i \in \{ 1, ..., n_\mathrm{c} \} \), where $n_\mathrm{c}$ is the total number of credentials authorities. A credentials authority is an institution, consisting of humans and software processes. Each of them is responsible for generating voter credentials and distribute them privately to the voters. It is recommended that each credentials authority should use a different communication channel for distributing credentials (e.g. e-mail, post, SMS). Credentials Authorities must delete the voter credentials after they have been distributed.
+There is a set of credentials authorities, each noted as $\mathcal{C}_i$, with $i \in \{ 1, ..., n_\mathrm{c} \}$, where $n_\mathrm{c}$ is the total number of credentials authorities. A credentials authority is an institution, consisting of humans and software processes. Each of them is responsible for generating voter credentials and distribute them privately to the voters. It is recommended that each credentials authority should use a different communication channel for distributing credentials (e.g. e-mail, post, SMS). Credentials Authorities must delete the voter credentials after they have been distributed.
 
 
 \subsubsection{Trustee}
-There is a set of trustees, each denoted as $\mathcal{T}_i$, with \( i \in \{ 1, ..., n_\mathrm{t} \} \), where $n_\mathrm{t}$ is the total number of trustees. A trustee is a human controlling a computer that has the \textit{Trustee Application} installed. Trustees are responsible for preserving the privacy and the fairness of the election during the election phase by working together to build the election encryption key while safely storing their shares of the decryption key.
+There is a set of trustees, each denoted as $\mathcal{T}_i$, with $i \in \{ 1, ..., n_\mathrm{t} \}$, where $n_\mathrm{t}$ is the total number of trustees. A trustee is a human controlling a computer that has the \textit{Trustee Application} installed. Trustees are responsible for preserving the privacy and the fairness of the election during the election phase by working together to build the election encryption key while safely storing their shares of the decryption key.
 
 The Trustee $\mathcal{T}_i$ protects its own private key $x_{\mathcal{T}_i}$ and its share of the election decryption key $sx_i$.
 
