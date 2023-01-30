@@ -707,7 +707,9 @@ Note that, if a voter $\mathcal{V}_i$ has a vote confirmation receipt $(\rho_\ma
             $(b_\mathrm{cr}, \rho_\mathrm{cr}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{cr}, c_\mathrm{cr}, p_\mathrm{cr})$, therefore $b_\mathrm{cr} \in \boldsymbol{b}$
             };
         \node[block, keep_left, spaced] at (b_1.south -| v.west) (v_2) {
-            store $\rho_\mathrm{cr}$ as the vote receipt
+            $\sigma_\mathrm{cr} \gets$ the voter's signtaure on $b_\mathrm{cr}$  \\
+            $h_\mathrm{cr} \gets$ the address of $b_\mathrm{cr}$  \\ [7pt]
+            store $(\rho_\mathrm{cr}, \sigma_\mathrm{cr}, h_\mathrm{cr})$ as the vote receipt
             };
         
         % Arrows and lines
