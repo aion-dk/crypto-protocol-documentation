@@ -64,13 +64,12 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
         \node[block, keep_right, spaced] at (a_1.south -| va.east) (va_1) {
             verify that $Y_{\mathrm{auth}; i} \in \{ Y_{\mathrm{auth}; 1}, ..., Y_{\mathrm{auth}; n_\mathrm{v}} \}$ and \\
             $\mathsf{DLVer} (PK_\mathrm{auth}, \{ G \}, \{ Y_{\mathrm{auth}; i} \})$ then: \\ [7pt]
-            $\phi \gets \mathcal{H}(PK_\mathrm{auth})$, $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \phi)$ \\
-            $m_\mathrm{vs} \gets$ "voter session", \\
+            $m_\mathrm{vs} \gets$ "voter session", $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \mathcal{H}(PK_\mathrm{auth}))$ \\
             $p_\mathrm{vs} \gets$ the address of the latest item from $\alpha_\mathrm{cnf}$ \\ [7pt]
             \scriptsize $\mathcal{A}$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{vs}$ as the next \\ [-2pt]
             \scriptsize item of the bulletin board \\ [-2pt]
             \scriptsize $(b_\mathrm{vs}, \rho_\mathrm{vs}) \gets \mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ \\ [7pt]
-            internally store tuple $(\mathcal{V}_i, \phi, PK_\mathrm{auth})$ for auditing
+            internally store tuple $(\mathcal{V}_i, PK_\mathrm{auth})$ for auditing
             };
         \node[arrow, towards_left, immediate, between={v.center}{va.center}] at (va_1.south -| v.center) (a_2) {
             $b_\mathrm{vs}$ \hspace{110pt}
@@ -162,11 +161,11 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
             };
         \node[block, keep_left, spaced] at (a_3.south -| va.west) (va_1) {
             verify that $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$ and $\mathsf{SigVer}(Y_{\mathcal{I}_j}, \sigma_{\mathrm{id}, j}; \mathcal{V}_i)$, with $j \in \{1, ..., n_\mathrm{i}\}$ then: \\ [6pt]
-            $\phi \gets \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}})$, $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \phi)$ \\
+            $c_\mathrm{vs} \gets (\mathcal{V}_i, Y_i, \mathcal{H}(\sigma_{\mathrm{id}, 1} || ... || \sigma_{\mathrm{id}, n_\mathrm{i}}))$ \\
             $m_\mathrm{vs} \gets$ "voter session", $p_\mathrm{vs} \gets$ the address of the latest item from $\alpha_\mathrm{cnf}$ \\ [6pt]
             \scriptsize $\mathcal{A}$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{vs}$ as the next item of the bulletin board \\ [-2pt]
             \scriptsize $(b_\mathrm{vs}, \rho_\mathrm{vs}) \gets \mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ \\ [6pt]
-            internally store the tuple for auditing: $(\mathcal{V}_i, \phi, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \})$
+            internally store the tuple for auditing: $(\mathcal{V}_i, \{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \})$
             };
         \node[arrow, towards_left, immediate, between={v.center}{va.center}] at (va_1.south -| v.center) (a_4) {
             $b_\mathrm{vs}$ \hspace{70pt}
