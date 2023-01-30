@@ -10,6 +10,8 @@ The process of computing a result consists of:
     \item finally, the election administrator publishes the result in a verifiable manner as described in \cref{sec: result publication}.
 \end{itemize}
 
+This process of computing a result is executed separately for each voting round configured in the pre-election phase (described in \cref{sec: voting rounds}).
+
 
 \subsubsection{Cleansing procedure} \label{sec: cleansing procedure}
 Triggered by the extraction intent item $b_\mathrm{ei}$ being published, the digital ballot box $\mathcal{D}$ bundles a list of cryptograms that represent only the valid votes from the ballot cryptograms items from the bulletin board. This is, essentially, the votes that will be decrypted and tallied as a result. It is considered a valid vote only the last ballot cryptograms item, followed by a cast request item for each voter. All other votes are considered overwritten and, therefore, discarded.
