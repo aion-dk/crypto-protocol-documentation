@@ -3,14 +3,14 @@
 
 \subsubsection{Elliptic Curve over a Prime Field} \label{app: elliptic curve over a prime field}
 We define the elliptic curve $E$ over the prime field $\mathbb{F}_p$ as the set of points
-\[ E(\mathbb{F}_p) = \{(x, y) \in (\mathbb{F}_p)^2 \mid y^2 = x^3 + ax + b \pmod p \} \cup \{ \mathcal{O} \} \]
+\[ E(\mathbb{F}_p) = \{ (x, y) \in (\mathbb{F}_p)^2 \mid y^2 = x^3 + ax + b \pmod p \} \cup \{ \mathcal{O} \} \]
 where a tuple $(x, y)$ represent the coordinates of a point, $\mathcal{O}$ is the point at infinity and $a, b \in \mathbb{F}_p$.
 
 The elliptic curve $E(\mathbb{F}_p)$ follows a group structure with the following rules:
 \begin{itemize}
     \item $\mathcal{O}$ is the identity element, thus $P + \mathcal{O} = \mathcal{O} + P = P$ for all $P \in E(\mathbb{F}_p)$.
-    \item The inverse operations is point negation, noted $-$. For all $P = (P_x, P_y) \in E(\mathbb{F}_p)$, we define $-P = (P_x, -P_y)$ such that $P + (- P) = \mathcal{O}$.
-    \item The binary operation is point addition, noted $+$. Let $P, Q \in E(\mathbb{F}_p)$. The line through $P$ and $Q$ intersects the elliptic curve in a third point $R = (R_x, R_y) \in E(\mathbb{F}_p)$. The point addition is defined as $P + Q = -R$. The coordinates of $R$ can be computed in the following way:
+    \item The inverse operation is point negation noted $-$. For all $P = (P_x, P_y) \in E(\mathbb{F}_p)$, we define $-P = (P_x, -P_y)$ such that $P + (- P) = \mathcal{O}$.
+    \item The binary operation is point addition noted $+$. Let $P, Q \in E(\mathbb{F}_p)$. The line through $P$ and $Q$ intersects the elliptic curve in a third point $R = (R_x, R_y) \in E(\mathbb{F}_p)$. The point addition is defined as $P + Q = -R$. The coordinates of $R$ can be computed in the following way:
     \begin{align*}
         R_x & = \lambda^2 - P_x - Q_x \pmod p \\
         R_y & = P_y + \lambda \cdot (R_x - P_x) \pmod p 
@@ -24,11 +24,11 @@ The elliptic curve $E(\mathbb{F}_p)$ follows a group structure with the followin
     \]
 \end{itemize}
 
-We define the total number of point on the $E(\mathbb{F}_p)$ as $N$ and it can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$ which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup we follow:
+We define the total number of points on the $E(\mathbb{F}_p)$ as $N$ and it can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$ which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup we follow:
 \begin{enumerate}
-    \item Choose a random point $P \in E(\mathbb{F}_p)$.
-    \item Compute $G = [h]P$.
-    \item If $G = \mathcal{O}$, repeat the process. Otherwise, $G$ is a generator.
+    \item choose a random point $P \in E(\mathbb{F}_p)$,
+    \item compute $G = [h]P$,
+    \item if $G = \mathcal{O}$, repeat the process. Otherwise, $G$ is a generator.
 \end{enumerate}
 
 In conclusion, we can define our cryptographic cyclic subgroup as:
@@ -118,13 +118,13 @@ The following elliptic curves are supported by AVX:
 
 
 \subsubsection{Elliptic Curve Point Encoding}
-Each point on the curve is represented by its $x$ and $y$ coordinate. As presented in \cite{Trappe05}, the $y$ coordinate can be calculated based on the $x$ coordinate. Note that the elliptic curve equation might spawn no valid values for $y$ or two values for $y$. In case $y$ is not valid, it means $x$ is not a valid coordinate to generate a point, otherwise, the algorithm has to chooses one of the two value for $y$ and continues. Thus, one extra bit of information is required specifying which of the two values is to be used.
+Each point on the curve is represented by its $x$ and $y$ coordinate. As presented in \cite{Trappe05}, the $y$ coordinate can be calculated based on the $x$ coordinate. Note that the elliptic curve equation might spawn no valid values for $y$ or two values for $y$. In case $y$ is not valid, it means $x$ is not a valid coordinate to generate a point, otherwise, the algorithm has to choose one of the two values for $y$ and continues. Thus, one extra bit of information is required specifying which of the two values is to be used.
 
-An elliptic curve point can be represented as byte array in two ways: \textit{compressed form} or \textit{uncompressed form}. The compressed form contains the byte representation of only the $x$ coordinate to which is prepended a byte $f \in \{ 02, 03 \}$ as a flag to determine which value to choose for the $y$ coordinate. Formally, $y \gets \mathsf{RecoverY}(x, f)$ (\cref{alg: recover y}).
+An elliptic curve point can be represented as a byte array in two ways: \textit{compressed form} or \textit{uncompressed form}. The compressed form contains the byte representation of only the $x$ coordinate to which is prepended a byte $f \in \{ 02, 03 \}$ as a flag to determine which value to choose for the $y$ coordinate. Formally, $y \gets \mathsf{RecoverY}(x, f)$ (\cref{alg: recover y}).
 
 The uncompressed form contains the byte representation of both $x$ and $y$ coordinates concatenated together, to which is prepended the byte 04.
 
-In our system, when an elliptic curve point has to be stored in the database, or when it needs to be transferred over the network, or when it is used as input to a hash function, it is represented as byte array in compressed form.
+In our system, when an elliptic curve point has to be stored in the database, or when it needs to be transferred over the network, or when it is used as input to a hash function, it is represented as a byte array in compressed form.
 
 \begin{algorithm}[ht]
 \DontPrintSemicolon
@@ -145,24 +145,25 @@ In our system, when an elliptic curve point has to be stored in the database, or
 
 
 \subsubsection{Mapping a message on the Elliptic Curve} \label{app: mapping a message on the elliptic curve}
-An important use case of a cryptographic system is to be able to interpret an arbitrary message (a plain text, a number, an id or even a more complex construction). In elliptic curve context, that means mapping a message into an elliptic curve point in a deterministic way. Additionally, this point must be able to be interpreted back as the original message. This section considers the message as an arbitrary byte array and it is up to specific use cases to convert data to byte array (i.e. UTF-8 encoding of text, the byte representation of an integer, or even custom encoding of complex JSON object).
+An important use case of a cryptographic system is to be able to interpret an arbitrary message (a plain text, a number, an id, or even a more complex construction). In the elliptic curve context, that means mapping a message into an elliptic curve point in a deterministic way. Additionally, this point must be able to be interpreted back as the original message. This section considers the message as an arbitrary byte array and it is up to specific use cases to convert data to a byte array (i.e. UTF-8 encoding of text, the byte representation of an integer, or even custom encoding of complex JSON object).
 
-Mapping a message $\boldsymbol{b} \in \mathbb{B}^*$ into an elliptic curve point is done by $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}). The byte array $\boldsymbol{b}$ is prepended with an adjusting byte $b_0 = 00$ and appended (padded) with $00$ bytes such that it has a length of $\ell$, where $\ell$ is the byte size of the elliptic curve (i.e. $\ell \gets \mathsf{ByteLengthOf}(p)$ (\cref{alg: bytes length of}), where $p$ is the prime of the elliptic curve). The resulting byte array is interpreted as a field element $x \in \mathbb{F}_p$. Then, the algorithm checks whether $x$ spawns a valid point $M = (x, y)$, where $y$ is computed according to the elliptic curve equation $y \gets \mathsf{RecoverY}(x, 02)$ (\cref{alg: recover y}). If valid, then $M$ is the encoding of $\boldsymbol{b}$. Otherwise, the algorithm modifies $x$ by incrementing the adjusting byte and tries again, 255 times. If no valid points are found, the algorithm returns failure.
+Mapping a message $\boldsymbol{b} \in \mathbb{B}^*$ into an elliptic curve point is done by $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}). The byte array $\boldsymbol{b}$ is prepended with an adjusting byte $b_0 = 00$ and appended (padded) with $00$ bytes such that it has a length of $\ell$, which is the elliptic curve byte size (i.e. $\ell \gets \mathsf{ByteLengthOf}(p)$ (\cref{alg: bytes length of}), where $p$ is the prime of the elliptic curve). The resulting byte array is interpreted as a field element $x \in \mathbb{F}_p$. Then, the algorithm checks whether $x$ spawns a valid point $M = (x, y)$, where $y$ is computed according to the elliptic curve equation $y \gets \mathsf{RecoverY}(x, 02)$ (\cref{alg: recover y}). If valid, then $M$ is the encoding of $\boldsymbol{b}$. Otherwise, the algorithm modifies $x$ by incrementing the adjusting byte and retries 255 times. If no valid point is found, the algorithm returns failure.
 
-By having one \textit{byte space} to find a valid point on the curve, we know from \cite{Trappe05} that the probability that all 256 $x$ coordinates generate invalid points is $1/2^{256}$, which we consider acceptable. Formally, $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}) converts an arbitrary message $\boldsymbol{b}$ of legal size (i.e. $|\boldsymbol{b}| \leq \ell - 1$, where $\ell$ is the byte size of the elliptic curve) into a valid point $M$ on the elliptic curve with negligible failure rate.
+By having one \textit{byte space} to find a valid point on the curve, \cite{Trappe05} shows that the probability of all 256 $x$ coordinates to generate invalid points is $1/2^{256}$, which is considered acceptable. Formally, $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}) converts any message $\boldsymbol{b}$ of legal size (i.e. $|\boldsymbol{b}| \leq \ell - 1$, where $\ell$ is the byte size of the elliptic curve) into a valid elliptic curve point $M$ with a negligible failure rate.
 
-Recovering the message $\boldsymbol{b}$ from an elliptic curve point $M$ can be done by calling $\boldsymbol{b} \gets \mathsf{Point2Bytes}(M)$ (\cref{alg: point to bytes}). The algorithm tries to extract the byte representation of the $x$ coordinate, disregarding the right most $00$ bytes and the adjusting byte $b_0$.
+Recovering the message $\boldsymbol{b}$ from an elliptic curve point $M$ can be done by calling $\boldsymbol{b} \gets \mathsf{Point2Bytes}(M)$ (\cref{alg: point to bytes}). It extracts the byte representation of the $x$ coordinate, disregarding the rightmost $00$ bytes and the adjusting byte $b_0$.
 
-Having these two algorithms, mapping a message on the Elliptic Curve is a sound procedure as
-\[ \boldsymbol{b} = \mathsf{Point2Bytes}(\mathsf{Bytes2Point}(\boldsymbol{b})) \text{ , for all $\boldsymbol{b} \in \mathbb{B}^*$, with $|\boldsymbol{b}| \leq \ell - 1$.} \]
+Having these two algorithms, mapping a message on the Elliptic Curve is a sound procedure as $\boldsymbol{b} = \mathsf{Point2Bytes}(\mathsf{Bytes2Point}(\boldsymbol{b}))$, for all $\boldsymbol{b} \in \mathbb{B}^*$, with $|\boldsymbol{b}| \leq \ell - 1$.
 
 Examples of $\ell$ values, depending on elliptic curves, are:
+\begin{multicols}{2}
 \begin{itemize}
     \item $\ell = 32$ for \textbf{Secp256k1},
     \item $\ell = 32$ for \textbf{Secp256r1},
     \item $\ell = 48$ for \textbf{Secp384r1},
     \item $\ell = 65$ for \textbf{Secp521r1}.
 \end{itemize}
+\end{multicols}
 
 \begin{algorithm}[ht]
 \DontPrintSemicolon
