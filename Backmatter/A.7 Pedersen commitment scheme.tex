@@ -12,16 +12,17 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
     \caption{$\mathsf{BaseGen} (i)$}
     \KwData{An index $i \in \mathbb{N}$}
     
-    $x \gets \mathcal{H}(G || i)$ \\
+    $j \gets 0$ \\
     \Repeat{$H$ is valid}{
+        $x \gets \mathcal{H}(G || i || j)$ \\
         $y \gets \mathsf{RecoverY}(x)$ \tcp*{according to elliptic curve equation}
         \If{$y$ is invalid}{
-            $x \gets x + 1$ \;
+            $j \gets j + 1$ \;
             \Continue \;
         }
         $H \gets (x, y)$ \;
         \If{$H$ is invalid}{
-            $x \gets x + 1$ \;
+            $j \gets j + 1$ \;
             \Continue \;
         }
     }
