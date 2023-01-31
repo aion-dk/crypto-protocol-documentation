@@ -132,6 +132,7 @@ In our system, when an elliptic curve point has to be stored in the database, or
     \label{alg: recover y}
     \KwData{The field element $x \in \mathbb{F}_p$}
     \KwMoreData{The flag $f \in \{ 02, 03 \}$}
+
     $\{ y_1, y_2 \} \gets \sqrt{x^3 + a \cdot x + b} \pmod p$ \;
     \If{$\{ y_1, y_2 \} \notin \mathbb{Z}$}{
         \Return{failure}
@@ -170,6 +171,7 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \caption{$\mathsf{Bytes2Point} (\boldsymbol{b})$}
     \label{alg: bytes to point}
     \KwData{The byte array $\boldsymbol{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
+
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     \If{$n > \ell - 1$}{
         \Return{failure}
@@ -195,10 +197,10 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \caption{$\mathsf{Point2Bytes} (M)$}
     \label{alg: point to bytes}
     \KwData{The point $M = (x, y) \in \mathbb{P} = \mathbb{F}_p \times \mathbb{F}_p$}
+
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     $\boldsymbol{b}' = \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \} \gets \mathsf{Field2Bytes}(x)$ \tcp*{$\ell = m + n + 1$}
     $\boldsymbol{b} \gets \{ b_1, ..., b_n \}$ \;
-    
     \Return{$\boldsymbol{b}$} \tcp*{$\boldsymbol{b} \in \mathbb{B}^*$}
 \end{algorithm}
 
@@ -207,6 +209,7 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \caption{$\mathsf{Bytes2Field} (\boldsymbol{b})$}
     \label{alg: bytes to field}
     \KwData{The byte array $\boldsymbol{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
+
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     \If{$n \neq \ell$}{
         \Return{failure}
@@ -226,13 +229,13 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \caption{$\mathsf{Field2Bytes} (x)$}
     \label{alg: field to bytes}
     \KwData{The field element $x \in \mathbb{F}_p$}
+
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     \For{$i \gets \ell$ \KwTo $1$ \KwBy $1$}{
         $b_i \gets x \mod{256}$ \;
         $x \gets x / 256$ \;
         }
     $\boldsymbol{b} \gets \{ b_1, ..., b_\ell \}$ \;
-    
     \Return{$\boldsymbol{b}$} \tcp*{$\boldsymbol{b} \in \mathbb{B}^\ell$}
 \end{algorithm}
 
@@ -241,6 +244,7 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \caption{$\mathsf{ByteLengthOf} (x)$}
     \label{alg: bytes length of}
     \KwData{The number $x \in \mathbb{Z}$}
+    
     $n \gets 0$ \;
     \While {$x \neq 0$}{
         $n \gets n + 1$ \;

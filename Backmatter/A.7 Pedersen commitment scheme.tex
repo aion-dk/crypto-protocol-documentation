@@ -10,6 +10,7 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{BaseGen} (i)$}
+    \label{alg: base gen}
     \KwData{An index $i \in \mathbb{N}$}
     
     $j \gets 0$ \\
@@ -27,13 +28,12 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
         }
     }
     \Return{$H$} \tcp*{$H \in \mathbb{P}$}
-    
-    \label{alg: base gen}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{Com} (\boldsymbol{m}; r)$}
+    \label{alg: com}
     \KwData{The list of messages $\boldsymbol{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
@@ -43,13 +43,12 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
     $C \gets [r]G + \sum\limits_{i=1}^n [m_i]G_i$ \;
     
     \Return{$C$} \tcp*{$C \in \mathbb{P}$}
-    
-    \label{alg: com}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{ComVer} (C, \boldsymbol{m}; r)$}
+    \label{alg: com ver}
     \KwData{The commitment $C \in \mathbb{P}$}
     \KwMoreData{The list of messages $\boldsymbol{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
@@ -63,6 +62,4 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
         $b \gets 0$ \tcp*{commitment is invalid}
         }
     \Return{$b$} \tcp*{$b \in \mathbb{B}$}
-    
-    \label{alg: com ver}
 \end{algorithm}

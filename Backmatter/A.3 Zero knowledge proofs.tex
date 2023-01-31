@@ -85,6 +85,7 @@ A public verifier accepts the proof if the algorithm $\mathsf{DLVer}(PK, \boldsy
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{DLProve} (x, \boldsymbol{G})$}
+    \label{alg: dl prove}
     \KwData{The private key $x \in \mathbb{Z}_q$}
     \KwMoreData{The list of generators $\boldsymbol{G} = \{ G_0, G_1, ..., G_n \} \in \mathbb{P}^{n+1}$}
     
@@ -97,13 +98,12 @@ A public verifier accepts the proof if the algorithm $\mathsf{DLVer}(PK, \boldsy
     $r \gets k + c \cdot x \pmod q$ \;
     $PK \gets (K, c, r)$ \;
     \Return{$PK$} \tcp*{$PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
-    
-    \label{alg: dl prove}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{DLVer}(PK, \boldsymbol{G}; \boldsymbol{Y})$}
+    \label{alg: dl ver}
     \KwData{The proof $PK = (K, c, r) \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
     \KwMoreData{The list of generators $\boldsymbol{G} = \{ G_0, G_1, ..., G_n \} \in \mathbb{P}^{n+1}$}
     \KwMoreData{The list of public keys $\boldsymbol{Y} = \{ Y_0, Y_1, ..., Y_n \} \in \mathbb{P}^{n+1}$}
@@ -118,6 +118,4 @@ A public verifier accepts the proof if the algorithm $\mathsf{DLVer}(PK, \boldsy
         $b \gets 0$ \tcp*{proof is invalid}
         }
     \Return{$b$} \tcp*{$b \in \mathbb{B}$}
-    
-    \label{alg: dl ver}
 \end{algorithm}

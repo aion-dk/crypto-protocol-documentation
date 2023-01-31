@@ -6,12 +6,11 @@ An Elgamal key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\cref{alg: key 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{KeyGen}()$}
+    \label{alg: key gen}
     
     $x \in_\mathrm{R} \mathbb{Z}_q$ \;
     $Y \gets [x]G$ \;
     \Return{$(x, Y)$} \tcp*{$(x, Y) \in \mathbb{Z}_q \times \mathbb{P}$}
-    
-    \label{alg: key gen}
 \end{algorithm}
 
 The encryption algorithm $e = (R, C) \gets \mathsf{Enc} (Y, M; r)$ (\cref{alg: enc}) can be used by anybody in possession of the public encryption key $Y$ to generate a cryptogram on a message $M$, using the randomizer $r$. The cryptogram $e$ can be decrypted back to the original message $M$, only by the one in possession of the private decryption key $x$ in the decryption algorithm $M \gets \mathsf{Dec} (x, e)$ (\cref{alg: dec}). Note that both $\mathsf{Enc}$ and $\mathsf{Dec}$ work on messages that are formatted as elliptic curve points $M \in \mathbb{P}$.
@@ -21,6 +20,7 @@ For sake of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P}$ as t
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{Enc} (Y, M; r)$}
+    \label{alg: enc}
     \KwData{The encryption key $Y \in \mathbb{P}$}
     \KwMoreData{The message $M \in \mathbb{P}$}
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
@@ -30,25 +30,22 @@ For sake of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P}$ as t
     $C \gets S + M$ \;
     $e \gets (R, C)$ \;
     \Return{$e$} \tcp*{$e \in \mathbb{E}$}
-    
-    \label{alg: enc}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{Dec} (x, e)$}
+    \label{alg: dec}
     \KwData{The decryption key $x \in \mathbb{Z}_q$}
     \KwMoreData{The cryptogram $e = (R, C) \in \mathbb{E}$}
     
     $S \gets [x]R$ \;
     $M \gets C - S$ \;
     \Return{$M$} \tcp*{$M \in \mathbb{P}$}
-    
-    \label{alg: dec}
 \end{algorithm}
 
 
-\subsubsection{Encryption of arbitrary data}
+\subsubsection{Encryption of arbitrary data} \label{app: encryption of arbitrary data}
 A special encryption scheme ($\mathsf{KeyGen}$, $\mathsf{TxtEnc}$, $\mathsf{TxtDec}$) exists in case the message to be encrypted is not an elliptic curve point but instead, an arbitrary length message $m \in \mathbb{B}^*$ e.g. a text message. The strategy is to transform the encryption-decryption key pair into a symmetric encryption key using a \textit{key encapsulation method} based on \textit{Diffie Hellman Key Exchange}. Then, the symmetric key is used to encrypt the message $m$ using standard \textit{AES encryption} algorithms \cite{NIST01}. For decryption, the same symmetric key is derived and then used to decrypt message $m$ using standard \textit{AES} algorithms.
 
 We describe the \textit{AES standard algorithms} as the encryption algorithm $c \gets \mathsf{AESEnc} (k, m)$ and the decryption algorithm $m \gets \mathsf{AESDec} (k, c)$, where $c \in \mathbb{B}^*$ is the ciphertext of message $m \in \mathbb{B}^*$ encrypted with the symmetric key $k \in \mathbb{B}^{128 \text{ or } 256 \text{ or } 512 \text{ or ...}}$ that can have various size in length.
@@ -60,6 +57,7 @@ To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encrypti
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{TxtEnc} (Y, m)$}
+    \label{alg: txt enc}
     \KwData{The encryption key $Y \in \mathbb{P}$}
     \KwMoreData{The message $m \in \mathbb{B}^*$}
     
@@ -69,13 +67,12 @@ To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encrypti
     $c \gets \mathsf{AESEnc} (k, m)$ \;
     $e \gets (R, c)$ \;
     \Return{$e$} \tcp*{$e \in \mathbb{P} \times \mathbb{B}^*$}
-    
-    \label{alg: txt enc}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{TxtDec} (x, e)$}
+    \label{alg: txt dec}
     \KwData{The decryption key $x \in \mathbb{Z}_q$}
     \KwMoreData{The encryption $e = (R, c) \in \mathbb{P} \times \mathbb{B}^*$}
     
@@ -83,8 +80,6 @@ To encrypt a message $m \in \mathbb{B}^*$, anybody in possession of the encrypti
     $k \gets \mathcal{H} (S || R)$ \;
     $m \gets \mathsf{AESDec} (k, c)$ \;
     \Return{$m$} \tcp*{$m \in \mathbb{B}^*$}
-    
-    \label{alg: txt dec}
 \end{algorithm}
 
 
@@ -99,6 +94,7 @@ The resulting encryption of the homomorphic addition of two cryptograms is $e' =
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{HomAdd}(e_1; e_2)$}
+    \label{alg: hom add}
     \KwData{The first cryptogram $e_1 = (R_1, C_1) \in \mathbb{E}$}
     \KwMoreData{The second cryptogram $e_2 = (R_2, C_2) \in \mathbb{E}$}
     
@@ -106,8 +102,6 @@ The resulting encryption of the homomorphic addition of two cryptograms is $e' =
     $C' \gets C_1 + C_2$ \;
     $e' \gets (R', C')$\;
     \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
-    
-    \label{alg: hom add}
 \end{algorithm}
 
 Following the procedure above, a given cryptogram $e = (R, C)$ can be \textit{re-encrypted} by homomorphically adding it to an \textit{empty cryptogram} (i.e. an encryption of the neutral point $\mathcal{O}$) with randomizer $r' \in_\mathrm{R} \mathbb{Z}_q$. The result is a new, randomly different cryptogram that contains the same message $M$. The process of generating the new cryptogram $e' = (R', C') \gets \mathsf{ReEnc} (Y, e; r')$ is described in \cref{alg: re enc}.
@@ -115,6 +109,7 @@ Following the procedure above, a given cryptogram $e = (R, C)$ can be \textit{re
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{ReEnc} (Y, e; r')$}
+    \label{alg: re enc}
     \KwData{The encryption key $Y \in \mathbb{P}$}
     \KwMoreData{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
     \KwMoreData{The new randomizer $r' \in \mathbb{Z}_q$}
@@ -122,8 +117,6 @@ Following the procedure above, a given cryptogram $e = (R, C)$ can be \textit{re
     $e_2 \gets \mathsf{Enc}(Y, \mathcal{O}; r')$ \tcp*{\cref{alg: enc}}
     $e' \gets \mathsf{HomAdd} (e, e_2)$ \tcp*{\cref{alg: hom add}}
     \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
-    
-    \label{alg: re enc}
 \end{algorithm}
 
 Usually, a re-encrypted cryptogram comes with a re-encryption proof to assure that the content of the cryptogram has not been changed. The proof is a non-interactive discrete logarithm equality proof (described in \cref{app: discrete logarithm proofs}) $PK = (K, c, r) \gets \mathsf{DLProve} (r', \{ G, Y \})$ (\cref{alg: dl prove}), while the proof verification algorithm is $\mathsf{DLVer} (PK, \{ G, Y \}; \{ R'-R, C'-C \})$ (\cref{alg: dl ver}).
@@ -133,6 +126,7 @@ Naturally, cryptogram addition can be expanded to multiplication to achieve the 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{HomMul} (e; n)$}
+    \label{alg: hom mul}
     \KwData{The initial cryptogram $e = (R, C) \in \mathbb{E}$}
     \KwMoreData{The multiplication factor $n \in \mathbb{Z}$}
     
@@ -140,8 +134,6 @@ Naturally, cryptogram addition can be expanded to multiplication to achieve the 
     $C' \gets [n]C$ \;
     $e' \gets (R', C')$ \;
     \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
-    
-    \label{alg: hom mul}
 \end{algorithm}
 
 

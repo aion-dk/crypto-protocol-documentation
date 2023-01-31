@@ -45,6 +45,7 @@ Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathca
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{PartiallyDecryptAndProve}(\boldsymbol{e}, sx)$}
+    \label{alg: partially decrypt and prove}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
     \KwMoreData{The share of decryption key $sx \in \mathbb{Z}_q$}
     
@@ -54,15 +55,13 @@ Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathca
     $\boldsymbol{S} \gets \{S_1, ..., S_n\}$ \;
     $\boldsymbol{R} \gets \{R_1, ..., R_n\}$ \;
     $PK \gets \mathsf{DLProve}(sx, \boldsymbol{R})$ \tcp*{\cref{alg: dl prove}}
-    
     \Return{$(\boldsymbol{S}, PK)$} \tcp*{$\boldsymbol{S} \in \mathbb{P}^n$, $PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
-    
-    \label{alg: partially decrypt and prove}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}, PK, sY)$}
+    \label{alg: partial decryption ver}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
     \KwMoreData{The list of partial decryptions $S = \{ S_1, ..., S_n \} \in \mathbb{P}^n$}
     \KwMoreData{The proof of correct decryption $PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
@@ -71,15 +70,13 @@ Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathca
     $\boldsymbol{R}' \gets \{G, R_1, ..., R_n\}$ \;
     $\boldsymbol{S}' \gets \{sY, S_1, ..., S_n\}$ \;
     $b \gets \mathsf{DLVer}(PK, \boldsymbol{R}', \boldsymbol{S}')$ \tcp*{\cref{alg: dl ver}}
-    
     \Return{$b$} \tcp*{$b \in \mathbb{B}$}
-    
-    \label{alg: partial decryption ver}
 \end{algorithm}
 
 \begin{algorithm}[ht]
-\DontPrintSemicolon
+    \DontPrintSemicolon
     \caption{$\mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$}
+    \label{alg: finalize decryption}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{ e_1, ..., e_n \} \in \mathbb{E}^n$, with $e_j = (R_j, C_j)$}
     \KwMoreData{The partial decryptions $\boldsymbol{S}_i = \{ S_{i, 1}, ..., S_{i, n} \} \in \mathbb{P}^n$, where $i \in \tau$}
     
@@ -87,10 +84,7 @@ Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathca
         $V_j \gets C_j - \sum_{i \in \tau} [\lambda(i)]S_{i,j}$ \tcp*{$\lambda(i)$ computed as in \cref{fig: threshold decryption}}
         }
     $\boldsymbol{V} \gets \{ V_1, ..., V_n \}$ \;
-    
     \Return{$\boldsymbol{V}$} \tcp*{$\boldsymbol{V} \in \mathbb{P}^n$}
-    
-    \label{alg: finalize decryption}
 \end{algorithm}
 
 
