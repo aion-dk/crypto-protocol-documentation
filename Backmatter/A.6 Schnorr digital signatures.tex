@@ -1,4 +1,3 @@
-\clearpage
 \subsection{Schnorr digital signature}
 The \textit{Schnorr digital signature scheme}, introduced in \cite{Schnorr90}, consists of a triple of algorithms (\textsf{KeyGen}, \textsf{Sign}, \textsf{SigVer}), which are based on elliptic curve cryptographic primitive.
 
@@ -9,6 +8,7 @@ Only the owner of the signing key is able to generate a signature $\sigma = (c, 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
     \caption{$\mathsf{Sign} (x, m)$}
+    \label{alg: sign}
     \KwData{The signing key $x \in \mathbb{Z}_q$}
     \KwMoreData{The message to be signed $m \in \mathbb{B}^*$}
     
@@ -18,8 +18,6 @@ Only the owner of the signing key is able to generate a signature $\sigma = (c, 
     $s \gets r - c \cdot x \pmod q$ \\
     $\sigma \gets (c, s)$ \\
     \Return{$\sigma$} \tcp*{$\sigma \in \mathbb{Z}_q \times \mathbb{Z}_q$}
-    
-    \label{alg: sign}
 \end{algorithm}
 
 Given a signature $\sigma$ on a message $m$, anybody in the possession of the public verification key $Y$ is able to verify the validity of the signature $b \gets \mathsf{SigVer} (Y, \sigma; m)$, with $b \in \mathbb{B}$ which represents $true$ or $false$. The signature verification algorithm is described in \cref{alg: sig ver}.
@@ -27,6 +25,7 @@ Given a signature $\sigma$ on a message $m$, anybody in the possession of the pu
 \begin{algorithm}[H]
     \DontPrintSemicolon
     \caption{$\mathsf{SigVer} (Y, \sigma; m)$}
+    \label{alg: sig ver}
     \KwData{The signature verification key $Y \in \mathbb{P}$}
     \KwMoreData{The signature $\sigma = (c, s) \in \mathbb{Z}_q \times \mathbb{Z}_q$}
     \KwMoreData{The signed message $m \in \mathbb{B}^*$}
@@ -38,6 +37,4 @@ Given a signature $\sigma$ on a message $m$, anybody in the possession of the pu
         $b \gets 0$ \tcp*{signature is invalid}
         }
     \Return{$b$} \tcp*{$b \in \mathbb{B}$}
-    
-    \label{alg: sig ver}
 \end{algorithm}
