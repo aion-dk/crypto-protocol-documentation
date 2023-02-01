@@ -6,9 +6,9 @@ Key derivation functions are algorithms that convert one source of randomness an
 \subsubsection{Password-based key derivation function} \label{app: password-based key derivation function}
 $\mathsf{PBKDF2}$ is a standard algorithm, described in \cite{RFC8018}, that converts passwords (arbitrary text) into keys that can be used in a cryptographic context. The algorithm takes as arguments a pseudorandom function, a password, a salt, an iteration count, and the desired length of the output key in bytes.
 
-We use $\mathsf{PBKDF2}$ as a building block for $\mathsf{Pass2Key}(m)$ (\cref{alg: pass to key}) that converts password $m$ into a key pair $(x, Y)$. This can be seen as an alternative algorithm to $\mathsf{KeyGen}()$ (\cref{alg: key gen}) in order to get a deterministic key pair based on some random seed.
+We use $\mathsf{PBKDF2}$ as a building block for $\mathsf{Pass2Key}(m)$ (\cref{alg: pass to key}) that converts password $m$ into a key pair $(x, Y)$. This can be seen as an alternative algorithm to $\mathsf{KeyGen}()$ (\cref{alg: key gen}) that can be used to get a deterministic key pair based on some random seed.
 
-Particularly, no salt is used (i.e. salt is set to $\varnothing$), therefore only one key pair can be derived from password $m$. The amount of iterations is set to 600.000, according to recommendations from \cite{OWASP}. The password is concatenated with a counter that gets incremented until the output of the key derivation function can be interpreted as a correct private key (i.e. the output bytes are decoded as number $x$, then checked whether $x \in \mathbb{Z}_q$).
+Particularly, no salt is used (i.e. salt is set to $\varnothing$), therefore only one key pair can be derived from password $m$. The amount of iterations is set to 600.000, according to recommendations from \cite{OWASP}. The password is concatenated with a counter that gets incremented until the output of the key derivation function can be interpreted as a correct private key (i.e. the output bytes are decoded as integer $x$, then checked whether $x \in \mathbb{Z}_q$).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
