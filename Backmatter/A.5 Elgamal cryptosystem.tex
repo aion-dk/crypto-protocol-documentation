@@ -103,25 +103,27 @@ Naturally, cryptogram addition can be expanded to multiplication to achieve the 
 
 
 \subsubsection{Threshold Cryptosystem} \label{app: threshold cryptosystem}
-A $t$ out of $n$ threshold cryptosystem is a homomorphic encryption scheme where the decryption key is split among $n$ key holders, called \textit{trustees}. Anybody can encrypt a message using the encryption key. The decryption of a message happens during a process in which at least $t$ trustees have to collaborate in a cryptographic protocol. It is recommended that $t \geq 2/3 \cdot n$. The entire scheme was introduced in \cite{Pedersen91} which is based on mathematical principles of the threshold cryptosystem \cite{Desmedt89, Shamir79}.
+A $t$ out of $n$ threshold cryptosystem is a homomorphic encryption scheme where the decryption key is split among $n$ key holders, called \textit{trustees} $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_n \}$. Anybody can encrypt a message using the encryption key. The decryption of a message happens during a process in which at least $t$ trustees have to collaborate in a cryptographic protocol. It is recommended that $t \geq 2/3 \cdot n$. The entire scheme was introduced in \cite{Pedersen91} which is based on mathematical principles of the threshold cryptosystem \cite{Desmedt89, Shamir79}.
 
 The key generation process concludes with the following $(sx_1, ..., sx_n, Y)$, where $Y$ is the public encryption key and each $sx_i$ is a private share of the decryption key, one for each of the $n$ trustees. The process is performed by all trustees while being facilitated by a central entity called \textit{the server}. The entire process is described by the protocol called \textit{the threshold ceremony} illustrated in \cref{fig: threshold ceremony}.
 
-During the \textit{threshold ceremony}, all trustees generate a private-public key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and publish to the server their public keys. The public encryption key is computed by the sum of the public keys of all trustees $Y = \sum_{i=1}^n Y_i$, while nobody being in the possession of the decryption key $x = \sum_{i=1}^n x_i$, because all $x_i$ are secret. Instead, all trustees work together to distribute $x$ such that any $t$ trustees can find it when necessary. 
+During the \textit{threshold ceremony}, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ generates a private-public key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and publishes the public key to the server. The public encryption key is computed by the sum of the public keys of all trustees $Y = \sum_{i=1}^n Y_i$, while nobody being in the possession of the decryption key $x = \sum_{i=1}^n x_i$, because all $x_i$ are secret. Instead, all trustees work together to distribute $x$ such that any $t$ trustees can find it when necessary. 
 
-Each trustee $\mathcal{T}_i$ generates a polynomial function of degree $t-1$
+Each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ generates a polynomial function of degree $t-1$
 \[
 f_i(z) = x_i + p_{i, 1} \cdot z + ... + p_{i, t-1} \cdot z^{t-1}
 \]
 and publishes to the server the points $\{ P_{i, 1}, ..., P_{i, t-1} \}$, where each private-public coefficient pair is $(p_{i, k}, P_{i, k}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), with $k \in \{ 1, ..., t-1 \}$.
 
-When all trustees have published their public coefficients, each trustee computes a \textit{partial secret share of the decryption key} for each of the other trustees by $s_{i, j} \gets f_i(j)$, and encrypts them with that specific trustee's public key $c_{i, j} \gets \mathsf{TxtEnc}(Y_j, s_{i, j})$ (\cref{alg: txt enc}). Finally, all trustees publish to the server all encrypted \textit{partial secret shares of the decryption key}.
+When all public coefficients have been published, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ computes a \textit{partial secret share of the decryption key} for each of the other trustees by $s_{i, j} \gets f_i(j)$, where $j \in \{ 1, ..., n \}$. Then, $\mathcal{T}_i$ encrypts each partial secret share with a key derived from the Diffie-Hellman key exchange mechanism with each of the other trustees' public keys, i.e. $c_{i, j} \gets \mathsf{SymEnc}(k_{i, j}, s_{i, j})$ (\cref{alg: sym enc}), where $k_{i, j} \gets \mathsf{DerSymKey} (x_i, Y_j)$ (\cref{alg: der sym key}). Finally, all trustees publish to the server all encrypted \textit{partial secret shares of the decryption key}.
 
-By encrypting the partial secret shares with different trustee's public key, we make sure that only that specific trustee can read his \textit{partial secret shares of the decryption key}. This procedure is a small deviation from \cite{Pedersen91}, which we introduced in order to simulate a secret communication channel between every two trustees.
+By encrypting the partial secret shares with different trustee's public key, we make sure that only that specific trustee can read his \textit{partial secret shares of the decryption key}. This procedure is a small deviation from \cite{Pedersen91}, which we introduced in order to simulate a secret communication channel between trustees.
 
-Finally, each trustee $\mathcal{T}_i$ downloads from the server their encrypted \textit{partial secret shares} $c_{j, i}$, with $j \in \{ 1, ..., n \}$, decrypts them $s_{j, i} \gets \mathsf{TxtDec}(x_i, c_{j, i})$ (\cref{alg: txt dec}) and validates that they are consistent with the polynomial coefficients of the other trustees $[s_{j, i}]G = Y_j + \sum_{k=1}^{t-1} [i^k] P_{j, k}$. If all \textit{partial secret shares} validate, then trustee $\mathcal{T}_i$ computes his \textit{secret share of the decryption key} by $sx_i \gets \sum_{j=1}^n s_{j, i}$ and stores it privately until needed.
+Finally, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ downloads from the server their encrypted \textit{partial secret shares} $c_{j, i}$, with $j \in \{ 1, ..., n \}$ and decrypts them $s_{j, i} \gets \mathsf{SymDec}(k_{i, j}, c_{j, i})$ (\cref{alg: sym dec}), where $k_{i, j} \gets \mathsf{DerSymKey} (x_i, Y_j)$ (\cref{alg: der sym key}). Recall form \cref{app: diffie hellman key derivation function} that $k_{i, j} = k_{j, i}$ as $\mathsf{DerSymKey} (x_i, Y_j) = \mathsf{DerSymKey} (x_j, Y_i)$, when $Y_i = [x_i]G$ and $Y_j = [x_j]G$.
 
-At the end of the \textit{threshold ceremony}, for each trustee $\mathcal{T}_i$, with $i \in \{ 1, ..., n \}$, the \textit{public share of the decryption key} ($sY_i = [sx_i]G$) is publicly computable by the following:
+Then, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ validates that the partial secret shares generated by all the other trustees are consistent with their respective polynomial coefficients $[s_{j, i}]G = Y_j + \sum_{k=1}^{t-1} [i^k] P_{j, k}$, with $j \in \{ 1, ..., n \}$. If all \textit{partial secret shares} validate, then trustee $\mathcal{T}_i$ computes his \textit{secret share of the decryption key} by $sx_i \gets \sum_{j=1}^n s_{j, i}$ and stores it privately until needed for decryption.
+
+At the end of the \textit{threshold ceremony}, for each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$, the \textit{public share of the decryption key} ($sY_i = [sx_i]G$) is publicly computable by the following:
 \[
 sY_i \gets \sum\limits_{j=1}^{n} (Y_j + \sum\limits_{k=1}^{t-1} [i^k]P_{j, k}).
 \]
@@ -170,7 +172,8 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
             $(p_{i, k}, P_{i, k}) \gets \mathsf{KeyGen}()$, with $k \in \{ 1, ..., t-1 \}$ \\
             $f_i(a) = x_i + \sum\limits_{k=1}^{t-1} p_{i, k} \cdot a^k \pmod q$ \\
             $s_{i, j} \gets f_i(j)$, with $j \in \{ 1, ..., n \}$ \\
-            $c_{i, j} \gets \mathsf{TxtEnc} (Y_j, s_{i, j})$
+            $k_{i, j} \gets \mathsf{DerSymKey} (x_i, Y_j)$ \\
+            $c_{i, j} \gets \mathsf{SymEnc} (k_{i, j}, s_{i, j})$
             };
         \node[arrow, towards_left, immediate, between={s.center}{t.center}] at (t_2.south -| s.center) (a_4) {
             $P_{i, k}$, $c_{i, j}$ \hspace{100pt}
@@ -186,7 +189,7 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
             $\boldsymbol{P} = \{ P_{1, 1}, ..., P_{n, t-1} \}$, $\{ c_{1, i}, ..., c_{n, i} \}$
             };
         \node[block, keep_right, spaced] at (a_5.south -| t.east) (t_3) {
-            $s_{j, i} \gets \mathsf{TxtDec} (x_i, c_{j, i})$, with $j \in \{ 1, ..., n \}$ \\ [7pt]
+            $s_{j, i} \gets \mathsf{SymDec} (k_{i, j}, c_{j, i})$, with $j \in \{ 1, ..., n \}$ \\ [7pt]
             verify that $[s_{j, i}]G = Y_j + \sum\limits_{k=1}^{t-1} [i^k]P_{j, k}$ then: \\ [7pt]
             $sx_i \gets \sum\limits_{j=1}^{n} s_{j, i} \pmod q$
             };
