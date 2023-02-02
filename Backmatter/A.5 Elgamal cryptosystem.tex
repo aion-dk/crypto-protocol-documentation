@@ -1,4 +1,7 @@
 \subsection{Elgamal cryptosystem} \label{app: elgamal cryptosystem}
+
+
+\subsubsection{Encryption scheme} \label{app: encryption scheme}
 The \textit{Elgamal cryptosystem} is an asymmetric, randomized encryption scheme, where anybody can encrypt a message using the encryption key resulting in a \textit{cryptogram}, while only the one in possession of the decryption key can extract the message of a cryptogram. The scheme consists of a triple (\textsf{KeyGen}, \textsf{Enc}, \textsf{Dec}) of algorithms that work on the elliptic curve described in \cref{app: elliptic curve discrete logarithm problem}. The scheme is considered secure under the \textit{discrete logarithm assumption}.
 
 An Elgamal key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x$ is a randomly chosen scalar representing the private decryption key and $Y$ is an elliptic curve point corresponding to the public encryption key.
@@ -99,7 +102,7 @@ Naturally, cryptogram addition can be expanded to multiplication to achieve the 
 \end{algorithm}
 
 
-\subsubsection{Elgamal Threshold Cryptosystem} \label{app: elgamal threshold cryptosystem}
+\subsubsection{Threshold Cryptosystem} \label{app: threshold cryptosystem}
 A $t$ out of $n$ threshold cryptosystem is a homomorphic encryption scheme where the decryption key is split among $n$ key holders, called \textit{trustees}. Anybody can encrypt a message using the encryption key. The decryption of a message happens during a process in which at least $t$ trustees have to collaborate in a cryptographic protocol. It is recommended that $t \geq 2/3 \cdot n$. The entire scheme was introduced in \cite{Pedersen91} which is based on mathematical principles of the threshold cryptosystem \cite{Desmedt89, Shamir79}.
 
 The key generation process concludes with the following $(sx_1, ..., sx_n, Y)$, where $Y$ is the public encryption key and each $sx_i$ is a private share of the decryption key, one for each of the $n$ trustees. The process is performed by all trustees while being facilitated by a central entity called \textit{the server}. The entire process is described by the protocol called \textit{the threshold ceremony} illustrated in \cref{fig: threshold ceremony}.
@@ -123,7 +126,7 @@ At the end of the \textit{threshold ceremony}, for each trustee $\mathcal{T}_i$,
 sY_i \gets \sum\limits_{j=1}^{n} (Y_j + \sum\limits_{k=1}^{t-1} [i^k]P_{j, k}).
 \]
 
-The encryption algorithm of the threshold cryptosystem is identical to the algorithm described in \cref{app: elgamal cryptosystem}: $e = (R, C) \gets \mathsf{Enc}(Y, M; r)$.
+The encryption algorithm of the threshold cryptosystem is identical to the algorithm described in \cref{app: encryption scheme}: $e = (R, C) \gets \mathsf{Enc}(Y, M; r)$.
 
 \begin{figure}[ht]
     \centering
