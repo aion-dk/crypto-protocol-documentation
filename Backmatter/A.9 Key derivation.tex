@@ -38,7 +38,7 @@ In order to use symmetric encryption for encrypting arbitrary amounts of data, a
 
 For two entities that have a private-public key infrastructure in place (i.e. entity 1 has key pair $(x_1, Y_1)$ and entity 2 has key pair $(x_2, Y_2)$, where $Y_1 = [x_1]G$ and $Y_2 = [x_2]G$) and that know each other (i.e. entity 1 knows $Y_2$ and entity 2 knows $Y_1$), they can both derive symmetric key $k$ by running $\mathsf{DerSymKey}(x_1, Y_2)$ as entity 1 and $\mathsf{DerSymKey}(x_2, Y_1)$ as entity 2.
 
-The algorithm performs a Diffie Hellman key exchange in order to reach a shared secret $S \gets [x_1]Y_2 = [x_2]Y_1 = [x_1 + x_2]G$. The resulting value is used as the keying material of a hash-based key derivation function \cite{RFC5869}, in order to convert it to a uniform key $k$. Particularly, no salt and info arguments are used (i.e. salt and info are set to $\varnothing$), therefore only one symmetric key can be derived from two particular key pairs $(x_1, Y_1)$ and $(x_2, Y_2)$.
+The algorithm performs a Diffie Hellman key exchange in order to reach a shared secret $S \gets [x_1]Y_2 = [x_2]Y_1 = [x_1 + x_2]G$. The resulting value is used as the keying material of a hash-based key derivation function $\mathsf{HKDF}$ (described in \cite{RFC5869}), in order to convert it to a uniform key $k$. Particularly, no salt and info arguments are used (i.e. salt and info are set to $\varnothing$), therefore only one symmetric key can be derived from two particular key pairs $(x_1, Y_1)$ and $(x_2, Y_2)$.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
