@@ -1,6 +1,7 @@
-\subsection{Private auditing process} \label{sec: private auditing process}
+\subsection{Administration auditing process} \label{sec: administration auditing process}
 This process is only relevant if the voter authentication mode \textbf{identity-based} described in \cref{sec: identity-based mode} is used. This auditing is private since the identification token contains the voter's identity information such an email address which is sensitive information that cannot be publicly accessible and must be audited privately within the system's borders.
 
+% Private auditing process are only accessible to the internal verification of AVX. This type of verification is only used during the voter authentication mode \textbf{identity-based} described in \cref{sec: identity-based mode}. This process is used when the identification and authentication of a user has to be audited during post-election. The private auditing process is used when auditing each users' confirmation token, authentication token, and public key.
 
 \subsubsection{Eligibility verifiability}
 During the post-election the entire bulletin board is audited. The auditor needs to be provided with the list of eligible voters $\boldsymbol{\mathcal{V}}$ from the \textit{Election Administrator} $\mathcal{E}$. The auditor also need to be provided with all identity tokens from the \textit{Identity Provider} $\mathcal{I}$. All authentication tokens and public keys are provided through the \textit{Digital Ballot Box} $\mathcal{D}$. The Auditor is also required to be provided the list that links the identity and authentication tokens with a voter that the \textit{Voter Authorization Service} $\mathcal{A}$ stores. 

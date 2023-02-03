@@ -25,7 +25,7 @@ If the authentication succeeds, the voter authorizer service will authorize the 
 
 The voter authorizer returns to the voter with the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. The voting application validates the item according to protocol \ref{pro: write on board}. Additionally, it checks that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e. $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
 
-The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and the proof of credentials $PK_\mathrm{auth}$ for the purpose of the private auditing process in the post-election phase as described in \cref{sec: private auditing process}.
+The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and the proof of credentials $PK_\mathrm{auth}$ for the purpose of the private auditing process in the post-election phase as described in \cref{sec: administration auditing process}.
 
 \begin{figure}[ht]
     \centering
@@ -105,7 +105,7 @@ If the voter authorizer service can validate all identity tokens and the voter i
 
 The voter authorizer returns to the voter the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. The voting application checks the item according to the validations of protocol \ref{pro: write on board}. Additionally, it checks that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e. $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
 
-The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and all related identity tokens for the purpose of the private auditing process in the post-election phase as described in \cref{sec: private auditing process}. This link is stored privately by the voter authorizer service due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
+The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and all related identity tokens for the purpose of the private auditing process in the post-election phase as described in \cref{sec: administration auditing process}. This link is stored privately by the voter authorizer service due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
 
 \clearpage
 \begin{landscape}
