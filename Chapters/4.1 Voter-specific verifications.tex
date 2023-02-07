@@ -21,4 +21,4 @@ When the voter submits and casts an encrypted ballot (by submitting a cast reque
 
 Anytime after casting a ballot, the voter can check the receipt against the bulletin board, which should find the appropriate ballot submission. Thus, the voter gains confidence that the vote is registered as cast.
 
-If a voter has a valid receipt (i.e., which validates $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma || h)$) that does not correspond to any item from the public bulletin board, then the receipt $\rho$ represents evidence that the integrity of the bulletin board has been compromised. The argument is that a previously accepted item has been removed or tampered with on the bulletin board.
+If a voter has a valid receipt (i.e., which validates $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma || h)$ \cref{alg: sig ver}) that does not correspond to any item from the public bulletin board, then the receipt $\rho$ represents evidence that the integrity of the bulletin board has been compromised. The argument is that a previously accepted item has been removed or tampered with on the bulletin board.
