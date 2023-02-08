@@ -312,7 +312,7 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1
     $\boldsymbol{m'} \gets \{ m'_1, ..., m'_n \}$, $r' \gets \lambda + r_\mathrm{d} \pmod{q}$ \;
     $C' \gets \mathsf{Com}(\boldsymbol{m'}; r')$ \tcp*{\cref{alg: com}}
     $AS \gets \mathsf{ProveASKC}(\psi; r'; \boldsymbol{m'}; C')$ \tcp*{\cref{alg: prove askc}}
-    $PM \gets (C, C_\mathrm{d}, \boldsymbol{e_\mathrm{d}}, \boldsymbol{t}, \boldsymbol{f}, \boldsymbol{z}, \lambda)$
+    $PM \gets (C, C_\mathrm{d}, \boldsymbol{e_\mathrm{d}}, \boldsymbol{t}, \boldsymbol{f}, \boldsymbol{z}, \lambda)$ \;
     \Return{$(PM, AS)$} \tcp*{
     $PM \in \mathbb{P}^2 \times \mathbb{E}^\ell \times \mathbb{Z}_q^{2n} \times \mathbb{Z}_q^\ell \times \mathbb{Z}_q$ \\
     $AS \in \mathbb{P}^3 \times \mathbb{Z}_q^4 \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{n-1}$ \phantom{..}}
