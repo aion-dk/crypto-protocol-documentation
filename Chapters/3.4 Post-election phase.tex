@@ -40,7 +40,7 @@ During the decryption phase, trustees have to collaborate again to perform the t
 
 Then, trustee $\mathcal{T}_i$ submits the partial decryption $\boldsymbol{S}_i$ and the proof $PK_i$ to the election administrator service, which in \cref{fig: threshold decryption} is reffered to as \textit{the server}. The election administrator accepts the partial decryption if the proof validates according to $\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}_i, PK_i, sY_i)$ (\cref{alg: partial decryption ver}), where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ and it is computable as in \cref{app: threshold cryptosystem}.
 
-Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathcal{T}_i$ with $i \in \tau$, the election administrator follows the protocol from \cref{fig: threshold decryption} and aggregates all partial decryptions for each cryptogram in $\boldsymbol{e}$ to finalize the decryption and extract the votes $\boldsymbol{V} = \{ V_1, ..., V_{n_\mathrm{e}} \} \gets \mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$ (\cref{alg: finalize decryption}), where $|\tau| = n_\mathrm{d}$. $\boldsymbol{V}$ represents the \textit{raw result} of the election, i.e. the full list of votes as elliptic curve points.
+Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathcal{T}_i$ with $i \in \tau$, the election administrator follows the protocol from \cref{fig: threshold decryption} and aggregates all partial decryptions for each cryptogram in $\boldsymbol{e}$ to finalize the decryption and extract the votes $\boldsymbol{V} = \{ V_1, ..., V_{n_\mathrm{e}} \} \gets \mathsf{FinalizeDecryption} (\boldsymbol{e}, \{ \boldsymbol{S}_i | i \in \tau \})$ (\cref{alg: finalize decryption}). $\boldsymbol{V}$ represents the \textit{raw result} of the election, i.e. the full list of votes as elliptic curve points.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -75,7 +75,7 @@ Upon receiving partial decryptions $\boldsymbol{S}_i$ from all trustees $\mathca
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{FinalizeDecryption} (\boldsymbol{e}, \boldsymbol{S}_1, ..., \boldsymbol{S}_{n_\mathrm{d}})$}
+    \caption{$\mathsf{FinalizeDecryption} (\boldsymbol{e}, \{ \boldsymbol{S}_i | i \in \tau \})$}
     \label{alg: finalize decryption}
     \KwData{The list of cryptograms $\boldsymbol{e} = \{ e_1, ..., e_n \} \in \mathbb{E}^n$, with $e_j = (R_j, C_j)$}
     \KwMoreData{The partial decryptions $\boldsymbol{S}_i = \{ S_{i, 1}, ..., S_{i, n} \} \in \mathbb{P}^n$, where $i \in \tau$}
