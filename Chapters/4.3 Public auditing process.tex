@@ -40,7 +40,7 @@ After a result has been published via an extraction confirmation item (as descri
     \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all the intermediate mixed boards that they produced $\boldsymbol{e}_i$, with $i \in \tau$, and their respective proofs of correct mixing $(PM_i, AS_i)$ are included in the extraction confirmation item.
 \end{itemize}
 
-The auditor validates each intermediate mixed board by running \cref{alg: ver mix} $\mathsf{VerMix} (PM_i, AS_i, Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$, for each $i \in \tau$. If any validations fail, the published result is not trustworthy.
+The auditor validates each intermediate mixed board by running \cref{alg: mix ver} $\mathsf{MixVer} (PM_i, AS_i, Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$, for each $i \in \tau$. If any validations fail, the published result is not trustworthy.
 
 
 \subsubsection{Verification of the decryption} \label{sec: verification of decryption}

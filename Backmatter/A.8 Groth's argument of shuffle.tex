@@ -205,12 +205,12 @@ Note that, in the description of the protocols, we abuse notation and define $\s
 
 Jens Groth suggests in \cite{Groth05} that the protocols can be turned into non-interactive algorithms by using the \textit{Fiat-Shamir heuristic} strategy \cite{Fiat87} to compute the random value $x$, $e$, $\boldsymbol{t}$ and $\lambda$ by applying a hash function to the transcript of the protocol. Therefore, we transform each protocol into a set of two algorithms (one for generating a universally verifiable non-interactive proof and another for verifying it).
 
-Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1, 1}, ..., e_{n, \ell} \}$ by randomizers $\boldsymbol{r} = \{ r_{1, 1}, ..., r_{n, \ell} \}$ and permutation $\psi$ into the mixed cryptograms $\boldsymbol{e'} = \{ e'_{1, 1}, ..., e'_{n, \ell} \}$, the \textit{Prover} generates the tuple (proof of mixing and argument of shuffle) $(PM, AS) \gets \mathsf{ProveMix}(\psi, Y, \boldsymbol{r}, \boldsymbol{e}, \boldsymbol{e'})$ (\cref{alg: prove mix}), where $Y$ is the encryption key. Anybody can universally verify a proof of mixing by $\mathsf{VerMix}(PM, AS, Y, \boldsymbol{e}, \boldsymbol{e'})$ (\cref{alg: ver mix}).
+Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1, 1}, ..., e_{n, \ell} \}$ by randomizers $\boldsymbol{r} = \{ r_{1, 1}, ..., r_{n, \ell} \}$ and permutation $\psi$ into the mixed cryptograms $\boldsymbol{e'} = \{ e'_{1, 1}, ..., e'_{n, \ell} \}$, the \textit{Prover} generates the tuple (proof of mixing and argument of shuffle) $(PM, AS) \gets \mathsf{MixProve}(\psi, Y, \boldsymbol{r}, \boldsymbol{e}, \boldsymbol{e'})$ (\cref{alg: mix prove}), where $Y$ is the encryption key. Anybody can universally verify a proof of mixing by $\mathsf{MixVer}(PM, AS, Y, \boldsymbol{e}, \boldsymbol{e'})$ (\cref{alg: mix ver}).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{ProveASKC}(\psi; r; \boldsymbol{m}; C)$}
-    \label{alg: prove askc}
+    \caption{$\mathsf{ASKCProve}(\psi; r; \boldsymbol{m}; C)$}
+    \label{alg: askc prove}
     \KwData{The permutation $\psi \in \Psi_n$}
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     \KwMoreData{The list of known messages $\boldsymbol{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
@@ -247,8 +247,8 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{VerASKC}(AS; \boldsymbol{m}; C)$}
-    \label{alg: ver askc}
+    \caption{$\mathsf{ASKCVer}(AS; \boldsymbol{m}; C)$}
+    \label{alg: askc ver}
     \KwData{The argument $AS = (C_\mathrm{d}, C_\delta, C_\mathrm{a}, x, e, z, z_\delta, \boldsymbol{f}, \boldsymbol{f'}) \in \mathbb{P}^3 \times \mathbb{Z}_q^4 \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{n-1}$}
     \KwMoreData{The list of known messages $\boldsymbol{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
     \KwMoreData{The public commitment $C \in \mathbb{P}$}
@@ -271,8 +271,8 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{ProveMix}(\psi, Y, \boldsymbol{r}, \boldsymbol{e}, \boldsymbol{e'})$}
-    \label{alg: prove mix}
+    \caption{$\mathsf{MixProve}(\psi, Y, \boldsymbol{r}, \boldsymbol{e}, \boldsymbol{e'})$}
+    \label{alg: mix prove}
     \KwData{The permutation $\psi \in \Psi_n$}
     \KwMoreData{The encryption key $Y \in \mathbb{P}$}
     \KwMoreData{The matrix of randomizers $\boldsymbol{r} = \{ r_{1, 1}, ..., r_{n, \ell} \} \in \mathbb{Z}_q^{n \times \ell}$}
@@ -311,7 +311,7 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1
         }
     $\boldsymbol{m'} \gets \{ m'_1, ..., m'_n \}$, $r' \gets \lambda + r_\mathrm{d} \pmod{q}$ \;
     $C' \gets \mathsf{Com}(\boldsymbol{m'}; r')$ \tcp*{\cref{alg: com}}
-    $AS \gets \mathsf{ProveASKC}(\psi; r'; \boldsymbol{m'}; C')$ \tcp*{\cref{alg: prove askc}}
+    $AS \gets \mathsf{ASKCProve}(\psi; r'; \boldsymbol{m'}; C')$ \tcp*{\cref{alg: askc prove}}
     $PM \gets (C, C_\mathrm{d}, \boldsymbol{e_\mathrm{d}}, \boldsymbol{t}, \boldsymbol{f}, \boldsymbol{z}, \lambda)$ \;
     \Return{$(PM, AS)$} \tcp*{
     $PM \in \mathbb{P}^2 \times \mathbb{E}^\ell \times \mathbb{Z}_q^{2n} \times \mathbb{Z}_q^\ell \times \mathbb{Z}_q$ \\
@@ -320,8 +320,8 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{VerMix}(PM, AS, Y, \boldsymbol{e}, \boldsymbol{e'})$}
-    \label{alg: ver mix}
+    \caption{$\mathsf{MixVer}(PM, AS, Y, \boldsymbol{e}, \boldsymbol{e'})$}
+    \label{alg: mix ver}
     \KwData{The proof $PM = (C, C_\mathrm{d}, \boldsymbol{e_\mathrm{d}}, \boldsymbol{t}, \boldsymbol{f}, \boldsymbol{z}, \lambda) \in \mathbb{P}^2 \times \mathbb{E}^\ell \times \mathbb{Z}_q^{2n} \times \mathbb{Z}_q^\ell \times \mathbb{Z}_q$}
     \KwMoreData{The argument of shuffle $AS \in \times \mathbb{P}^3 \times \mathbb{Z}_q^4 \times \mathbb{Z}_q^n \times \mathbb{Z}_q^{n-1}$}
     \KwMoreData{The encryption key $Y \in \mathbb{P}$}
@@ -344,7 +344,7 @@ Explicitly, to prove the correct mixing of cryptograms $\boldsymbol{e} = \{ e_{1
     \eIf{$t_i = \mathcal{H}(\boldsymbol{e} || \boldsymbol{e'} || C || C_\mathrm{d} || \boldsymbol{e_\mathrm{d}} || i)$, where $i \in \{ 1, ..., n \}$ \\
     \KwAnd $\lambda = \mathcal{H}(\boldsymbol{e} || \boldsymbol{e'} || C || C_\mathrm{d} || \boldsymbol{e_\mathrm{d}} || \boldsymbol{f} || \boldsymbol{z})$ \\
     \KwAnd $\mathsf{HomAdd}(\tilde{e}_j^{\prime +}; e_{\mathrm{d}, j}) = \mathsf{ReEnc}(Y, \tilde{e}_j^+; z_j)$, where $j \in \{ 1, ..., \ell \}$ \\
-    \KwAnd $\mathsf{VerASKC}(AS; \boldsymbol{m}; C')$ \tcp*{\cref{alg: ver askc}}}{
+    \KwAnd $\mathsf{ASKCVer}(AS; \boldsymbol{m}; C')$ \tcp*{\cref{alg: askc ver}}}{
         $b \gets 1$ \tcp*{proof is valid}
         }{
         $b \gets 0$ \tcp*{proof is invalid}
