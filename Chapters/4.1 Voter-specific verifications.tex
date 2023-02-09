@@ -1,0 +1,24 @@
+\subsection{Voter-specific verifications} \label{sec: voter-specific verifications}
+During the voting process, voters can verify two aspects of their vote: that it is cast as intended and registered as cast. These verification steps help voters gain confidence that the election system behaves correctly, at least at processing their vote.
+
+
+\subsubsection{Vote is cast as intended}
+At the end of the vote cryptogram generation process (\cref{sec: vote cryptogram generation process}), the voter is presented with cryptogram $e = (R, C)$, which is the encryption of vote $V$ with the encryption key $Y_\mathrm{enc}$ and randomizer $r = r_\mathrm{v} + r_\mathrm{d}$, where $r_\mathrm{v}$ is known by the voting application and $r_\mathrm{d}$ is known only by the digital ballot box. Hence, it is the voting application and the digital ballot box that collectively perform the encryption of the voter's vote.
+
+Because the vote is encrypted, the voter cannot tell whether cryptogram $e$ actually represents an encryption of vote $V$ or not. Therefore, to get convinced that the voting application and the digital ballot box behaved correctly during the vote cryptogram generation process, the voter can perform a challenge of the vote cryptogram, as presented in \cref{sec: challenging a vote cryptogram} to verify the activity of the voting application and digital ballot box.
+
+If the voter chooses to challenge the cryptogram, a second device is used to perform all the cryptographic validations on behalf of the voter. Both randomizers $r_\mathrm{v}$ and $r_\mathrm{d}$ are sent securely from the voting application and the digital ballot box, respectively, to the external verifier application that runs on the secondary device. The verification application uses them to unpack the encrypted ballot and present the vote choices to the voter. The fully detailed process is shown in \cref{sec: challenging a vote cryptogram}.
+
+If the vote corresponds to the voter's intended choices, then the voter gains confidence that the voting application behaved correctly.
+
+If the vote does not correspond to the voter's intention, the auditing process provides evidence that the encrypted ballot has not been cast as intended. Note that, in this case, there is no distinction between the election system maliciously changing the voter's vote behind the scenes or the voter accidentally mischoosing the vote options.
+
+After the voter has successfully audited the vote, it gets invalidated because the randomizer value $r_\mathrm{v} + r_\mathrm{d}$ has been exposed. Now, the voter has to regenerate a vote cryptogram (as presented in \cref{sec: vote cryptogram generation process}) and choose again whether to challenge or submit. Voters should challenge again until they have enough confidence in the election system to cast their vote as intended.
+
+ 
+\subsubsection{Vote is registered as cast} \label{sec: vote is registered as cast}
+When the voter submits and casts an encrypted ballot (by submitting a cast request item as described in \cref{sec: vote confirmation receipt}), a vote confirmation receipt $(\rho, \sigma, h)$ is returned as a response from the digital ballot box. The receipt contains a digital signature of the digital ballot box, which certifies that the voter's ballot has been registered on the public bulletin board. The receipt can be validated by checking $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma || h)$ (\cref{alg: sig ver}), where $Y_\mathcal{D}$ is the public key of the digital ballot box, $\sigma$ is the voter's signature on the cast request item, and $h$ is the address of the item on the bulletin board.
+
+Anytime after casting a ballot, the voter can check the receipt against the bulletin board, which should find the appropriate ballot submission. Thus, the voter gains confidence that the vote is registered as cast.
+
+If a voter has a valid receipt (i.e., which validates $\mathsf{SigVer} (Y_\mathcal{D}, \rho; \sigma || h)$ \cref{alg: sig ver}) that does not correspond to any item from the public bulletin board, then the tuple $(\rho, \sigma, h)$ represents evidence that the integrity of the bulletin board has been compromised. The argument is that a previously accepted item has been removed or tampered with on the bulletin board.

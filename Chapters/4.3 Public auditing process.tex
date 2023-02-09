@@ -1,0 +1,58 @@
+\subsection{Public auditing process} \label{sec: public auditing process}
+Public auditing processes are accessible to anybody. They are used to validate that the entire election is run correctly. This audit is typically run at the end of the election period by certified auditors that will validate or invalidate an election result. Nevertheless, it could be run both during the election phase or when the election has finished by any public person with access to the public bulletin board and suitable verification algorithms.
+
+As part of the public auditing, the following verification steps are included:
+\begin{itemize}
+    \item During the election phase and after the election has finished, anybody can verify the integrity of the data published on the bulletin board, as explained in \cref{sec: integrity of the bulletin board}.
+    \item After a result has been initiated (i.e., an extraction data item has been published as in \cref{sec: cleansing procedure}), anybody can verify that the cleansing procedure has been performed correctly, as explained in \cref{sec: verification of the cleansing procedure}.
+    \item After a result has been computed and published, any public auditor can check the correctness of the result by verifying both the mixing process (see \cref{sec: verification of mixing procedure}) and the decryption process (see \cref{sec: verification of decryption}).
+\end{itemize}
+
+By having the election result auditable, the election protocol achieves one of the end-to-end verifiability properties, i.e., verification that all votes have been counted as registered.
+
+
+\subsubsection{Integrity of the bulletin board} \label{sec: integrity of the bulletin board}
+This verification step checks that only qualified actors have published items on the bulletin board. It also checks that no items have been removed or tampered with once posted on the bulletin board. This is achieved by checking the integrity of the hash structure of the bulletin board (referred to as the \textit{history} property of the bulletin board in \cref{sec: public bulletin board}) and by checking the validity of the digital signatures of each item.
+
+Formally, given a complete bulletin board or a portion of it, in the form of a list of items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, any public auditor can check the integrity of the list by running $\mathsf{HistoryVer} (\boldsymbol{b}, h'_1)$ (\cref{alg: history ver}), where $h'_1$ is the address of the previous item in the history. When $\boldsymbol{b}$ is a complete bulletin board (i.e., $b_1$ is a genesis item), then $h'_1$ must be equal to $\varnothing$, as the genesis item has no previous address.
+
+Additionally, the auditor checks the correctness of the chosen parameters of each item $b_i \in \boldsymbol{b}$ (i.e., that it has a properly structured content $c_i$ and that it references a proper parent $p_i$ both according to the rules specified in \cref{app: bulletin board item types}). Then the auditor validates the integrity of each item by $\mathsf{ItemVer} (b_i, Y_{\mathcal{W}_i})$, where $Y_{\mathcal{W}_i}$ is the public key of the writer of the $i^\mathrm{th}$ item. Note that, as described in \cref{app: bulletin board item types}, depending on the type of item, one of the following actors can be the writer of an item: the digital ballot box $\mathcal{D}$, the election administrator $\mathcal{E}$, the voter authorizer $\mathcal{A}$ or a specific voter $\mathcal{V}$. The public key of any of these actors must be retrieved from the content of the bulletin board itself, such as:
+\begin{itemize}
+    \item the public keys of the election administrator $Y_\mathcal{E}$ and of the digital ballot box $Y_\mathcal{D}$ are listed in the genesis item,
+    \item the public key of the voter authorizer $Y_\mathcal{A}$ is listed in an actor configuration item that defines the voter authorizer role,
+    \item each public key $Y_j$ of the $j^\mathrm{th}$ voter is introduced by a voter session item.
+\end{itemize}
+
+If any verification steps mentioned above fail, then $\boldsymbol{b}$ does not represent a valid bulletin board trace.
+
+
+\subsubsection{Verification of the cleansing procedure} \label{sec: verification of the cleansing procedure}
+Given a bulletin board trace $\boldsymbol{b}$, with an extraction data item included in $\boldsymbol{b}$, any public auditor can verify the correctness of the list of cryptograms $\boldsymbol{e}_0$ present in the extraction data item. Recall from \cref{sec: cleansing procedure} that $\boldsymbol{e}_0$ lists all votes that will make up the election result.
+
+The auditor reruns the cleansing procedure on the bulletin board $\boldsymbol{b}$, applying all the filtering rules specified in \cref{sec: cleansing procedure} to recompute the \textit{initial mixed board} $\boldsymbol{e'}_0$. If $\boldsymbol{e'}_0$ is identical with $\boldsymbol{e}_0$, then the cleansing procedure has been performed correctly.
+
+
+\subsubsection{Verification of mixing procedure} \label{sec: verification of mixing procedure}
+After a result has been published via an extraction confirmation item (as described in \cref{sec: result publication}), any public auditor can verify the mixing procedure of each trustee that participated in the mixing phase. This checks that no votes have been tampered with during mixing. The data that an auditor needs to collect comes from the following sources:
+\begin{itemize}
+    \item the initial mixed board $\boldsymbol{e}_0$ is listed in the extraction data item,
+    \item the encryption keys $Y_\mathrm{enc}$ and the list of all trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$ are listed in the threshold configuration item, where $n_\mathrm{t}$ is the total number of trustees,
+    \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all the intermediate mixed boards that they produced $\boldsymbol{e}_i$, with $i \in \tau$, and their respective proofs of correct mixing $(PM_i, AS_i)$ are included in the extraction confirmation item.
+\end{itemize}
+
+The auditor validates each intermediate mixed board by running \cref{alg: mix ver} $\mathsf{MixVer} (PM_i, AS_i, Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$, for each $i \in \tau$. If any validations fail, the published result is not trustworthy.
+
+
+\subsubsection{Verification of the decryption} \label{sec: verification of decryption}
+After a result has been published via an extraction confirmation item (as described in \cref{sec: result publication}), any public auditor can verify the decryption procedure by checking all the partial decryptions of each trustee that participated in the decryption phase. The data that an auditor needs to collect comes from the following sources:
+\begin{itemize}
+    \item the list of all trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$, together with their public keys $\{ Y_{\mathcal{T}_1}, ..., Y_{\mathcal{T}_{n_\mathrm{t}}} \}$ and public polynomial coefficients $\{ P_{\mathcal{T}_1, 1}, ..., P_{\mathcal{T}_{n_\mathrm{t}}, t-1} \}$, are listed in the threshold configuration item, where $t$ is the threshold value set during the threshold ceremony (see \cref{sec: threshold ceremony}), and $n_\mathrm{t}$ is the total number of trustees,
+    \item the final mixed board $\boldsymbol{e}_{n_\mathrm{t}}$ is listed in the extraction confirmation item,
+    \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all their partial decryption $\boldsymbol{S}_i$, with $i \in \tau$, and their respective proofs of correct decryption $PK_i$ are also included in the extraction confirmation item.
+\end{itemize}
+
+The auditor validates the proof of each partial decryption by running \cref{alg: partial decryption ver} $\mathsf{PartialDecryptionVer} (\boldsymbol{e}_{n_\mathrm{t}}, \boldsymbol{S}_i, PK_i, sY_i)$, for each $i \in \tau$, where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ computed as in \cref{app: threshold cryptosystem}.
+
+If all partial decryptions are valid, the auditor aggregates them together to recompute the raw result $\boldsymbol{V} \gets \mathsf{FinalizeDecryption} (\boldsymbol{e}_{n_\mathrm{t}}, \{ \boldsymbol{S}_i | i \in \tau \})$ (\cref{alg: finalize decryption}). The list of decrypted votes $\boldsymbol{V}$ should be identical to the published result. If any validation step fails, the result is considered untrustworthy.
+
+Counting the votes and sorting the candidates based on their vote count is considered trivial and out of scope.
