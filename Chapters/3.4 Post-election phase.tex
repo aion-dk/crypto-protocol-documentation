@@ -42,7 +42,7 @@ During the decryption phase, trustees have to collaborate again to perform the t
 
 Then, trustee $\mathcal{T}_i$ submits the partial decryption $\vec{\vec{S}}_i$ and the proof $PK_i$ to the election administrator service, which in \cref{fig: threshold decryption} is reffered to as \textit{the server}. The election administrator accepts the partial decryption if the proof validates according to $\mathsf{PartialDecryptionVer}(\vec{\vec{e}}, \vec{\vec{S}}_i, PK_i, sY_i)$ (\cref{alg: partial decryption ver}), where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ and it is computable as in \cref{app: threshold cryptosystem}.
 
-Upon receiving partial decryptions $\vec{\vec{S}}_i$ from all trustees $\mathcal{T}_i$ with $i \in \tau$, the election administrator follows the protocol from \cref{fig: threshold decryption} and aggregates all partial decryptions for each cryptogram in $\vec{\vec{e}}$ to finalize the decryption and extract the votes $\vec{\vec{V}} = \{ V_{1, 1}, ..., V_{n_\mathrm{e}, \ell} \} \gets \mathsf{FinalizeDecryption} (\vec{\vec{e}}, \{ \vec{\vec{S}}_i | i \in \tau \})$ (\cref{alg: finalize decryption}). $\boldsymbol{V}$ represents the \textit{raw result} of the election, i.e. the full list of votes as elliptic curve points.
+Upon receiving partial decryptions $\vec{\vec{S}}_i$ from all trustees $\mathcal{T}_i$ with $i \in \tau$, the election administrator follows the protocol from \cref{fig: threshold decryption} and aggregates all partial decryptions for each cryptogram in $\vec{\vec{e}}$ to finalize the decryption and extract the votes $\vec{\vec{V}} = \{ V_{1, 1}, ..., V_{n_\mathrm{e}, \ell} \} \gets \mathsf{FinalizeDecryption} (\vec{\vec{e}}, \{ \vec{\vec{S}}_i | i \in \tau \})$ (\cref{alg: finalize decryption}). $\vec{\vec{V}}$ represents the \textit{raw result} of the election, i.e. the full list of votes as elliptic curve points.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -58,58 +58,63 @@ Upon receiving partial decryptions $\vec{\vec{S}}_i$ from all trustees $\mathcal
         }
     }
     $\vec{\vec{S}} \gets \{ S_{1, 1}, ..., S_{n, \ell} \}$ \;
-    $\vec{\vec{R}} \gets \{ R_{1, 1}, ..., R_{n, \ell} \}$ \;
-    $PK \gets \mathsf{DLProve}(sx, \vec{\vec{R}})$ \tcp*{\cref{alg: dl prove}}
-    % $PK \gets \mathsf{DLProve}(sx, \{ R_{1, 1}, ..., R_{n, \ell} \})$ \tcp*{\cref{alg: dl prove}}
+    $\vec{R} \gets \{ G, R_{1, 1}, ..., R_{n, \ell} \}$ \;
+    $PK \gets \mathsf{DLProve}(sx, \vec{R})$ \tcp*{\cref{alg: dl prove}}
     \Return{$(\vec{\vec{S}}, PK)$} \tcp*{$\vec{\vec{S}} \in \mathbb{P}^{n \times \ell}$, $PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{PartialDecryptionVer}(\boldsymbol{e}, \boldsymbol{S}, PK, sY)$}
+    \caption{$\mathsf{PartialDecryptionVer}(\vec{\vec{e}}, \vec{\vec{S}}, PK, sY)$}
     \label{alg: partial decryption ver}
-    \KwData{The list of cryptograms $\boldsymbol{e} = \{e_1, ..., e_n\} \in \mathbb{E}^n$, with $e_i = (R_i, C_i)$}
-    \KwMoreData{The list of partial decryptions $S = \{ S_1, ..., S_n \} \in \mathbb{P}^n$}
+    \KwData{The matrix of cryptograms $\vec{\vec{e}} = \{ e_{1, 1}, ..., e_{n, \ell} \} \in \mathbb{E}^{n \times \ell}$, with}
+    \KwMoreData{\hfill $e_{i, j} = (R_{i, j}, C_{i, j})$}
+    \KwMoreData{The partial decryptions $\vec{\vec{S}} = \{ S_{1, 1}, ..., S_{n, \ell} \} \in \mathbb{P}^{n \times \ell}$}
     \KwMoreData{The proof of correct decryption $PK \in \mathbb{P} \times \mathbb{Z}_q \times \mathbb{Z}_q$}
     \KwMoreData{The public share of decryption key $sY \in \mathbb{P}$}
     
-    $\boldsymbol{R}' \gets \{G, R_1, ..., R_n\}$ \;
-    $\boldsymbol{S}' \gets \{sY, S_1, ..., S_n\}$ \;
-    $b \gets \mathsf{DLVer}(PK, \boldsymbol{R}', \boldsymbol{S}')$ \tcp*{\cref{alg: dl ver}}
+    $\vec{R} \gets \{ G, R_{1, 1}, ..., R_{n, \ell} \}$ \;
+    $\vec{S} \gets \{ sY, S_{1, 1}, ..., S_{n, \ell} \}$ \;
+    $b \gets \mathsf{DLVer}(PK, \vec{R}, \vec{S})$ \tcp*{\cref{alg: dl ver}}
     \Return{$b$} \tcp*{$b \in \mathbb{B}$}
 \end{algorithm}
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{FinalizeDecryption} (\boldsymbol{e}, \{ \boldsymbol{S}_i | i \in \tau \})$}
+    \caption{$\mathsf{FinalizeDecryption} (\vec{\vec{e}}, \vec{\vec{\vec{S}}})$}
     \label{alg: finalize decryption}
-    \KwData{The list of cryptograms $\boldsymbol{e} = \{ e_1, ..., e_n \} \in \mathbb{E}^n$, with $e_j = (R_j, C_j)$}
-    \KwMoreData{The partial decryptions $\boldsymbol{S}_i = \{ S_{i, 1}, ..., S_{i, n} \} \in \mathbb{P}^n$, where $i \in \tau$}
+    \KwData{The matrix of cryptograms $\vec{\vec{e}} = \{ e_{1, 1}, ..., e_{n, \ell} \} \in \mathbb{E}^{n \times \ell}$, with}
+    \KwMoreData{\hfill $e_{i,j} = (R_{i, j}, C_{i, j})$}
+    \KwMoreData{The partial decryptions $\vec{\vec{\vec{S}}} = \{ \vec{\vec{S}}_k | k \in \tau \}$, with each}
+    \KwMoreData{\hfill $\vec{\vec{S}}_k = \{ S_{1, 1}, ..., S_{n, \ell} \} \in \mathbb{P}^{n \times \ell}$}
     
-    \For{$j \gets 1$ \KwTo $n$ \KwBy $1$}{
-        $V_j \gets C_j - \sum_{i \in \tau} [\lambda(i)]S_{i,j}$ \tcp*{$\lambda(i)$ computed as in \cref{fig: threshold decryption}}
+    \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
+        \For{$j \gets 1$ \KwTo $\ell$ \KwBy $1$}{
+            $V_{i, j} \gets C_{i, j} - \sum_{k \in \tau} [\lambda(k)]S_{k, i, j}$ \tcp*{$\lambda(k)$ computed as in \cref{fig: threshold decryption}}
         }
-    $\boldsymbol{V} \gets \{ V_1, ..., V_n \}$ \;
-    \Return{$\boldsymbol{V}$} \tcp*{$\boldsymbol{V} \in \mathbb{P}^n$}
+    }
+    $\vec{\vec{V}} \gets \{ V_{1, 1}, ..., V_{n, \ell} \}$ \;
+    \Return{$\vec{\vec{V}}$} \tcp*{$\vec{\vec{V}} \in \mathbb{P}^{n \times \ell}$}
 \end{algorithm}
 
 
+\clearpage
 \subsubsection{Result Publication} \label{sec: result publication}
 The \textit{results module} is responsible for interpreting the \textit{raw result} and present the result of the election in a more readable way. The interpretation of the result is dependant on the election type (simple election, multiple election, STV, etc.).
 
 For simplicity, we will consider the simple election case, where voters had to choose one option from a predefined set of candidates, i.e. a vote is a plain text that represents a candidate name.
 
-First, all votes $V_i \in \boldsymbol{V}$ have to be decoded into bytes $\boldsymbol{b}_i \gets \mathsf{Point2Bytes}(V_i)$ (\cref{alg: point to bytes}), then interpreted as text and finally mapped to one of the candidate names. If any of these steps fail, then the vote $V_i$ is considered invalid. Tallying the votes that each candidate received is considered trivial and out of scope for this document.
+First, all votes $\vec{V}_i \in \vec{\vec{V}}$ have to be decoded into bytes $\boldsymbol{b}_i \gets \mathsf{Point2Bytes}(V_i)$ (\cref{alg: point to bytes}), then interpreted as text and finally mapped to one of the candidate names. If any of these steps fail, then the vote $V_i$ is considered invalid. Tallying the votes that each candidate received is considered trivial and out of scope for this document.
 
 Finally, all data that has been computed in the result ceremony (both mixing and decryption phases) is collected by the election administrator $\mathcal{E}$, and published on the bulletin board as the extraction confirmation item $b_\mathrm{ec}$ by performing $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ec}, c_\mathrm{ec}, p_\mathrm{ec})$ (protocol \ref{pro: write on board}), where $m_\mathrm{ec} = $ "extraction confirmation", the parent $p_\mathrm{ec}$ is the address of the extraction data item $b_\mathrm{ed}$  and the content $c_\mathrm{ec}$ consists of:
 \begin{itemize}
     \item a set of the following data from each trustee $\mathcal{T}_i$ that participated in the result ceremony, with $i \in \tau$:
     \begin{itemize}
-        \item the mixed boards of cryptograms $\boldsymbol{e}_i$
+        \item the mixed boards of cryptograms $\vec{\vec{e}}_i$
         \item the mixing proofs $(PM_i, AS_i)$
-        \item the partial decryptions $\boldsymbol{S}_i$
+        \item the partial decryptions $\vec{\vec{S}}_i$
         \item the proofs of correct decryption $PK_i$
     \end{itemize}
-    \item the list of decrypted votes $\boldsymbol{V}$
+    \item the list of decrypted votes $\vec{\vec{V}}$
     \item the summarized (tallied) election result
 \end{itemize}
