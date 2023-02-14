@@ -204,11 +204,39 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
 
 \clearpage
 \subsubsection{Mapping vote options on the Elliptic Curve} \label{sec: mapping vote options on the elliptic curve}
-An expressed vote (a vote in plain text) must be able to be converted, deterministically, into an elliptic curve point in order to be used in our cryptographic protocols. Additionally, a point from the elliptic curve must be able to be turned back to a plain text vote, if the point has been constructed from a plain text. Depending on the election type (referendum, simple election, multiple choice election, STV election), the plain text vote can be constructed in different ways, for example a simple string, or an array of integers or even a complex data structure. Regardless of the vote encoding rules, the plin text vote is converted into its byte representation $\boldsymbol{b} \in \mathbb{B}^*$.
+An expressed vote (i.e., a vote in plain text) must be able to be converted deterministically into elliptic curve points to be used in our cryptographic protocols. Additionally, a series of points from the elliptic curve must be able to be turned back into a plain-text vote if the points have been constructed from a plain-text vote. Depending on the election type (referendum, simple election, multiple choice election, STV election), the plain text vote can be constructed in different ways, for example, a simple string, an array of integers, or even a complex data structure. Regardless of the vote encoding rules, the plain-text vote has a byte representation $\vec{b} \in \mathbb{B}^*$.
 
-Next, $\boldsymbol{b}$ is converted into an elliptic curve point $V \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}), which can be used further in the encryption mechanism described in \cref{sec: vote cryptogram generation process}. Thus, point $M$ is the representation of voter's vote choices in cryptographic form.
+Next, $\vec{b}$ is converted into elliptic curve points $\vec{V} \gets \mathsf{EncodeVote}(\vec{b})$ (\cref{alg: encode vote}), which can be used in the encryption mechanism described in \cref{sec: vote cryptogram generation process}. Thus, the set of points $\vec{V}$ represents the voter's choices in cryptographic form.
 
-Recovering the byte array $\boldsymbol{b}$ from $V$ can be done by $\boldsymbol{b} \gets \mathsf{Point2Bytes}(V)$ (\cref{alg: point to bytes}), which can further be decoded into a plain text vote, depending on the vote encoding rules.
+Recovering the byte array $\vec{b}$ from $\vec{V}$ can be done by $\vec{b} \gets \mathsf{DecodeVote}(\vec{V})$ (\cref{alg: decode vote}). Depending on the vote encoding rules, the byte array $\vec{b}$ can further be interpreted as a plain-text vote.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{EncodeVote} (\vec{b})$}
+    \label{alg: encode vote}
+    \KwData{The plain-text vote $\vec{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
+    
+    $m \gets \mathsf{ByteLengthOf} (p)$  \;
+    $\ell \gets \lceil n / m \rceil$ \;
+    \For{$i \gets 0$ \KwTo $\ell - 1$ \KwBy $1$}{
+        $V_i \gets \mathsf{Bytes2Point} (\{ b_{i+1}, ..., b_{i+m} \})$ \;
+        }
+    $\vec{V} \gets \{ V_1, ..., V_\ell \}$ \;
+    \Return{$\vec{V}$} \tcp*{$\vec{V} \in \mathbb{P}^*$}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{DecodeVote} (\vec{V})$}
+    \label{alg: decode vote}
+    \KwData{The list of points $\vec{V} = \{ V_1, ..., V_\ell \} \in \mathbb{P}^\ell$}
+    
+    $\vec{b} \gets \{ \}$  \;
+    \For{$i \gets 1$ \KwTo $\ell$ \KwBy $1$}{
+        $\vec{b} \gets \vec{b} \cup \mathsf{Point2Bytes} (V_i)$ \;
+        }
+    \Return{$\vec{b}$} \tcp*{$\vec{b} \in \mathbb{B}^*$}
+\end{algorithm}
 
 
 \subsubsection{Vote cryptogram generation process} \label{sec: vote cryptogram generation process}
