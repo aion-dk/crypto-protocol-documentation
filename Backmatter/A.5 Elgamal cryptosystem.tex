@@ -145,7 +145,7 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
         
         %All content
         \node[block, spaced, keep_left] at (s.south -| s.west) (s_1) {
-            $\boldsymbol{Y} \gets \{ \}$, $\boldsymbol{P} \gets \{ \}$, $\boldsymbol{c} \gets \{ \}$
+            $\vec{Y} \gets \{ \}$, $\vec{\vec{P}} \gets \{ \}$, $\vec{\vec{c}} \gets \{ \}$
             };
         \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_1.south -| s.south) (a_1) {
             \hspace{20pt} invitation
@@ -157,7 +157,7 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
             $Y_i$ \hspace{20pt}
             };
         \node[block, spaced, keep_middle] at (a_2.south -| s.center) (s_2) {
-            $\boldsymbol{Y} \gets \boldsymbol{Y} \cup \{ Y_i \}$
+            $\vec{Y} \gets \vec{Y} \cup \{ Y_i \}$
             };
         \node[banner, keep_left, spaced, between={s.west}{t.east}] at (s_2.south -| s.west) (b_1) {
             when all $\mathcal{T}_i$ have published $Y_i$
@@ -166,7 +166,7 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
             set $t \in [\frac{2}{3}n, ..., n]$
             };
         \node[arrow, towards_right, immediate, between={s.center}{t.center}] at (s_3.south -| s.center) (a_3) {
-            \hspace{20pt} $t$, $\boldsymbol{Y} = \{ Y_1, ..., Y_n \}$
+            \hspace{20pt} $t$, $\vec{Y} = \{ Y_1, ..., Y_n \}$
             };
         \node[block, keep_right, spaced] at (a_3.south -| t.east) (t_2) {
             $(p_{i, k}, P_{i, k}) \gets \mathsf{KeyGen}()$, with $k \in \{ 1, ..., t-1 \}$ \\
@@ -179,14 +179,14 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
             $P_{i, k}$, $c_{i, j}$ \hspace{100pt}
             };
         \node[block, keep_left, spaced] at (a_4.south -| s.west) (s_4) {
-            $\boldsymbol{P} \gets \boldsymbol{P} \cup \{ P_{i, k} \}$, with $k \in \{ 1, ..., t-1 \}$ \\
-            $\boldsymbol{c} \gets \boldsymbol{c} \cup \{ c_{i, j} \}$, with $j \in \{ 1, ..., n \}$
+            $\vec{\vec{P}} \gets \vec{\vec{P}} \cup \{ P_{i, k} \}$, with $k \in \{ 1, ..., t-1 \}$ \\
+            $\vec{\vec{c}} \gets \vec{\vec{c}} \cup \{ c_{i, j} \}$, with $j \in \{ 1, ..., n \}$
             };
         \node[banner, keep_left, spaced, between={s.west}{t.east}] at (s_4.south -| s.west) (b_2) {
             when all $\mathcal{T}_i$ have published $P_{i, k}$ and $c_{i, j}$
             };
         \node[arrow, towards_right, between={s.center}{t.center}] at (b_2.south -| s.south) (a_5) {
-            $\boldsymbol{P} = \{ P_{1, 1}, ..., P_{n, t-1} \}$, $\{ c_{1, i}, ..., c_{n, i} \}$
+            $\vec{\vec{P}} = \{ P_{1, 1}, ..., P_{n, t-1} \}$, $\{ c_{1, i}, ..., c_{n, i} \}$
             };
         \node[block, keep_right, spaced] at (a_5.south -| t.east) (t_3) {
             $s_{j, i} \gets \mathsf{SymDec} (k_{i, j}, c_{j, i})$, with $j \in \{ 1, ..., n \}$ \\ [7pt]
