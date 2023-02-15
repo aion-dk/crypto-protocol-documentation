@@ -100,13 +100,13 @@ Upon receiving partial decryptions $\vec{\vec{S}}_i$ from all trustees $\mathcal
 
 \clearpage
 \subsubsection{Result Publication} \label{sec: result publication}
-The \textit{results module} is responsible for interpreting the \textit{raw result} and present the result of the election in a more readable way. The interpretation of the result is dependant on the election type (simple election, multiple election, STV, etc.).
+The \textit{results module} is responsible for interpreting the \textit{raw result} and presenting the result of the election in a more readable way. The result interpretation depends on the election type (simple election, multiple choice, STV, etc.).
 
-For simplicity, we will consider the simple election case, where voters had to choose one option from a predefined set of candidates, i.e. a vote is a plain text that represents a candidate name.
+For simplicity, we will consider the simple election case, where voters had to choose one option from a predefined set of candidates, i.e., a vote is a plain text representing a candidate's name.
 
-First, all votes $\vec{V}_i \in \vec{\vec{V}}$ have to be decoded into bytes $\boldsymbol{b}_i \gets \mathsf{Point2Bytes}(V_i)$ (\cref{alg: point to bytes}), then interpreted as text and finally mapped to one of the candidate names. If any of these steps fail, then the vote $V_i$ is considered invalid. Tallying the votes that each candidate received is considered trivial and out of scope for this document.
+First, all votes $\vec{V}_i \in \vec{\vec{V}}$ have to be decoded into bytes $\vec{b}_i \gets \mathsf{DecodeVote}(\vec{V}_i)$ (\cref{alg: decode vote}), then interpreted as text and finally mapped to one of the candidate names. If any of these steps fail, the vote $\vec{V}_i$ is considered invalid. Tallying the votes that each candidate received is considered trivial and out of scope for this document.
 
-Finally, all data that has been computed in the result ceremony (both mixing and decryption phases) is collected by the election administrator $\mathcal{E}$, and published on the bulletin board as the extraction confirmation item $b_\mathrm{ec}$ by performing $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ec}, c_\mathrm{ec}, p_\mathrm{ec})$ (protocol \ref{pro: write on board}), where $m_\mathrm{ec} = $ "extraction confirmation", the parent $p_\mathrm{ec}$ is the address of the extraction data item $b_\mathrm{ed}$  and the content $c_\mathrm{ec}$ consists of:
+Finally, all data that has been computed in the result ceremony (both mixing and decryption phases) is collected by the election administrator $\mathcal{E}$ and published on the bulletin board as the extraction confirmation item $b_\mathrm{ec}$ by performing $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ec}, c_\mathrm{ec}, p_\mathrm{ec})$ (protocol \ref{pro: write on board}), where $m_\mathrm{ec} = $ "extraction confirmation", the parent $p_\mathrm{ec}$ is the address of the extraction data item $b_\mathrm{ed}$  and the content $c_\mathrm{ec}$ consists of:
 \begin{itemize}
     \item a set of the following data from each trustee $\mathcal{T}_i$ that participated in the result ceremony, with $i \in \tau$:
     \begin{itemize}
