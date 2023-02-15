@@ -2,7 +2,7 @@
 
 
 \subsubsection{Encryption scheme} \label{app: encryption scheme}
-The \textit{Elgamal cryptosystem} is an asymmetric, randomized encryption scheme, where anybody can encrypt a message using the encryption key resulting in a \textit{cryptogram}, while only the one in possession of the decryption key can extract the message of a cryptogram. The scheme consists of a triple (\textsf{KeyGen}, \textsf{Enc}, \textsf{Dec}) of algorithms that work on the elliptic curve described in \cref{app: elliptic curve discrete logarithm problem}. The scheme is considered secure under the \textit{discrete logarithm assumption}.
+The \textit{Elgamal cryptosystem} is an asymmetric, randomized encryption scheme where anybody can encrypt a message using the encryption key, resulting in a \textit{cryptogram}. In contrast, only the one with the decryption key can extract the message of a cryptogram. The scheme consists of a triple (\textsf{KeyGen}, \textsf{Enc}, \textsf{Dec}) of algorithms that work on the elliptic curve described in \cref{app: elliptic curve discrete logarithm problem}. The scheme is considered secure under the \textit{discrete logarithm assumption}.
 
 An Elgamal key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x$ is a randomly chosen scalar representing the private decryption key and $Y$ is an elliptic curve point corresponding to the public encryption key.
 
@@ -16,9 +16,9 @@ An Elgamal key pair is a tuple $(x, Y) \gets \mathsf{KeyGen}()$ (\cref{alg: key 
     \Return{$(x, Y)$} \tcp*{$(x, Y) \in \mathbb{Z}_q \times \mathbb{P}$}
 \end{algorithm}
 
-The encryption algorithm $e = (R, C) \gets \mathsf{Enc} (Y, M; r)$ (\cref{alg: enc}) can be used by anybody in possession of the public encryption key $Y$ to generate a cryptogram on a message $M$, using the randomizer $r$. The cryptogram $e$ can be decrypted back to the original message $M$, only by the one in possession of the private decryption key $x$ in the decryption algorithm $M \gets \mathsf{Dec} (x, e)$ (\cref{alg: dec}). Note that both $\mathsf{Enc}$ and $\mathsf{Dec}$ work on messages that are formatted as elliptic curve points $M \in \mathbb{P}$.
+The encryption algorithm $e = (R, C) \gets \mathsf{Enc} (Y, M; r)$ (\cref{alg: enc}) can be used by anybody in possession of the public encryption key $Y$ to generate a cryptogram on a message $M$, using the randomizer $r$. The cryptogram $e$ can be decrypted back to the original message $M$ only by the one in possession of the private decryption key $x$ in the decryption algorithm $M \gets \mathsf{Dec} (x, e)$ (\cref{alg: dec}). Note that both $\mathsf{Enc}$ and $\mathsf{Dec}$ work on messages that are formatted as elliptic curve points $M \in \mathbb{P}$.
 
-For sake of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P}$ as the set of all possible cryptograms.
+For the sake of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P}$ as the set of all possible cryptograms.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -49,7 +49,7 @@ For sake of notation, we define $\mathbb{E} = \mathbb{P} \times \mathbb{P}$ as t
 
 
 \subsubsection{Homomorphic Encryption}
-Elgamal encryption based on elliptic curve cryptographic primitive is a \textit{homomorphic} encryption scheme concerning point addition. That means the component-wise addition of two cryptograms would result in a new, valid cryptogram that contains the two messages added together.
+Elgamal encryption based on elliptic curve cryptographic primitive is a \textit{homomorphic} encryption scheme concerning point addition. That means the component-wise addition of two cryptograms would result in a new, valid cryptogram containing the two messages summed up.
 \[
 \mathsf{Enc}(Y, M_1; r_1) + \mathsf{Enc}(Y, M_2; r_2) = \mathsf{Enc}(Y, M_1 + M_2; r_1 + r_2)
 \]
@@ -69,7 +69,7 @@ The resulting encryption of the homomorphic addition of two cryptograms is $e' =
     \Return{$e'$} \tcp*{$e' \in \mathbb{E}$}
 \end{algorithm}
 
-Following the procedure above, a given cryptogram $e = (R, C)$ can be \textit{re-encrypted} by homomorphically adding it to an \textit{empty cryptogram} (i.e. an encryption of the neutral point $\mathcal{O}$) with randomizer $r' \in_\mathrm{R} \mathbb{Z}_q$. The result is a new, randomly different cryptogram that contains the same message $M$. The process of generating the new cryptogram $e' = (R', C') \gets \mathsf{ReEnc} (Y, e; r')$ is described in \cref{alg: re enc}.
+Following the procedure above, a given cryptogram $e = (R, C)$ can be \textit{re-encrypted} by homomorphically adding it to an \textit{empty cryptogram} (i.e., an encryption of the neutral point $\mathcal{O}$) with randomizer $r' \in_\mathrm{R} \mathbb{Z}_q$. The result is a new, randomly different cryptogram that contains the same message $M$. The process of generating the new cryptogram $e' = (R', C') \gets \mathsf{ReEnc} (Y, e; r')$ is described in \cref{alg: re enc}.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -103,11 +103,11 @@ Naturally, cryptogram addition can be expanded to multiplication to achieve the 
 
 
 \subsubsection{Threshold Cryptosystem} \label{app: threshold cryptosystem}
-A $t$ out of $n$ threshold cryptosystem is a homomorphic encryption scheme where the decryption key is split among $n$ key holders, called \textit{trustees} $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_n \}$. Anybody can encrypt a message using the encryption key. The decryption of a message happens during a process in which at least $t$ trustees have to collaborate in a cryptographic protocol. It is recommended that $t \geq 2/3 \cdot n$. The entire scheme was introduced in \cite{Pedersen91} which is based on mathematical principles of the threshold cryptosystem \cite{Desmedt89, Shamir79}.
+A $t$ out of $n$ threshold cryptosystem is a homomorphic encryption scheme where the decryption key is split among $n$ key holders, called \textit{trustees} $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_n \}$. Anybody can encrypt a message using the encryption key. The decryption of a message happens during a process in which at least $t$ trustees have to collaborate in a cryptographic protocol. It is recommended that $t \geq 2/3 \cdot n$. The entire scheme was introduced in \cite{Pedersen91}, which is based on mathematical principles of the threshold cryptosystem \cite{Desmedt89, Shamir79}.
 
-The key generation process concludes with the following $(sx_1, ..., sx_n, Y)$, where $Y$ is the public encryption key and each $sx_i$ is a private share of the decryption key, one for each of the $n$ trustees. The process is performed by all trustees while being facilitated by a central entity called \textit{the server}. The entire process is described by the protocol called \textit{the threshold ceremony} illustrated in \cref{fig: threshold ceremony}.
+The key generation process concludes with the following $(sx_1, ..., sx_n, Y)$, where $Y$ is the public encryption key, and each $sx_i$ is a private share of the decryption key, one for each of the $n$ trustees. The process is performed by all trustees while being facilitated by a central entity called \textit{the server}. The entire process is described by the protocol called \textit{the threshold ceremony} illustrated in \cref{fig: threshold ceremony}.
 
-During the \textit{threshold ceremony}, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ generates a private-public key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and publishes the public key to the server. The public encryption key is computed by the sum of the public keys of all trustees $Y = \sum_{i=1}^n Y_i$, while nobody being in the possession of the decryption key $x = \sum_{i=1}^n x_i$, because all $x_i$ are secret. Instead, all trustees work together to distribute $x$ such that any $t$ trustees can find it when necessary. 
+During the \textit{threshold ceremony}, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ generates a private-public key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and publishes the public key to the server. The public encryption key is computed by the sum of the public keys of all trustees $Y = \sum_{i=1}^n Y_i$, while nobody knowing the decryption key $x = \sum_{i=1}^n x_i$ because all $x_i$ are secret. Instead, all trustees work together to distribute $x$ such that any $t$ trustees can find it when necessary. 
 
 Each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ generates a polynomial function of degree $t-1$
 \[
@@ -115,9 +115,9 @@ f_i(z) = x_i + p_{i, 1} \cdot z + ... + p_{i, t-1} \cdot z^{t-1}
 \]
 and publishes to the server the points $\{ P_{i, 1}, ..., P_{i, t-1} \}$, where each private-public coefficient pair is $(p_{i, k}, P_{i, k}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), with $k \in \{ 1, ..., t-1 \}$.
 
-When all public coefficients have been published, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ computes a \textit{partial secret share of the decryption key} for each of the other trustees by $s_{i, j} \gets f_i(j)$, where $j \in \{ 1, ..., n \}$. Then, $\mathcal{T}_i$ encrypts each partial secret share with a key derived from the Diffie-Hellman key exchange mechanism with each of the other trustees' public keys, i.e. $c_{i, j} \gets \mathsf{SymEnc}(k_{i, j}, s_{i, j})$ (\cref{alg: sym enc}), where $k_{i, j} \gets \mathsf{DerSymKey} (x_i, Y_j)$ (\cref{alg: der sym key}). Finally, all trustees publish to the server all encrypted \textit{partial secret shares of the decryption key}.
+When all public coefficients have been published, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ computes a \textit{partial secret share of the decryption key} for each of the other trustees by $s_{i, j} \gets f_i(j)$, where $j \in \{ 1, ..., n \}$. Then, $\mathcal{T}_i$ encrypts each partial secret share with a key derived from the Diffie-Hellman key exchange mechanism with each of the other trustees' public keys, i.e., $c_{i, j} \gets \mathsf{SymEnc}(k_{i, j}, s_{i, j})$ (\cref{alg: sym enc}), where $k_{i, j} \gets \mathsf{DerSymKey} (x_i, Y_j)$ (\cref{alg: der sym key}). Finally, all trustees publish to the server all encrypted \textit{partial secret shares of the decryption key}.
 
-By encrypting the partial secret shares with different trustee's public key, we make sure that only that specific trustee can read his \textit{partial secret shares of the decryption key}. This procedure is a small deviation from \cite{Pedersen91}, which we introduced in order to simulate a secret communication channel between trustees.
+By encrypting the partial secret shares with each trustee's public keys, we ensure that only that specific trustee can read his \textit{partial secret shares of the decryption key}. This procedure is a slight deviation from \cite{Pedersen91}, which we introduced to simulate a private communication channel between trustees.
 
 Finally, each trustee $\mathcal{T}_i \in \boldsymbol{\mathcal{T}}$ downloads from the server their encrypted \textit{partial secret shares} $c_{j, i}$, with $j \in \{ 1, ..., n \}$ and decrypts them $s_{j, i} \gets \mathsf{SymDec}(k_{i, j}, c_{j, i})$ (\cref{alg: sym dec}), where $k_{i, j} \gets \mathsf{DerSymKey} (x_i, Y_j)$ (\cref{alg: der sym key}). Recall form \cref{app: diffie hellman key derivation function} that $k_{i, j} = k_{j, i}$ as $\mathsf{DerSymKey} (x_i, Y_j) = \mathsf{DerSymKey} (x_j, Y_i)$, when $Y_i = [x_i]G$ and $Y_j = [x_j]G$.
 
@@ -234,13 +234,13 @@ The encryption algorithm of the threshold cryptosystem is identical to the algor
 \end{figure}
 
 \clearpage
-The decryption protocol of the threshold cryptosystem is inspired from paper \cite{Desmedt89}. At least $t$ trustees are needed to collaborate in the protocol described in \cref{fig: threshold decryption} in order to extract the message $M$ of a cryptogram $e = (R, C)$. We define $\tau \subset \{ 1, ..., n \}$ to be the subset of trustees that do participate in the decryption protocol, with $|\tau| \geq t$. 
+The decryption protocol of the threshold cryptosystem is inspired by paper \cite{Desmedt89}. At least $t$ trustees are needed to collaborate in the protocol described in \cref{fig: threshold decryption} to extract the message $M$ of a cryptogram $e = (R, C)$. We define $\tau \subset \{ 1, ..., n \}$ as the subset of trustees participating in the decryption protocol, with $|\tau| \geq t$. 
 
-Each trustee $\mathcal{T}_i$, with $i \in \tau$, computes a partial decryption $S_i \gets [sx_i]R$ and sends it to the server, where $sx_i$ is trustee's share of the decryption key. The trustee also publishes a proof of correct decryption in form of a non-interactive discrete logarithm zero knowledge proof $PK \gets \mathsf{DLProve} (sx_i, \{ G, R \})$ (\cref{alg: dl prove}).
+Each trustee $\mathcal{T}_i$, with $i \in \tau$, computes a partial decryption $S_i \gets [sx_i]R$ and sends it to the server, where $sx_i$ is trustee's share of the decryption key. The trustee also publishes a proof of correct decryption in the form of a non-interactive discrete logarithm zero-knowledge proof $PK \gets \mathsf{DLProve} (sx_i, \{ G, R \})$ (\cref{alg: dl prove}).
 
 When receiving a partial decryption from a trustee $\mathcal{T}_i$, the server accepts it if the proof of correct decryption validates by $\mathsf{DLVer} (PK, \{ G, R \}, \{ sY_i, S_i \})$ (\cref{alg: dl ver}), where $sY_i$ is trustee's \textit{public share of the decryption key}. After it received valid, partial decryptions from all trustees $\mathcal{T}_i$, with $i \in \tau$, the server aggregates all partial decryptions together to finalize the decryption and to output the message $M$. The aggregation process from \cite{Desmedt89} is described as follows:
 
-Basically, $M = C - [x]R$, where $x$ is the main decryption key that nobody has. A possible way of computing $[x]R$ is by calculating the \textit{Lagrange Interpolation Polynomial} where each term is a partial decryption $S_i$ received from a trustee $\mathcal{T}_i$ that needs to be multiplied by the \textit{Lagrange Interpolation Polynomial coefficient} which is $\lambda(i) = \prod_{j \in \tau, j \neq i} \frac{-j}{i-j} \pmod q$. Formally, $M \gets C - \sum_{i \in \tau} [\lambda(i)]S_i\text{, with } |\tau| \geq t$. Note that the \textit{Lagrange Interpolation Polynomial} can be computed only when the number of terms is at least the degree of the polynomial, i.e $|\tau| \geq t$.
+Basically, $M = C - [x]R$, where $x$ is the main decryption key that nobody has. A possible way of computing $[x]R$ is by calculating the \textit{Lagrange Interpolation Polynomial} where each term is a partial decryption $S_i$ received from a trustee $\mathcal{T}_i$ that needs to be multiplied by the \textit{Lagrange Interpolation Polynomial coefficient} which is $\lambda(i) = \prod_{j \in \tau, j \neq i} \frac{-j}{i-j} \pmod q$. Formally, $M \gets C - \sum_{i \in \tau} [\lambda(i)]S_i\text{, with } |\tau| \geq t$. Note that the \textit{Lagrange Interpolation Polynomial} can be computed only when the number of terms is at least the degree of the polynomial, i.e., $|\tau| \geq t$.
 
 \begin{figure}[ht]
     \centering
@@ -313,17 +313,17 @@ Basically, $M = C - [x]R$, where $x$ is the main decryption key that nobody has.
 \subsubsection{Proving the Content of a Cryptogram} \label{app: proving the content of a cryptogram}
 Once a cryptogram is generated $e = (R, C) \gets \mathsf{Enc} (Y, M; r)$, only the \textit{sender} (the one who generated the cryptogram) and the \textit{receiver} (the one in possession of the decryption key $x$) know the value of the message $M$. Both of them have the possibility to prove to somebody else (or publicly prove) the content of the cryptogram.
 
-The one who generated the cryptogram can prove to a verifier that the cryptogram $e$ contains message $M$ by engaging in the protocol from \cref{fig: protocol for proving multiple discrete logarithms} in order to prove the knowledge of the randomizer $PK[(r): R = [r]G \wedge (C - M) = [r]Y]$. To generate a publicly verifiable proof, the \textit{sender} can generate a non-interactive proof $PK \gets \mathsf{DLProve} (r, \{ G, Y \})$ (\cref{alg: dl prove}). Any public verifier is convinced that cryptogram $e$ contains message $M$ if the verification algorithm succeeds $\mathsf{DLVer} (PK, \{ G, Y \}; \{ R, C - M \})$ (\cref{alg: dl ver}).
+The one who generated the cryptogram can prove to a verifier that the cryptogram $e$ contains message $M$ by engaging in the protocol from \cref{fig: protocol for proving multiple discrete logarithms} to prove the knowledge of the randomizer $PK[(r): R = [r]G \wedge (C - M) = [r]Y]$. To generate a publicly verifiable proof, the \textit{sender} can generate a non-interactive proof $PK \gets \mathsf{DLProve} (r, \{ G, Y \})$ (\cref{alg: dl prove}). Any public verifier is convinced that cryptogram $e$ contains message $M$ if the verification algorithm succeeds $\mathsf{DLVer} (PK, \{ G, Y \}; \{ R, C - M \})$ (\cref{alg: dl ver}).
 
 At the same time, the one in possession of the decryption key $x$ can prove the content of the cryptogram $e$ to a verifier by engaging in the same protocol from \cref{fig: protocol for proving multiple discrete logarithms} but this time for proving the knowledge of the decryption key $PK[(x): Y = [x]G \wedge (C - M) = [x]R]$. To generate a publicly verifiable proof, the \textit{receiver} of the cryptogram can generate a non-interactive proof $PK \gets \mathsf{DLProve} (x, \{ G, R \})$ (\cref{alg: dl prove}). Any public verifier is convinced that cryptogram $e$ contains message $M$ if the verification algorithm succeeds $\mathsf{DLVer} (PK, \{ G, R \}; \{ Y, C - M \})$ (\cref{alg: dl ver}).
 
 
 \subsubsection{Symmetric encryption} \label{app: symmetric encryption}
-A special encryption scheme ($\mathsf{SymEnc}$, $\mathsf{SymDec}$) exists in case the message to be encrypted is not an elliptic curve point but instead, an arbitrary length message $m \in \mathbb{B}^*$ e.g. a text message. A difference from Elgamal cryptography is that both encryption and decryption are done based on the same key that needs to be known by both parties (i.e. the sender and the receiver). 
+A particular encryption scheme ($\mathsf{SymEnc}$, $\mathsf{SymDec}$) exists in case the message to be encrypted is not an elliptic curve point but, instead, an arbitrary length message $m \in \mathbb{B}^*$, e.g., a text message. A difference from Elgamal cryptography is that both encryption and decryption are done based on the same key that needs to be known by both parties (i.e., the sender and the receiver). 
 
 The strategy to convert from a private-public key infrastructure into a symmetric key is to use a \textit{key encapsulation method} based on \textit{Diffie Hellman Key Exchange} as described in \cref{app: diffie hellman key derivation function}. Then, the symmetric key $k$ is used to encrypt the message $m$ using a standard \textit{AES encryption} algorithm \cite{NIST01}, resulting in the encryption $e \gets \mathsf{SymEnc} (k, m)$ (\cref{alg: sym enc}). For decryption, the same symmetric key is derived and then used to decrypt the message $m \gets \mathsf{SymDec} (k, e)$ (\cref{alg: sym dec}).
 
-We use AES algorithms with 256-bit keys in \textit{Galois Counter Mode} with a random 96-bit initialization vector $iv$, no authentication data (i.e. $ad \gets \varnothing$), and a 128-bit tag $t$. Therefore, we define algorithm $\mathsf{AES-GCM-Encrypt}$ that returns the ciphertext $c$ representing the encryption of message $m$ with the key $k$ after the AES-GCM cipher has been initialized with the initialization vector $iv$. Additionally, it returns tag $t$ that authenticates the encryption. We consider as the encryption of message $m$ the tuple $e = (iv, t, c)$.
+We use AES algorithms with 256-bit keys in \textit{Galois Counter Mode} with a random 96-bit initialization vector $iv$, no authentication data (i.e., $ad \gets \varnothing$), and a 128-bit tag $t$. Therefore, we define algorithm $\mathsf{AES-GCM-Encrypt}$ that returns the ciphertext $c$ representing the encryption of message $m$ with the key $k$ after the AES-GCM cipher has been initialized with the initialization vector $iv$. Additionally, it returns tag $t$ that authenticates the encryption. We consider as the encryption of message $m$ the tuple $e = (iv, t, c)$.
 
 We also define algorithm $\mathsf{AES-GCM-Decrypt}$ that returns plain text $m$ as the decryption of ciphertext $c$ with key $k$ after initializing the AES-GCM cipher with the initialization vector $iv$. Note that $m$ is returned only if the authentication tag $t$ validates.
 

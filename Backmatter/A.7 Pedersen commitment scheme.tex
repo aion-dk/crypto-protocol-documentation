@@ -1,11 +1,11 @@
 \subsection{Pedersen commitment scheme}
-A \textit{commitment scheme} consists of a tuple of algorithms ($\mathsf{Com}$, $\mathsf{ComVer}$) that enables a writer to commit to a specific message $m$ while keeping it secret. At a later point, if appropriate, the writer has the ability to open the commitment and reveal the committed message $m$. The \textit{Pedersen Commitment Scheme} is a randomized commitment scheme introduced in \cite{Pedersen91-commitment}. Later, the scheme has been updated in \cite{Bootle18} to enable commitment computation on a list of messages $\boldsymbol{m} = \{ m_1, ..., m_n \}$, where each $m_i \in \mathbb{Z}_q$, with $i \in \{ 1, ..., n \}$.
+A \textit{commitment scheme} consists of a tuple of algorithms ($\mathsf{Com}$, $\mathsf{ComVer}$) that enables a writer to commit to a specific message $m$ while keeping it secret. At a later point, if appropriate, the writer can open the commitment and reveal the committed message $m$. The \textit{Pedersen Commitment Scheme} is a randomized commitment scheme introduced in \cite{Pedersen91-commitment}. Later, the scheme has been updated in \cite{Bootle18} to enable commitment computation on a list of messages $\vec{m} = \{ m_1, ..., m_n \}$, where each $m_i \in \mathbb{Z}_q$, with $i \in \{ 1, ..., n \}$.
 
-An important part of the commitment scheme is the existence of multiple generators (one for each message in the list  $\boldsymbol{m}$) in the subgroup such that the discrete logarithm amongst any two of them is unknown. To support that, we define the algorithm $\mathsf{BaseGen}$ that outputs a new generator $H$ such that the value $x$ is unknown where $H = [x]G$.
+A prerequisite part of the commitment scheme is the existence of multiple generators (one for each message in the list  $\vec{m}$) in the subgroup such that the discrete logarithm amongst any two of them is unknown. To support that, we define the algorithm $\mathsf{BaseGen}$ that outputs a new generator $H$ such that the value $x$ is unknown where $H = [x]G$.
 
-In order to commit to messages $\boldsymbol{m} = \{ m_1, ..., m_n \}$ a writer computes the commitment $C \gets \mathsf{Com}(\boldsymbol{m}; r)$ (\cref{alg: com}), where $r \in_\mathrm{R} \mathbb{Z}_q$ is a randomizer. The algorithm internally computes a list of generators $\boldsymbol{G} = \{ G_1, ..., G_n \}$ where each $G_i \gets \mathsf{BaseGen}(i)$ (\cref{alg: base gen}), with $i \in \{ 1, ..., n \}$.
+In order to commit to messages $\vec{m} = \{ m_1, ..., m_n \}$ a writer computes the commitment $C \gets \mathsf{Com}(\vec{m}; r)$ (\cref{alg: com}), where $r \in_\mathrm{R} \mathbb{Z}_q$ is a randomizer. The algorithm internally computes a list of generators $\vec{G} = \{ G_1, ..., G_n \}$ where each $G_i \gets \mathsf{BaseGen}(i)$ (\cref{alg: base gen}), with $i \in \{ 1, ..., n \}$.
 
-In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values $\boldsymbol{m}$ and $r$. A verifier is convinced that the commitment $C$ opens to messages $\boldsymbol{m}$ by running $b \gets \mathsf{ComVer}(C, \boldsymbol{m}; r)$ (\cref{alg: com ver}).
+To reveal messages $\vec{m}$, the writer needs to publish values $\vec{m}$ and $r$. A verifier is convinced that the commitment $C$ opens to messages $\vec{m}$ by running $b \gets \mathsf{ComVer}(C, \vec{m}; r)$ (\cref{alg: com ver}).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -32,9 +32,9 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{Com} (\boldsymbol{m}; r)$}
+    \caption{$\mathsf{Com} (\vec{m}; r)$}
     \label{alg: com}
-    \KwData{The list of messages $\boldsymbol{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
+    \KwData{The list of messages $\vec{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
@@ -47,10 +47,10 @@ In order to reveal messages $\boldsymbol{m}$, the writer needs to publish values
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
-    \caption{$\mathsf{ComVer} (C, \boldsymbol{m}; r)$}
+    \caption{$\mathsf{ComVer} (C, \vec{m}; r)$}
     \label{alg: com ver}
     \KwData{The commitment $C \in \mathbb{P}$}
-    \KwMoreData{The list of messages $\boldsymbol{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
+    \KwMoreData{The list of messages $\vec{m} = \{ m_1, ..., m_n \} \in \mathbb{Z}_q^n$}
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
