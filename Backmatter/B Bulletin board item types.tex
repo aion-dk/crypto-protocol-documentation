@@ -52,7 +52,7 @@ All item types that can appear on the bulletin board are described in the follow
     $\mathcal{E}$ &
     actor identifier, \newline actor role, \newline actor public key &
     latest configuration item &
-    The first item with an actor identifier defines the configuration of that actor. \newline The following items with the same actor identifier update the configuration of that specific actor. \newline The roles can be: \textit{Voter Authorizer} $\mathcal{A}$ and \textit{Ballot Adjudicator} $\mathcal{B}$.
+    The first item with an actor identifier defines the configuration of that actor. \newline The following items with the same actor identifier update the configuration of that specific actor. \newline The role can be: \textit{Voter Authorizer} $\mathcal{A}$.
     \\ \hline
 
     voter authorization configuration &
@@ -90,7 +90,7 @@ All item types that can appear on the bulletin board are described in the follow
 
     voter session &
     $\mathcal{A}$ &
-    voter identifier, \newline voter's public key $Y_i$, \newline voter's weight, \newline voter's authentication fingerprint \newline list of assigned contest identifiers &
+    voter identifier, \newline voter public key $Y_i$, \newline voter weight, \newline voter authentication fingerprint \newline list of assigned contest identifiers &
     latest configuration item &
     This item can be created only during the election phase. \newline The following voter session items with the same voter identifier overwrite the previous voter sessions of that voter.
     \\ \hline
@@ -128,18 +128,6 @@ All item types that can appear on the bulletin board are described in the follow
     &
     the ballot cryptograms item &
     There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline The voter's public key $Y_i$ is defined in the voter session item.
-    \\ \hline
-    
-    ballot accepted &
-    $\mathcal{B}$ &
-    &
-    the cast request item or a ballot rejected item &
-    \\ \hline
-
-    ballot rejected &
-    $\mathcal{B}$ &
-    rejection reason &
-    the cast request item or a ballot accepted item &
     \\ \hline
 \end{longtable}
 
