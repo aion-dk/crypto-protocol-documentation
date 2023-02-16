@@ -1,7 +1,7 @@
 \begin{landscape}
 \section{Bulletin board item types} \label{app: bulletin board item types}
 
-All item types that can appear on the bulletin board are described in the following list and are grouped in the following 3 categories:
+All item types that can appear on the bulletin board are described in the following list and are grouped into the following four categories:
 
 \paragraph{Configuration items}
 \begin{longtable}{|
@@ -24,7 +24,7 @@ All item types that can appear on the bulletin board are described in the follow
     $\mathcal{D}$ &
     elliptic curve domain parameters $(p, a, b, G, q, h)$, \newline digital ballot box public key $Y_\mathcal{D}$, \newline election admin public key $Y_\mathcal{E}$ &
     none & 
-    It is the first item of the board.
+    It is the first item on the board.
     \\ \hline
 
     election configuration &
@@ -36,7 +36,7 @@ All item types that can appear on the bulletin board are described in the follow
 
     contest configuration &
     $\mathcal{E}$ &
-    contest identifier, \newline contest marking rules, question type and result rules, \newline candidate labels $\{m_1, ..., m_{n_\mathrm{c}}\}$ &
+    contest identifier, \newline contest marking rules, question type, and result rules, \newline candidate labels $\{m_1, ..., m_{n_\mathrm{c}}\}$ &
     latest configuration item &
     The first item with a contest identifier defines the configuration of that contest. \newline The following items with the same contest identifier update the configuration of that specific contest.
     \\ \hline
@@ -99,35 +99,35 @@ All item types that can appear on the bulletin board are described in the follow
     $\mathcal{V}_i$ &
     commitment $c_\mathrm{v}$ &
     the voter session item &
-    Voter's public key $Y_i$ is defined in the voter session item.
+    The voter's public key $Y_i$ is defined in the voter session item.
     \\ \hline
 
     server encryption commitment &
     $\mathcal{D}$ &
     commitment $c_\mathrm{d}$ &
     the voter encryption commitment item &
-    There can be only one server encryption commitment item referencing the voter encryption commitment item. \newline This item is created as a response to the voter encryption commitment item being created.
+    Only one server encryption commitment item can reference the voter encryption commitment item. \newline This item is created in response to the voter encryption commitment item being published.
     \\ \hline
 
     ballot cryptograms &
     $\mathcal{V}_i$ &
-    cryptogram $e_i$ &
+    cryptograms $\vec{e}_i$ &
     the server encryption commitment item &
-    There can be only one ballot cryptograms item referencing the server encryption commitment item. \newline Voter's public key $Y_i$ is defined in the voter session item.
+    Only one ballot cryptograms item can reference the server encryption commitment item. \newline The voter's public key $Y_i$ is defined in the voter session item.
     \\ \hline
 
     cast request &
     $\mathcal{V}_i$ &
     &
     the ballot cryptograms item &
-    There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline Voter's public key $Y_i$ is defined in the voter session item.
+    There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline The voter's public key $Y_i$ is defined in the voter session item.
     \\ \hline
 
     spoil request &
     $\mathcal{V}_i$ &
     &
     the ballot cryptograms item &
-    There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline Voter's public key $Y_i$ is defined in the voter session item.
+    There can be either a cast request or a spoil request item referencing the ballot cryptograms item. \newline The voter's public key $Y_i$ is defined in the voter session item.
     \\ \hline
     
     ballot accepted &
@@ -165,28 +165,28 @@ All item types that can appear on the bulletin board are described in the follow
     $\mathcal{D}$ &
     &
     the ballot cryptograms item &
-    There can be only one verification track start item referencing the ballot cryptograms item. \newline This item is created as a response to the ballot cryptograms item being created.
+    Only one verification track start item can reference the ballot cryptograms item. \newline This item is created in response to the ballot cryptograms item being published.
     \\ \hline
 
     verifier &
     $\mathcal{X}$ &
     external verifier's public key $Y_\mathcal{X}$ &
     the verification track start item &
-    This is a self signed item, i.e. the public key of the author is defined in the item itself. \newline There can be only one verifier item referencing the verifiaction track start item.
+    This is a self-signed item, i.e., the author's public key is defined in the item itself. \newline Only one verifier item can reference the verification track start item.
     \\ \hline
 
     voter commitment opening &
     $\mathcal{V}_i$ &
     encrypted commitment opening $d_\mathrm{v}$ &
     the verifier item &
-    There can be only one voter commitment opening item referencing the verifier item.
+    Only one voter commitment opening item can reference the verifier item.
     \\ \hline
 
     server commitment opening &
     $\mathcal{D}$ &
     encrypted commitment opening $d_\mathrm{d}$ &
     the voter commitment opening item &
-    There can be only one server commitment opening item referencing the voter commitment opening item.
+    Only a server commitment opening item can reference the voter commitment opening item.
     \\ \hline
 \end{longtable}
 
@@ -216,16 +216,16 @@ All item types that can appear on the bulletin board are described in the follow
 
     extraction data &
     $\mathcal{D}$ &
-    a fingerprint of list of cryptograms $\boldsymbol{e}_0$ &
+    a fingerprint of the matrix of cryptograms $\vec{\vec{e}}_0$ &
     the extraction intent item &
-    There can be a single extraction data item referencing the extraction intent item. \newline The item provides a way of aquiring the list $\boldsymbol{e}_0 = \{ e_1, ..., e_{n_\mathrm{e}} \}$.
+    Only one extraction data item can reference the extraction intent item. \newline The item provides a way of aquiring the list $\vec{\vec{e}}_0 = \{ e_1, ..., e_{n_\mathrm{e}} \}$.
     \\ \hline
 
     extraction confirmation &
     $\mathcal{E}$ &
-    list of trustees that participated in the result ceremony $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, \newline fingerprints of each intermediate mixed boards of cryptograms $\boldsymbol{e}_i$ and proofs of correct mixing $(PM_i, AS_i)$, \newline fingerprints of each partial decryption $\boldsymbol{S}_i$ and proofs of correct decryption $PK_i$, \newline signatures from each trustee $\mathcal{T}_i$ on all the fingerprints above, where $i \in \tau$ &
+    list of trustees that participated in the result ceremony $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, \newline fingerprints of each intermediate mixed boards of cryptograms $\vec{\vec{e}}_i$ and proofs of correct mixing $(PM_i, AS_i)$, \newline fingerprints of each partial decryption $\vec{\vec{S}}_i$ and proofs of correct decryption $PK_i$, \newline signatures from each trustee $\mathcal{T}_i$ on all the fingerprints above, where $i \in \tau$ &
     the extraction data item &
-    There can be only one extraction confirmation item referencing the extraction data item.
+    Only one extraction confirmation item can reference the extraction data item.
     \\ \hline
 \end{longtable}
 \end{landscape}

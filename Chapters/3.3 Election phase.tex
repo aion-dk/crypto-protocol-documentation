@@ -11,11 +11,11 @@ The election phase lasts from the start date until the end date of a voting roun
 
 
 \subsubsection{Voter authorization procedure} \label{sec: voter authorization procedure}
-A voter $\mathcal{V}_i$ is considered authorized to cast a digital ballot when it is in possession of a secret signing key $x_i$ that corresponds to an eligible signature verification key $Y_i$ from the bulletin board. This is achieved differently depending on the voter authentication mode.
+A voter $\mathcal{V}_i$ is considered authorized to cast a digital ballot when it owns a secret signing key $x_i$ that corresponds to an eligible signature verification key $Y_i$ from the bulletin board. This is achieved differently depending on the voter authentication mode.
 
 
 \paragraph{When credential-based voter authentication mode}\mbox{}\\
-Each voter $\mathcal{V}_i$ has to follow the protocol from \cref{fig: credential-based voter authentication protocol} in order to get authorized to cast a digital ballot on the bulletin board. Specifically, the voter must prove possession of credentials that are associated with the voter's authentication public key $Y_{\mathrm{auth}; i}$.
+Each voter $\mathcal{V}_i$ has to follow the protocol from \cref{fig: credential-based voter authentication protocol} to get authorized to cast a digital ballot on the bulletin board. Specifically, the voter must prove possession of credentials associated with the voter's authentication public key $Y_{\mathrm{auth}; i}$.
 
 Voter inputs to the voting application the credentials received from each credentials authority $\{ c_1, ..., c_{n_\mathrm{c}} \}$. All credentials get converted into the voter's authentication key pair $(x_{\mathrm{auth}; i}, Y_{\mathrm{auth}; i})$, where the private key $x_{\mathrm{auth}; i}$ is computed by adding together all keys derived from each credential $c_j$ (by using \cref{alg: pass to key} $\mathsf{Pass2Key}(c_j)$), with $j \in \{ 1, ..., n_\mathrm{c} \}$. The public key is trivially computed by $Y_{\mathrm{auth}; i} \gets [x_{\mathrm{auth}; i}]G$. Based on the private key, the voting application computes $PK_\mathrm{auth} \gets \mathsf{DLProve} (x_{\mathrm{auth}; i}, \{ G \})$ as the proof of credentials.
 
@@ -23,9 +23,9 @@ Then, the voting application generates a new key pair $(x_i, Y_i)$ to be used as
 
 If the authentication succeeds, the voter authorizer service will authorize the use of public key $Y_i$ for the voter $\mathcal{V}_i$ by interacting with the digital ballot box $\mathcal{D}$ in $\mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ (protocol \ref{pro: write on board}) to write a voter session item $b_\mathrm{vs}$ as the next item on the bulletin board, according to the rules specified in \cref{app: bulletin board item types}, where $m_\mathrm{vs} =$ "voter session", the parent $p_\mathrm{vs}$ is the address of the latest configuration item and the content $c_\mathrm{vs}$ consists of the voter identifier, the public key $Y_i$, and a digest of the proof $PK_\mathrm{auth}$.
 
-The voter authorizer returns to the voter with the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. The voting application validates the item according to protocol \ref{pro: write on board}. Additionally, it checks that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e. $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
+The voter authorizer returns to the voter with the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. The voting application validates the item according to protocol \ref{pro: write on board}. Additionally, it checks that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e., $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
 
-The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and the proof of credentials $PK_\mathrm{auth}$ for the purpose of the administration auditing process in the post-election phase as described in \cref{sec: administration auditing process}.
+The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and the proof of credentials $PK_\mathrm{auth}$ for the administration auditing process in the post-election phase as described in \cref{sec: administration auditing process}.
 
 \begin{figure}[ht]
     \centering
@@ -97,15 +97,15 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
 
 
 \paragraph{When identity-based voter athentication mode}\mbox{}\\
-Each voter $\mathcal{V}_i$ has to follow the protocol from \cref{fig: identity-based voter authentication protocol} in order to get authorized to cast a digital ballot on the bulletin board. Specifically, the voter must authenticate and get identity tokens $\sigma_{\mathrm{id}, j}$ from all of the idenitity providers $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ that have been configured by the voter authorizer in the pre-election phase.
+Each voter $\mathcal{V}_i$ has to follow the protocol from \cref{fig: identity-based voter authentication protocol} to get authorized to cast a digital ballot on the bulletin board. Specifically, the voter must authenticate and get identity tokens $\sigma_{\mathrm{id}, j}$ from all of the identity providers $\mathcal{I}_j \in \boldsymbol{\mathcal{I}}$ that the voter authorizer has configured in the pre-election phase.
 
 Then, the voting application generates a key pair $(x_i, Y_i) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and forwards all identity tokens $\{ \sigma_{\mathrm{id}, 1}, ..., \sigma_{\mathrm{id}, n_\mathrm{i}} \}$ and the public key $Y_i$ to the voter authorizer service $\mathcal{A}$ proving the identity of the voter $\mathcal{V}_i$.
 
-If the voter authorizer service can validate all identity tokens and the voter is eligible, i.e. $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$, then it will authorize the use of the public key $Y_i$ for the voter $\mathcal{V}_i$. This is done by the voter authorizer $\mathcal{A}$ interacting with the digital ballot box $\mathcal{D}$ in the protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ to write a voter session item $b_\mathrm{vs}$ on the bulletin board as the next item, according to the rules specified in \cref{app: bulletin board item types}, where $m_\mathrm{vs} =$ "voter session", the parent $p_\mathrm{vs}$ is the address of the latest configuration item and the content $c_\mathrm{vs}$ consists of the voter identifier, the public key $Y_i$, and the authentication fingerprint computed by hashing all identity tokens received from the voter. 
+If the voter authorizer service can validate all identity tokens and the voter is eligible, i.e., $\mathcal{V}_i \in \boldsymbol{\mathcal{V}}$, it will authorize the use of the public key $Y_i$ for the voter $\mathcal{V}_i$. This is done by the voter authorizer $\mathcal{A}$ interacting with the digital ballot box $\mathcal{D}$ in the protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{A}, m_\mathrm{vs}, c_\mathrm{vs}, p_\mathrm{vs})$ to write a voter session item $b_\mathrm{vs}$ on the bulletin board as the next item, according to the rules specified in \cref{app: bulletin board item types}, where $m_\mathrm{vs} =$ "voter session", the parent $p_\mathrm{vs}$ is the address of the latest configuration item and the content $c_\mathrm{vs}$ consists of the voter identifier, the public key $Y_i$, and the authentication fingerprint computed by hashing all identity tokens received from the voter. 
 
-The voter authorizer returns to the voter the voter session item $b_\mathrm{vs}$ as received from the digital ballot box. The voting application checks the item according to the validations of protocol \ref{pro: write on board}. Additionally, it checks that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e. $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
+The voter authorizer returns the voter session item $b_\mathrm{vs}$  to the voter as received from the digital ballot box. The voting application checks the item according to the validations of protocol \ref{pro: write on board}. Additionally, it verifies that the item is consistent according to the configuration ancestry $\alpha_\mathrm{cnf}$ (i.e., $\mathsf{AncestryVer}(\{ b_\mathrm{vs} \}, h_\mathrm{cnf})$, where $h_\mathrm{cnf}$ is the address of the last item in $\alpha_\mathrm{cnf}$). From this point on, the voter can interact directly with the digital ballot box as the identity $\mathcal{V}_i$.
 
-The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and all related identity tokens for the purpose of the private auditing process in the post-election phase as described in \cref{sec: administration auditing process}. This link is stored privately by the voter authorizer service due to the fact that the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
+The voter authorizer service stores a link between the voter identity $\mathcal{V}_i$ and all related identity tokens for the administrative auditing process in the post-election phase as described in \cref{sec: administration auditing process}. This link is stored privately by the voter authorizer service since the identity tokens likely contain personal information that must not be disclosed on the public bulletin board.
 
 \clearpage
 \begin{landscape}
@@ -204,15 +204,43 @@ The voter authorizer service stores a link between the voter identity $\mathcal{
 
 \clearpage
 \subsubsection{Mapping vote options on the Elliptic Curve} \label{sec: mapping vote options on the elliptic curve}
-An expressed vote (a vote in plain text) must be able to be converted, deterministically, into an elliptic curve point in order to be used in our cryptographic protocols. Additionally, a point from the elliptic curve must be able to be turned back to a plain text vote, if the point has been constructed from a plain text. Depending on the election type (referendum, simple election, multiple choice election, STV election), the plain text vote can be constructed in different ways, for example a simple string, or an array of integers or even a complex data structure. Regardless of the vote encoding rules, the plin text vote is converted into its byte representation $\boldsymbol{b} \in \mathbb{B}^*$.
+An expressed vote (i.e., a vote in plain text) must be able to be converted deterministically into elliptic curve points to be used in our cryptographic protocols. Additionally, a series of points from the elliptic curve must be able to be turned back into a plain-text vote if the points have been constructed from a plain-text vote. Depending on the election type (referendum, simple election, multiple choice election, STV election), the plain text vote can be constructed in different ways, for example, a simple string, an array of integers, or even a complex data structure. Regardless of the vote encoding rules, the plain-text vote has a byte representation $\vec{b} \in \mathbb{B}^*$.
 
-Next, $\boldsymbol{b}$ is converted into an elliptic curve point $V \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}), which can be used further in the encryption mechanism described in \cref{sec: vote cryptogram generation process}. Thus, point $M$ is the representation of voter's vote choices in cryptographic form.
+Next, $\vec{b}$ is converted into elliptic curve points $\vec{V} \gets \mathsf{EncodeVote}(\vec{b})$ (\cref{alg: encode vote}), which can be used in the encryption mechanism described in \cref{sec: vote cryptogram generation process}. Thus, the set of points $\vec{V}$ represents the voter's choices in cryptographic form.
 
-Recovering the byte array $\boldsymbol{b}$ from $V$ can be done by $\boldsymbol{b} \gets \mathsf{Point2Bytes}(V)$ (\cref{alg: point to bytes}), which can further be decoded into a plain text vote, depending on the vote encoding rules.
+Recovering the byte array $\vec{b}$ from $\vec{V}$ can be done by $\vec{b} \gets \mathsf{DecodeVote}(\vec{V})$ (\cref{alg: decode vote}). Depending on the vote encoding rules, the byte array $\vec{b}$ can further be interpreted as a plain-text vote.
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{EncodeVote} (\vec{b})$}
+    \label{alg: encode vote}
+    \KwData{The plain-text vote $\vec{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
+    
+    $m \gets \mathsf{ByteLengthOf} (p)$  \;
+    $\ell \gets \lceil n / m \rceil$ \;
+    \For{$i \gets 0$ \KwTo $\ell - 1$ \KwBy $1$}{
+        $V_i \gets \mathsf{Bytes2Point} (\{ b_{i+1}, ..., b_{i+m} \})$ \;
+        }
+    $\vec{V} \gets \{ V_1, ..., V_\ell \}$ \;
+    \Return{$\vec{V}$} \tcp*{$\vec{V} \in \mathbb{P}^*$}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+    \DontPrintSemicolon
+    \caption{$\mathsf{DecodeVote} (\vec{V})$}
+    \label{alg: decode vote}
+    \KwData{The list of points $\vec{V} = \{ V_1, ..., V_\ell \} \in \mathbb{P}^\ell$}
+    
+    $\vec{b} \gets \{ \}$  \;
+    \For{$i \gets 1$ \KwTo $\ell$ \KwBy $1$}{
+        $\vec{b} \gets \vec{b} \cup \mathsf{Point2Bytes} (V_i)$ \;
+        }
+    \Return{$\vec{b}$} \tcp*{$\vec{b} \in \mathbb{B}^*$}
+\end{algorithm}
 
 
 \subsubsection{Vote cryptogram generation process} \label{sec: vote cryptogram generation process}
-During the vote cryptogram generation process, the voting application collaborates with the digital ballot box $\mathcal{D}$ for generating the cryptogram $e$ that represents the encryption of the vote $M$. This process results in the fact that neither the voter $\mathcal{V}_i$ nor the digital ballot box $\mathcal{D}$ will be in possession of whole randomizer value $r$ used in the generation process of cryptogram $e$ (recall from \cref{app: encryption scheme} that $e = \mathsf{Enc}(Y_\mathrm{enc}, M; r)$). That is achieved by both the voter and the digital ballot box building up the randomizer but none of them knowing its entire value. It is important for the voter to not know this value in order to not be able to produce cryptographic evidence of the way he voted (as in \cref{app: proving the content of a cryptogram}), thus achieving \textit{receipt freeness}. The entire process cosists of commiting to the encryption randomizers which is presented in \cref{fig: encryption commitments submission protocol} and submitting the encrypted ballot as presented in \cref{fig: encrypted ballot submission protocol}.
+During the vote cryptogram generation process, the voting application collaborates with the digital ballot box $\mathcal{D}$ for generating cryptograms $\vec{e}$ that represent the encryption of the vote $\vec{V}$. This process results in the fact that neither the voter $\mathcal{V}_i$ nor the digital ballot box $\mathcal{D}$ will have the whole randomizer value $r$ used in the generation process of each cryptogram $e$ (recall from \cref{app: encryption scheme} that $e = \mathsf{Enc}(Y_\mathrm{enc}, V; r)$). That is achieved by the voter and the digital ballot box building up the randomizer, while none of them know its entire value. It is important for the voters not to know this value not to be able to produce cryptographic evidence of the way they voted (as in \cref{app: proving the content of a cryptogram}), thus achieving \textit{receipt freeness}. The entire process consists of committing to the encryption randomizers, as presented in \cref{fig: encryption commitments submission protocol} and submitting the encrypted ballot, as shown in \cref{fig: encrypted ballot submission protocol}.
 
 \begin{figure}[ht]
     \centering
@@ -228,18 +256,18 @@ During the vote cryptogram generation process, the voting application collaborat
         
         % internal knowledge
         \node[ik] at (v.south) (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, \\
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $\ell$, \\
             $\alpha_\mathrm{vs} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs} \}$
             };
         \node[ik] at (dbb.south) (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, \\
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, $\ell$, \\
             $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$
             };
         
         %All content
         \node[block, keep_left, spaced] at (dbb_ik.south -| v.west) (v_1) {
-            $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ \\
-            $c_\mathrm{vec} \gets \mathsf{Com}(r_\mathrm{v}, s_\mathrm{v})$, $p_\mathrm{vec} \gets$ the address of $b_\mathrm{vs}$ \\
+            $\vec{r}_\mathrm{v} = \{ r_{\mathrm{v}; 1}, ..., r_{\mathrm{v}; \ell} \} \in_\mathrm{R} \mathbb{Z}^\ell_q$, $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $c_\mathrm{vec} \gets \mathsf{Com}(\vec{r}_\mathrm{v}, s_\mathrm{v})$, $p_\mathrm{vec} \gets$ the address of $b_\mathrm{vs}$ \\
             $m_\mathrm{vec} \gets$ "voter encryption commitment"
             };
         \node[banner, keep_left, spaced, between={v.west}{dbb.east}] at (v_1.south -| v.west) (b_1) {
@@ -247,16 +275,17 @@ During the vote cryptogram generation process, the voting application collaborat
             $(b_\mathrm{vec}, \rho_\mathrm{vec}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vec}, c_\mathrm{vec}, p_\mathrm{vec})$, therefore $b_\mathrm{vec} \in \boldsymbol{b}$
             };
         \node[block, keep_right, spaced] at (b_1.south -| dbb.east) (dbb_1) {
-            $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ \\
-            $c_\mathrm{sec} \gets \mathsf{Com}(r_\mathrm{d}, s_\mathrm{d})$, $p_\mathrm{sec} \gets$ the address of $b_\mathrm{vec}$ \\
+            $\vec{r}_\mathrm{d} = \{ r_{\mathrm{d}; 1}, ..., r_{\mathrm{d}; \ell} \} \in_\mathrm{R} \mathbb{Z}^\ell_q$, $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ \\
+            $c_\mathrm{sec} \gets \mathsf{Com}(\vec{r}_\mathrm{d}, s_\mathrm{d})$, $p_\mathrm{sec} \gets$ the address of $b_\mathrm{vec}$ \\
             $m_\mathrm{sec} \gets$ "server encryption commitment" \\ [7pt]
             \scriptsize perform protocol \ref{pro: write on board} to write $b_\mathrm{sec}$ as the $(k+1)^\mathrm{th}$ item of $\boldsymbol{b}$ \\ [-2pt]
             \scriptsize $(b_\mathrm{sec}, \rho_\mathrm{sec}) \gets \mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sec}, c_\mathrm{sec}, p_\mathrm{sec})$, \\[-2pt] 
             \scriptsize therefore $b_\mathrm{sec} \in \boldsymbol{b}$ \\ [7pt]
-            $e_\mathrm{d} \gets \mathsf{Enc}(Y_\mathrm{enc}, \mathcal{O}; r_\mathrm{d})$
+            $e_{\mathrm{d}; i} \gets \mathsf{Enc}(Y_\mathrm{enc}, \mathcal{O}; r_{\mathrm{d}; i})$, with $i \in \{ 1, ..., \ell \}$ \\
+            $\vec{e}_\mathrm{d} \gets \{ e_{\mathrm{d}; 1}, ..., e_{\mathrm{d}; \ell} \}$
             };
         \node[arrow, towards_left, between={v.center}{dbb.center}] at (dbb_1.south -| v.center) (a_1) {
-            $(b_\mathrm{vec}, \rho_\mathrm{vec})$, $(b_\mathrm{sec}, \rho_\mathrm{sec})$, $e_\mathrm{d}$
+            $(b_\mathrm{vec}, \rho_\mathrm{vec})$, $(b_\mathrm{sec}, \rho_\mathrm{sec})$, $\vec{e}_\mathrm{d}$
             };
         \node[block, keep_left, spaced] at (a_1.south -| v.west) (v_2) {
             $h_\mathrm{vs} \gets $ the address of $b_\mathrm{vs}$ \\
@@ -282,6 +311,12 @@ During the vote cryptogram generation process, the voting application collaborat
     \label{fig: encryption commitments submission protocol}
 \end{figure}
 
+The generation process begins with the voting application generating its encryption randomizers $\vec{r}_\mathrm{v} = \{ r_{\mathrm{v}; 1}, ..., r_{\mathrm{v}; \ell} \} \in_\mathrm{R} \mathbb{Z}^\ell_q$ and computing a commitment to them $c_\mathrm{v} \gets \mathsf{Com}(\vec{r}_\mathrm{v}, s_\mathrm{v})$ (\cref{alg: com}), where $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$. Then, the voting application interacts with the digital ballot box in the protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vec}, c_\mathrm{vec}, p_\mathrm{vec})$ to append the vote encryption commitment item $b_\mathrm{vec}$ on the board, where $m_\mathrm{vec} =$ "voter encryption commitment", the content $c_\mathrm{vec}$ consists of the commitment $c_\mathrm{v}$ and the parent $p_\mathrm{vec}$ is the address of the voter session item as received in \cref{sec: voter authorization procedure}. Note that before appending the new item, the bulletin board consists of items $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, therefore $b_\mathrm{vec}$ becoming the $k^\mathrm{th}$ item.
+
+After publishing the voter encryption commitment item on the bulletin board, the digital ballot box immediately generates its own set of encryption randomizers $\vec{r}_\mathrm{d} = \{ r_{\mathrm{d}; 1}, ..., r_{\mathrm{d}; \ell} \} \in_\mathrm{R} \mathbb{Z}^\ell_q$ and commitment $c_\mathrm{d} \gets \mathsf{Com}(\vec{r}_\mathrm{d}, s_\mathrm{d})$ (\cref{alg: com}), where $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$. Then, it self writes a server encryption commitment item $b_\mathrm{sec}$ on the board by running protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sec}, c_\mathrm{sec}, p_\mathrm{sec})$, where $m_\mathrm{sec} =$ "server encryption commitment", the content $c_\mathrm{sec}$ consists of its commitment $c_\mathrm{d}$ and the parrent $p_\mathrm{sec}$ is the address of the voter encryption commitment item $b_\mathrm{vec}$.
+
+Next, the digital ballot box returns to the voting application both items $b_\mathrm{vec}$ and $b_\mathrm{sec}$ together with their respective receipts, according to the protocol \ref{pro: write on board} described in \cref{sec: writing on the bulletin board} and the empty cryptograms $\vec{e}_\mathrm{d} = \{ e_{\mathrm{d}; 1}, ..., e_{\mathrm{d}; \ell} \}$, with each $e_{\mathrm{d}; i}$ being the encryption of the neutral point $\mathcal{O}$ using the encryption randomizers $r_{\mathrm{d}; i}$. The voting application performs the validation of the board items $b_\mathrm{vec}$ and $b_\mathrm{sec}$ according to the protocol \ref{pro: write on board} and continues if successful.
+
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}[framed,
@@ -296,28 +331,33 @@ During the vote cryptogram generation process, the voting application collaborat
             \textbf{Digital Ballot Box $\mathcal{D}$}};
         
         % internal knowledge
-        \node[ik] at (v.south) (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathrm{enc}$, \\
-            $\alpha_\mathrm{sec} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vec}, b_\mathrm{sec} \}$, $M$, $r_\mathrm{v}$, $e_\mathrm{d}$
+        \node[ik, keep_left] at (v.south west) (v_ik) {
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $Y_\mathrm{enc}$, $\ell$, \\
+            $\alpha_\mathrm{sec} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vec}, b_\mathrm{sec} \}$, $\vec{V} = \{ V_1, ..., V_\ell \}$, \\
+            $\vec{r}_\mathrm{v} = \{ r_{\mathrm{v}; 1}, ..., r_{\mathrm{v}; \ell} \}$, $\vec{e}_\mathrm{d} = \{ e_{\mathrm{d}; 1}, ..., e_{\mathrm{d}; \ell} \}$
             };
         \node[ik] at (dbb.south) (dbb_ik) {
-            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, \\
-            $\boldsymbol{b'} = \{ b_1, ..., b_{k'-1} \}$, $r_\mathrm{d}$
+            internal knowledge: $x_\mathcal{D}$, $Y_\mathrm{enc}$, $\ell$, \\
+            $\boldsymbol{b'} = \{ b_1, ..., b_{k'-1} \}$, \\
+            $\vec{r}_\mathrm{d} = \{ r_{\mathrm{d}; 1}, ..., r_{\mathrm{d}; \ell} \}$
             };
         
         %All content
         \node[block, spaced, keep_left] at (v_ik.south -| v.west) (v_1) {
-            $e_\mathrm{v} \gets \mathsf{Enc}(Y_\mathrm{enc}, M; r_\mathrm{v})$ \\
-            $e \gets \mathsf{HomAdd}(e_\mathrm{d}, e_\mathrm{v})$ \\
-            $PK \gets \mathsf{DLProve}(r_\mathrm{v}, \{ G \})$ \\
-            $c_\mathrm{bc} \gets e$, $p_\mathrm{bc} \gets$ address of $b_\mathrm{sec}$ \\
+            $e_{\mathrm{v}; i} \gets \mathsf{Enc}(Y_\mathrm{enc}, V_i; r_{\mathrm{v}; i})$, with $i \in \{ 1, ..., \ell \}$ \\
+            $e_i \gets \mathsf{HomAdd}(e_{\mathrm{d}; i}, e_{\mathrm{v}; i})$ \\
+            $\vec{e} \gets \{ e_1, ..., e_\ell \}$ \\
+            $PK_i \gets \mathsf{DLProve}(r_{\mathrm{v}; i}, \{ G \})$ \\
+            $c_\mathrm{bc} \gets \vec{e}$, $p_\mathrm{bc} \gets$ address of $b_\mathrm{sec}$ \\
             $m_\mathrm{bc} \gets$ "ballot cryptograms"
             };
-        \node[arrow, towards_right, immediate, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_1) {
-            \hspace{40pt} $e = (R, C)$, $PK$
+        \node[arrow, towards_right, between={v.center}{dbb.center}] at (v_1.south -| v.center) (a_1) {
+            $\{ PK_1, ..., PK_\ell \}$, \\
+            $\vec{e} = \{ e_1, ..., e_\ell \}$, with $e_i = (R_i, C_i)$
             };
         \node[block, keep_right, spaced] at (a_1.south -| dbb.east) (dbb_1) {
-            verify that $\mathsf{DLVer}(PK, \{ G \}; \{ R - [r_\mathrm{d}]G \})$
+            verify that \\
+            $\mathsf{DLVer}(PK_i, \{ G \}; \{ R_i - [r_{\mathrm{d}; i}]G \})$, with $i \in \{ 1, ..., \ell \}$
             };
         \node[banner, keep_left, spaced, between={v.west}{dbb.east}] at (dbb_1.south -| v.west) (b_1) {
             $\mathcal{V}_i$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write $b_\mathrm{bc}$ as the ${k'}^\mathrm{th}$ item of $\boldsymbol{b}$ \\
@@ -343,7 +383,7 @@ During the vote cryptogram generation process, the voting application collaborat
         
         % Arrows and lines
         \draw[dashed] (v.south west)--(dbb.south east);    
-        \draw[dashed] (dbb_ik.south -| v.west)--(dbb_ik.south -| dbb.east);
+        \draw[dashed] (v_ik.south -| v.west)--(v_ik.south -| dbb.east);
 
         \draw[dotted] (b_1.north west)--(b_1.north east);
         \draw[dotted] (b_1.south west)--(b_1.south east);
@@ -361,51 +401,46 @@ During the vote cryptogram generation process, the voting application collaborat
     \label{fig: encrypted ballot submission protocol}
 \end{figure}
 
-The generation process begins by the voting application generating its encryption randomizer $r_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$ and computing a commitment to it $c_\mathrm{v} \gets \mathsf{Com}(r_\mathrm{v}, s_\mathrm{v})$ (\cref{alg: com}), where $s_\mathrm{v} \in_\mathrm{R} \mathbb{Z}_q$. Then, the voting application interacts with the digital ballot box in the protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vec}, c_\mathrm{vec}, p_\mathrm{vec})$ in order to append the vote encryption commitment item $b_\mathrm{vec}$ on the board, where $m_\mathrm{vec} =$ "voter encryption commitment", the content $c_\mathrm{vec}$ consists of the commitment $c_\mathrm{v}$ and the parent $p_\mathrm{vec}$ is the address of the voter session item as received in \cref{sec: voter authorization procedure}. Note that before appending the new item, the bulletin board consists of items $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, therefore $b_\mathrm{vec}$ becoming the $k^\mathrm{th}$ item.
+After both parties have published their encryption commitment items, as presented in \cref{fig: encrypted ballot submission protocol}, the voting application encrypts the voter's encoded vote $\vec{V}$ (as constructed in \cref{sec: mapping vote options on the elliptic curve}) by computing $e_{\mathrm{v}; i} \gets \mathsf{Enc}(Y_\mathrm{enc}, V_i, r_{\mathrm{v}; i})$ (\cref{alg: enc}), with $i \in \{ 1, ..., \ell \}$. This gets further combined with the empty cryptograms received from the digital ballot box to produce the voter's final ballot cryptograms $\vec{e} = \{ e_1, ..., e_\ell \}$, where $e_i \gets \mathsf{HomAdd}(e_{\mathrm{v}; i}, e_{\mathrm{d}; i})$ (\cref{alg: hom add}). The voting application also computes as proof of correct encryption $PK_i \gets \mathsf{DLProve}(r_{\mathrm{v}; i}, \{ G \})$ (\cref{alg: dl prove}) to confirm that the empty cryptograms $\vec{e}_\mathrm{d}$ have been used in the creation of the final ballot cryptograms $\vec{e}$.
 
-After publishing the voter encryption commitment item on the bulletin board, the digital ballot box immediately generates its own set of encryption randomizer $r_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$ and commitment $c_\mathrm{d} \gets \mathsf{Com}(r_\mathrm{d}, s_\mathrm{d})$ (\cref{alg: com}), where $s_\mathrm{d} \in_\mathrm{R} \mathbb{Z}_q$. Then, it self writes a server encryption commitment item $b_\mathrm{sec}$ on the board by running protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sec}, c_\mathrm{sec}, p_\mathrm{sec})$, where $m_\mathrm{sec} =$ "server encryption commitment", the content $c_\mathrm{sec}$ consists of its commitment $c_\mathrm{d}$ and the parrent $p_\mathrm{sec}$ is the address of the voter encryption commitment item $b_\mathrm{vec}$.
+Finally, the voting application interacts with the digital ballot box in the protocol $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{bc}, c_\mathrm{bc}, p_\mathrm{bc})$ (protocol \ref{pro: write on board}) to append the ballot cryptogram item $b_\mathrm{bc}$ on the board, where $m_\mathrm{bc} =$ "ballot cryptograms", the content $c_\mathrm{bc}$ consists of the cryptograms $\vec{e}$ and the parent $p_\mathrm{bc}$ is the address of the server encryption commitment item $b_\mathrm{sec}$. Note that this time, the bulletin board consists of items $\boldsymbol{b'} = \{ b_1, ..., b_{k'-1} \}$, where $k' \geq k$ as more items could have been appended by other voters in between protocols from \cref{fig: encryption commitments submission protocol} and \cref{fig: encrypted ballot submission protocol}, therefore $b_\mathrm{bc}$ becoming the ${k'}^\mathrm{th}$ item.
 
-Next, the digital ballot box returns to the voting application both items $b_\mathrm{vec}$ and $b_\mathrm{sec}$ together with their respective receipts, according to the protocol \ref{pro: write on board} described in \cref{sec: writing on the bulletin board} and the empty cryptogram $e_\mathrm{d}$, i.e. the encryption of the neutral point $\mathcal{O}$ using the encryption randomizer $r_\mathrm{d}$. The voting application performs the validation of the board items $b_\mathrm{vec}$ and $b_\mathrm{sec}$ according to the protocol \ref{pro: write on board} and continues if successful.
+Additionally, the voting application submits the proofs $\{ PK_1, ..., PK_\ell \}$ to the digitla ballot box, which performs protocol \ref{pro: write on board} if $\mathsf{DLVer}(PK_i, \{ G \}, \{ R_i - [r_{\mathrm{d}; i}]G \})$ (\cref{alg: dl ver}) succeeds, for each $i \in \{ 1, ..., \ell \}$, where the content of the item  $c_\mathrm{bc}$ consists of $\vec{e} = \{ e_1, ..., e_\ell \}$ and each $ e_i = (R_i, C_i)$.
 
-After both parties have published their encryption commitment items, as presented in \cref{fig: encrypted ballot submission protocol}, the voting application encrypts the voter's encoded vote $M$ (as constructed in \cref{sec: mapping vote options on the elliptic curve}) by computing $e_\mathrm{v} \gets \mathsf{Enc}(Y_\mathrm{enc}, M; r_\mathrm{v})$ (\cref{alg: enc}). This gets further combined with the empty cryptogram received from the digital ballot box, to produce the voter's final ballot cryptogram $e \gets \mathsf{HomAdd}(e_\mathrm{v}, e_\mathrm{d})$ (\cref{alg: hom add}). The voting application also computes a proof of correct encryption $PK \gets \mathsf{DLProve}(r_\mathrm{v})$ (\cref{alg: dl prove}) that confirms the fact that the empty cryptogram $e_\mathrm{d}$ has been used in computation of the final ballot cryptogram $e$.
+After publishing the ballot cryptograms item on the bulletin board, the digital ballot box immediately self-writes a verification track start item $b_\mathrm{vts}$ on the hidden track of the bulletin board $\boldsymbol{b}^{b_\mathrm{bc}}$ by running $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{vts}, c_\mathrm{vts}, p_\mathrm{vts})$ (protocol \ref{pro: write on board}), where $m_\mathrm{vts} =$ "verification track start", the content $c_\mathrm{sec}$ is empty and the parent $p_\mathrm{vts}$ is the address of the ballot cryptogram item $b_\mathrm{bc}$. Note that at this point, the hidden track contains $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts} \}$.
 
-Finally, the voting application interacts with the digital ballot box in the protocol $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{bc}, c_\mathrm{bc}, p_\mathrm{bc})$ (protocol \ref{pro: write on board}) in order to append the ballot cryptogram item $b_\mathrm{bc}$ on the board, where $m_\mathrm{bc} =$ "ballot cryptograms", the content $c_\mathrm{bc}$ consists of the cryptogram $e$ and the parrent $p_\mathrm{bc}$ is the address of the server encryption commitment item $b_\mathrm{sec}$. Note that this time, the bulletin board consists of items $\boldsymbol{b'} = \{ b_1, ..., b_{k'-1} \}$, where $k' \geq k$ as more items could have been appended by other voters in between protocols from \cref{fig: encryption commitments submission protocol} and \cref{fig: encrypted ballot submission protocol}, therefore $b_\mathrm{bc}$ becoming the ${k'}^\mathrm{th}$ item.
+Next, the digital ballot box returns to the voting application both items $b_\mathrm{bc}$ and $b_\mathrm{vts}$ together with their respective receipts, according to the protocol \ref{pro: write on board}. The voting application validates the two board items according to the protocol \ref{pro: write on board}. In addition, it checks that the verification track start item is the only item on the hidden track by $\mathsf{HistoryVer}(\{ b_\mathrm{vts} \}, h_\mathrm{bc})$ (\cref{alg: history ver}), where $h_\mathrm{bc}$ is the address of the ballot cryptograms item.
 
-Additionally, the voting application submits the proof $PK$ to the digitla ballot box, which performs protocol \ref{pro: write on board} if $\mathsf{DLVer}(PK, \{ G \}, \{ R - [r_\mathrm{d}]G \})$ (\cref{alg: dl ver}) succeeds, where the content of the item  $c_\mathrm{bc}$ consists of $e = (R, C)$.
-
-After publishing the ballot cryptograms item on the bulletin board, the digital ballot box immediately self writes a verification track start item $b_\mathrm{vts}$ on the hidden track of the bulletin board $\boldsymbol{b}^{b_\mathrm{bc}}$ by running $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{vts}, c_\mathrm{vts}, p_\mathrm{vts})$ (protocol \ref{pro: write on board}), where $m_\mathrm{vts} =$ "verification track start", the content $c_\mathrm{sec}$ is empty and the parent $p_\mathrm{vts}$ is the address of the ballot cryptogram item $b_\mathrm{bc}$. Note that at this point, the hidden track contains $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts} \}$.
-
-Next, the digital ballot box returns to the voting application both items $b_\mathrm{bc}$ and $b_\mathrm{vts}$ together with their respective receipts, according to the protocol \ref{pro: write on board}. The voting application performs the validation of the two board items according to the protocol \ref{pro: write on board}. In addition, it checks that the verification track start item is the only item on the hidden track by $\mathsf{HistoryVer}(\{ b_\mathrm{vts} \}, h_\mathrm{bc})$ (\cref{alg: history ver}), where $h_\mathrm{bc}$ is the address of the ballot cryptograms item.
-
-Note that, the cryptogram $e$ is actually equivalent to $\mathsf{Enc}(Y_\mathrm{enc}, M; r)$, where $r = r_\mathrm{v} + r_\mathrm{d}$. Both the voter and the digital ballot box know part of the randomizer value, $r_\mathrm{v}$ and $r_\mathrm{d}$ respectively, but neither of them knows the combined value $r$.
+Note that, each cryptogram $e_i$ is actually equivalent to $\mathsf{Enc}(Y_\mathrm{enc}, V_i; r_i)$, where $r_i = r_{\mathrm{v}; i} + r_{\mathrm{d}; i}$. Both the voter and the digital ballot box know part of the randomizer value, $r_{\mathrm{v}; i}$ and $r_{\mathrm{d}; i}$ respectively, but neither of them knows the combined value $r_i$, for any $i \in \{ 1, ..., \ell \}$.
 
 
+\clearpage
 \subsubsection{Challenging a vote cryptogram} \label{sec: challenging a vote cryptogram}
-After encrypting a ballot, the voter $\mathcal{V}_i$ can choose whether to test or cast it. To perform the testing process of an encrypted ballot, the voter needs to interact with the \textit{external verifier} that will perform all the testing operations on behalf of the voter, according to the data published on the bulletin board. At the end of the testing process, the voter will be presented with the vote choice(s) that were encoded in the encrypted ballot. When doing the testing procedure, the encrypted ballot that is being tested gets spoiled. Therefore, the voter needs to redo the vote cryptogram generation process from \cref{sec: vote cryptogram generation process} to get a new encrypted ballot, which the voter has to choose again whether to test or to cast. This process can be repeated until the voter trusts the legitimacy of the next encrypted ballot generated by the voting application. The protocol is inspired from \cite{Benaloh06}.
+After encrypting a ballot, the voter $\mathcal{V}_i$ can choose whether to test or cast it. To perform the testing process of an encrypted ballot, the voter needs to interact with the \textit{external verifier} that will perform all the testing operations on behalf of the voter, according to the data published on the bulletin board. At the end of the testing process, the voter will be presented with the vote choices encoded in the encrypted ballot. The encrypted ballot being tested gets spoiled when doing the testing procedure. Therefore, the voter needs to redo the vote cryptogram generation process from \cref{sec: vote cryptogram generation process} to get a new encrypted ballot, which the voter has to choose again whether to test or to cast. This process can be repeated until the voter trusts the legitimacy of the next encrypted ballot generated by the voting application. The protocol is inspired by \cite{Benaloh06}.
 
-The first part of the protocol (\cref{fig: external verifier setup protocol}) establishes a trusted connection amongst the voting application and the external verifier over the bulletin board. The voter inputs into the external verifier the address of the verification track start item $b_\mathrm{vts}$, which queries the digital ballot box for the item at that address and its ancestry. The digital ballot box returns $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$, which consists of all the configuration items (e.g. the genesis item, election configuration items, contest configuration items, etc.) plus all the voting items that are relevant to voter $\mathcal{V}_i$. Notice that all configuration and voting items are on the public bulletin board (i.e. $\alpha_\mathrm{cnf}, b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \in \boldsymbol{b}$), except the verification track start item $b_\mathrm{vts}$ which exists on the hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$ that has been spawned by the ballot cryptograms item $b_\mathrm{bc}$.
+The first part of the protocol (\cref{fig: external verifier setup protocol}) establishes a trusted connection between the voting application and the external verifier over the bulletin board. The voter inputs into the external verifier the address of the verification track start item $b_\mathrm{vts}$, which queries the digital ballot box for the item at that address and its ancestry. The digital ballot box returns $\alpha_\mathrm{vts} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{vts} \}$, which consists of all the configuration items $\alpha_\mathrm{cnf}$ (e.g., the genesis item, election configuration items, contest configuration items, etc.) plus all the voting items that are relevant to voter $\mathcal{V}_i$. Notice that all configuration and voting items are on the public bulletin board (i.e., $\alpha_\mathrm{cnf}, b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \in \boldsymbol{b}$), except the verification track start item $b_\mathrm{vts}$ which exists on the hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$ that has been spawned by the ballot cryptograms item $b_\mathrm{bc}$.
 
-The external verifier validates the list by running $\mathsf{AncestryVer}(\alpha_\mathrm{vts}, \varnothing)$ (\cref{alg: ancestry ver}), therefore checking that $\alpha_\mathrm{vts}$ has a consistent ancestry all the way through the genesis item, with has no parent, therefore the parent of the entire ancestry is null or $\varnothing$. The external verifier also checks the integrity of every item by $\mathsf{ItemVer}(b_j, Y_\mathcal{W})$ (\cref{alg: item ver}), where $b_j \in \alpha_\mathrm{vts}$ and $Y_\mathcal{W}$ is the public key of the respective writer, according to the rules from \cref{app: bulletin board item types}. Note that the set of writers, as presented in \cref{sec: public bulletin board}, consists of the voter $\mathcal{V}_i$, the digital ballot box $\mathcal{D}$, the election administrator $\mathcal{E}$ and the voter authorizer $\mathcal{A}$. The external verifier can extract the voter's public key $Y_i$ from the voter session item $b_\mathrm{vs}$ and the other public keys $Y_\mathcal{D}$, $Y_\mathcal{E}$ and $Y_\mathcal{A}$ from the configuration items. If valid, the external verifier notifies the voter that the ballot was successfully found.
+The external verifier validates the list by running $\mathsf{AncestryVer}(\alpha_\mathrm{vts}, \varnothing)$ (\cref{alg: ancestry ver}), therefore checking that $\alpha_\mathrm{vts}$ has a consistent ancestry all the way through the genesis item, which has no parent. Thus, the parent of the entire ancestry is null or $\varnothing$. The external verifier also checks the integrity of every item by $\mathsf{ItemVer}(b_j, Y_\mathcal{W})$ (\cref{alg: item ver}), where $b_j \in \alpha_\mathrm{vts}$ and $Y_\mathcal{W}$ is the public key of the respective writer, according to the rules from \cref{app: bulletin board item types}. Note that the set of writers, as presented in \cref{sec: public bulletin board}, consists of the voter $\mathcal{V}_i$, the digital ballot box $\mathcal{D}$, the election administrator $\mathcal{E}$ and the voter authorizer $\mathcal{A}$. The external verifier can extract the voter's public key $Y_i$ from the voter session item $b_\mathrm{vs}$ and the other public keys $Y_\mathcal{D}$, $Y_\mathcal{E}$ and $Y_\mathcal{A}$ from the configuration items. If valid, the external verifier notifies the voter that the ballot was successfully found.
 
 Then, the voter chooses to test the encryption of the ballot, so the voting application interacts with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{sr}, c_\mathrm{sr}, p_\mathrm{sr})$ (protocol \ref{pro: write on board}) to append the spoil request item $b_\mathrm{sr}$ on the board, where $m_\mathrm{sr} = $ "spoil request", the content $c_\mathrm{sr}$ is empty and the parent $p_\mathrm{sr}$ is the address of the ballot cryptograms item $b_\mathrm{bc}$.
 
-After publishing the spoil request item $b_\mathrm{sr}$, the digital ballot box sends the new item also to the external verifier, which verifies its integrity $\mathsf{ItemVer}(b_\mathrm{sr}, Y_i)$ (\cref{alg: item ver}) and that it is consistent with the ancestry $\mathsf{AncestryVer}(\{ b_\mathrm{sr} \}, h_\mathrm{bc})$ (\cref{alg: ancestry ver}), where $h_\mathrm{bc}$ is the address of the ballot cryptograms item $b_\mathrm{bc}$. If valid, the external verifier generates its own key pair $(x_\mathcal{X}, Y_\mathcal{X}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and interacts with digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{X}, m_\mathrm{v}, c_\mathrm{v}, p_\mathrm{v})$ (protocol \ref{pro: write on board}) to write a verifier item $b_\mathrm{v}$ on the hidden track, where $m_\mathrm{v} =$ "verifier", the content $c_\mathrm{v}$ contains the external verifier's public key $Y_\mathcal{X}$ and the parent $p_\mathrm{v}$ is the address of the spoil request item $b_\mathrm{sr}$. Note that the verifier item $b_\mathrm{v}$ is appended on the hidden track introduces by the ballot cryptograms item $b_\mathrm{bc}$. Therefore, at the end of this step, the hidden track consists of $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$. From this point on, the external verifier represents indentity $\mathcal{X}$ on the hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$.
+After publishing the spoil request item $b_\mathrm{sr}$, the digital ballot box sends the new item also to the external verifier, which verifies its integrity $\mathsf{ItemVer}(b_\mathrm{sr}, Y_i)$ (\cref{alg: item ver}) and that it is consistent with the ancestry $\mathsf{AncestryVer}(\{ b_\mathrm{sr} \}, h_\mathrm{bc})$ (\cref{alg: ancestry ver}), where $h_\mathrm{bc}$ is the address of the ballot cryptograms item $b_\mathrm{bc}$. If valid, the external verifier generates its key pair $(x_\mathcal{X}, Y_\mathcal{X}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}) and interacts with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{X}, m_\mathrm{v}, c_\mathrm{v}, p_\mathrm{v})$ (protocol \ref{pro: write on board}) to write a verifier item $b_\mathrm{v}$ on the hidden track, where $m_\mathrm{v} =$ "verifier", the content $c_\mathrm{v}$ contains the external verifier's public key $Y_\mathcal{X}$ and the parent $p_\mathrm{v}$ is the address of the spoil request item $b_\mathrm{sr}$. Note that the verifier item $b_\mathrm{v}$ is appended on the hidden track introduced by the ballot cryptograms item $b_\mathrm{bc}$. Therefore, at the end of this step, the hidden track consists of $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$. From this point on, the external verifier represents identity $\mathcal{X}$ on the hidden track $\boldsymbol{b}^{b_\mathrm{bc}}$.
 
-The protocol continues with \cref{fig: commitment opening submission protocol} where the external verifier returns to the voter with the address of the verifier item $h_\mathrm{v}$. The voter also receives the verifier item $b_\mathrm{v}$ from the digital ballot box. The voter checks the integrity of the item $\mathsf{ItemVer}(b_\mathrm{v}, Y_\mathcal{X})$ (\cref{alg: item ver}) and that it is consistent with the ancestry $\mathsf{AncestryVer}(\{ b_\mathrm{v} \}, h_\mathrm{vts})$ (\cref{alg: ancestry ver}), where $Y_\mathcal{X}$ is extracted from the content of the verifier item and $h_\mathrm{vts}$ is the address of the verification track start item. Then the voter checks that the address received from the external verifier is consistent with the verifier item received from the digital ballot box. If valid, the voter managed to establish a trusted connection with the external verifier over the bulletin board, therefore the protocol can continue.
+The protocol continues with \cref{fig: commitment opening submission protocol} where the external verifier returns to the voter with the address of the verifier item $h_\mathrm{v}$. The voter also receives the verifier item $b_\mathrm{v}$ from the digital ballot box. The voter checks the integrity of the item $\mathsf{ItemVer}(b_\mathrm{v}, Y_\mathcal{X})$ (\cref{alg: item ver}) and that it is consistent with the ancestry $\mathsf{AncestryVer}(\{ b_\mathrm{v} \}, h_\mathrm{vts})$ (\cref{alg: ancestry ver}), where $Y_\mathcal{X}$ is extracted from the content of the verifier item and $h_\mathrm{vts}$ is the address of the verification track start item. Then the voter checks that the address received from the external verifier is consistent with the verifier item received from the digital ballot box. If valid, the voter managed to establish a trusted connection with the external verifier over the bulletin board. Therefore the protocol can continue.
 
-Next, both the voter and the digital ballot box collaborate to deliver to the external verifier, in a secure manner, their encryption randomizer $r_\mathrm{v}$ and $r_\mathrm{s}$ respectively, as generated in \cref{sec: vote cryptogram generation process}. The external verifier will use them to decrypt the voter's ballot cryptograms and present the vote choices to the voter for assessment.
+Next, both the voter and the digital ballot box collaborate to securely deliver to the external verifier their encryption randomizers $\vec{r}_\mathrm{v}$ and $\vec{r}_\mathrm{d}$ respectively, as generated in \cref{sec: vote cryptogram generation process}. The external verifier will use them to decrypt the voter's ballot cryptograms and present the vote choices to the voter for assessment.
 
-This is achieved by the voter encrypting (using standard symmetric key encryption) the randomizer and the commitment opening $d_\mathrm{v} \gets \mathsf{SymEnc}(k_\mathrm{v}, r_\mathrm{v} || s_\mathrm{v})$ (\cref{alg: sym enc}), where $k_\mathrm{v}$ is a derived symmetric key based on Diffie-Hellman key exchange mechanism between the voter and the external verifier, i.e. $k_\mathrm{v} \gets \mathsf{DerSymKey}(x_i, Y_\mathcal{X})$ (\cref{alg: der sym key}). Then, the voter interacts with the digital ballot box to write the voter commitment opening item $b_\mathrm{vco}$ on the hidden track $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vco}, c_\mathrm{vco}, p_\mathrm{vco})$ (protocol \ref{pro: write on board}), where $m_\mathrm{vco} = $ "voter commitment opening", content $c_\mathrm{vco}$ consists of the encryption $d_\mathrm{v}$ and the parent $p_\mathrm{v}$ is the address of the verifier item $b_\mathrm{v}$.
+This is achieved by the voting application encrypting (using standard symmetric key encryption) the randomizers and the commitment opening $d_\mathrm{v} \gets \mathsf{SymEnc}(k_\mathrm{v}, \vec{r}_\mathrm{v} || s_\mathrm{v})$ (\cref{alg: sym enc}), where $k_\mathrm{v}$ is a derived symmetric key based on Diffie-Hellman key exchange mechanism between the voter and the external verifier, i.e., $k_\mathrm{v} \gets \mathsf{DerSymKey}(x_i, Y_\mathcal{X})$ (\cref{alg: der sym key}). Then, the voter interacts with the digital ballot box to write the voter commitment opening item $b_\mathrm{vco}$ on the hidden track $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vco}, c_\mathrm{vco}, p_\mathrm{vco})$ (protocol \ref{pro: write on board}), where $m_\mathrm{vco} = $ "voter commitment opening", content $c_\mathrm{vco}$ consists of the encryption $d_\mathrm{v}$ and the parent $p_\mathrm{v}$ is the address of the verifier item $b_\mathrm{v}$.
 
-After publishing the voter commitment opening item, the digital ballot box immediately computes its own encryption of the randomizer and commitment opening $d_\mathrm{d}$ using the same strategy as the voter in the previous paragraph. Then, it self writes a server commitment opening item $b_\mathrm{sco}$ on the board by running $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sco}, c_\mathrm{sco}, p_\mathrm{sco})$ (protocol \ref{pro: write on board}), where $m_\mathrm{sco} =$ "server commitment opening", the content $c_\mathrm{sec}$ consists of the encryption $d_\mathrm{d}$ and the parrent $p_\mathrm{sco}$ is the address of the voter commitment opening item $b_\mathrm{vco}$. 
+After publishing the voter commitment opening item, the digital ballot box immediately computes its own encryption of the randomizers and commitment opening $d_\mathrm{d}$ using the same strategy as the voter in the previous paragraph. Then, it self writes a server commitment opening item $b_\mathrm{sco}$ on the board by running $\mathtt{WriteOnBoard}(\mathcal{D}, m_\mathrm{sco}, c_\mathrm{sco}, p_\mathrm{sco})$ (protocol \ref{pro: write on board}), where $m_\mathrm{sco} =$ "server commitment opening", the content $c_\mathrm{sec}$ consists of the encryption $d_\mathrm{d}$ and the parrent $p_\mathrm{sco}$ is the address of the voter commitment opening item $b_\mathrm{vco}$. 
 
-Then (\cref{fig: unpacking the encrypted ballot protocol}), the external verifier is notified about both commitment opening items, which verifies the integrity of them and that they are consistent with the previous ancestry. If valid, it decrypts (using standard symmetric key decryption) both commitment openings, of the voter $(r_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{SymDec}(k_\mathrm{v}, d_\mathrm{v})$ (\cref{alg: sym dec}) and of the digital ballot box $(r_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{SymDec}(k_\mathrm{d}, d_\mathrm{d})$, where the encryptions $d_\mathrm{v}$ and $d_\mathrm{d}$ are extracted from the content of the voter and of the server commitment opening items respectively, and the symmetric keys $k_\mathrm{v}$ and $k_\mathrm{d}$ are computed based on the Diffie-Hellman key exchange mechanism between the external verifier and the voter or the digital ballot box respectively.
+Then (\cref{fig: unpacking the encrypted ballot protocol}), the external verifier is notified about both commitment opening items, which verifies their integrity and that they are consistent with the previous ancestry. If valid, it decrypts (using standard symmetric key decryption) both commitment openings of the voter $(\vec{r}_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{SymDec}(k_\mathrm{v}, d_\mathrm{v})$ (\cref{alg: sym dec}) and of the digital ballot box $(\vec{r}_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{SymDec}(k_\mathrm{d}, d_\mathrm{d})$, where the encryptions $d_\mathrm{v}$ and $d_\mathrm{d}$ are extracted from the content of the voter and the server commitment opening items respectively. The symmetric keys $k_\mathrm{v}$ and $k_\mathrm{d}$ are computed based on the Diffie-Hellman key exchange mechanism between the external verifier and the voter or the digital ballot box, respectively.
 
-Next, the external verifier checks whether the commitment openings are consistent with the commitments that were published in \cref{sec: vote cryptogram generation process}, i.e. verification of the voter commitment $\mathsf{ComVer}(c_\mathrm{v}, r_\mathrm{v}, s_\mathrm{v})$ (\cref{alg: com ver}) and of the server commitment $\mathsf{ComVer}(c_\mathrm{d}, r_\mathrm{d}, s_\mathrm{d})$, where commitments $c_\mathrm{v}$ and $c_\mathrm{d}$ are extracted from the voter and server encryption commitment items respectively. If commitments are validated, the external verifier proceeds to the unpacking of the cryptogram $e$, which is extracted from the ballot cryptograms items $b_\mathrm{bc}$. If any of the validations fail, the external verifier informs the voter about the failure.
+Next, the external verifier checks whether the commitment openings are consistent with the commitments that were published in \cref{sec: vote cryptogram generation process}, i.e., verification of the voter commitment $\mathsf{ComVer}(c_\mathrm{v}, \vec{r}_\mathrm{v}, s_\mathrm{v})$ (\cref{alg: com ver}) and of the server commitment $\mathsf{ComVer}(c_\mathrm{d}, \vec{r}_\mathrm{d}, s_\mathrm{d})$, where commitments $c_\mathrm{v}$ and $c_\mathrm{d}$ are extracted from the voter and server encryption commitment items respectively. If commitments are valid, the external verifier proceeds to unpack the cryptograms $\vec{e}$, which are extracted from the ballot cryptograms items $b_\mathrm{bc}$. If any validations fail, the external verifier informs the voter about the failure.
 
-The external verifier unpacks the vote $V'$ by decrypting a variant of the cryptogram $e = (R, C)$, where point $R$ is substituted by the encryption key $Y_\mathrm{enc}$, such that it can be decrypted by the randomizer $r_\mathrm{v} + r_\mathrm{d}$ instead of the decryption key. Note that, the encryption key $Y_\mathrm{enc}$ can be extracted from the threshold configuration item, which is part of $\alpha_\mathrm{cnf}$. Formally, $V' \gets \mathsf{Dec}(r_\mathrm{v} + r_\mathrm{d}, e')$ (\cref{alg: dec}), where $e' \gets (Y_\mathrm{enc}, C)$.
+The external verifier unpacks vote $\vec{V}'$ by decrypting a variant of each cryptogram $e_i = (R_i, C_i)$, with $e_i \in \vec{e}$, where point $R_i$ is substituted by the encryption key $Y_\mathrm{enc}$, such that it can be decrypted by the randomizer $r_{\mathrm{v}; i} + r_{\mathrm{d}; i}$ instead of the decryption key. Note that the encryption key $Y_\mathrm{enc}$ can be extracted from the threshold configuration item, which is part of $\alpha_\mathrm{cnf}$. Formally, $\vec{V}' = \{ V'_1, ..., V'_\ell \}$, with $V'_i \gets \mathsf{Dec}(r_{\mathrm{v}; i} + r_{\mathrm{d}; i}, e'_i)$ (\cref{alg: dec}), where $e'_i \gets (Y_\mathrm{enc}, C_i)$.
 
-Finally, the external verifier presents to the voter, the plain text vote $V'$, which can compare to the original vote choice $V$, as computed in \cref{sec: mapping vote options on the elliptic curve}. Note that $V'$ can even be decoded into a human readable presentation of the vote choices by converting it to bytes $\mathsf{Point2Bytes}(V')$ (\cref{alg: point to bytes}) and then into a plaintext vote according to the configuration from $\alpha_\mathrm{cnf}$. If the vote matches, then the voter is assured that the voting application behaved correctly (i.e. it encrypted a genuine vote). Otherwise, the voter has evidence that the voting application has misbehaved during the process and should act accordingly.
+Finally, the external verifier presents the vote $\vec{V}'$ to the voter, which can compare to the original vote choice $\vec{V}$, as computed in \cref{sec: mapping vote options on the elliptic curve}. Note that $\vec{V}'$ can even be decoded into a human-readable presentation of the vote choices by decoding it to bytes $\mathsf{DecodeVote}(\vec{V}')$ (\cref{alg: decode vote}) and then into a plain-text vote according to the configuration from $\alpha_\mathrm{cnf}$. If the vote matches, then the voter is assured that the voting application behaved correctly (i.e., encrypted a genuine vote). Otherwise, the voter has evidence that the voting application has misbehaved during the process and should act accordingly.
 
 \clearpage
 \begin{landscape}
@@ -522,7 +557,7 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
         
         % internal knowledge
         \node[ik] at (v.south) (v_ik) {
-            internal knowledge: $x_i$, $Y_\mathcal{D}$, $r_\mathrm{v}$, $s_\mathrm{v}$, \\
+            internal knowledge: $x_i$, $Y_\mathcal{D}$, $\vec{r}_\mathrm{v}$, $s_\mathrm{v}$, \\
             $\alpha_\mathrm{bc} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc} \}$, \\
             $\alpha_\mathrm{vts} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{vts} \}$, $\alpha_\mathrm{sr} = \alpha_\mathrm{bc} \cup \{ b_\mathrm{sr} \}$
             };
@@ -533,7 +568,7 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
             };
         \node[ik] at (dbb.south) (dbb_ik) {
             internal knowledge: $x_\mathcal{D}$, $Y_\mathcal{X}$, \\
-            $r_\mathrm{d}$, $s_\mathrm{d}$, $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
+            $\vec{r}_\mathrm{d}$, $s_\mathrm{d}$, $\boldsymbol{b}$, $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v} \}$
             };
         
         % All content
@@ -546,7 +581,7 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
         \node[block, keep_left, spaced] at (a_2.south -| v.west) (v_1) {
             $Y_\mathcal{X} = $ the content of $b_\mathrm{v}$, $h_\mathrm{vts} = $ the address of $b_\mathrm{vts}$ \\
             verify $\mathsf{AncestryVer}(\{ b_\mathrm{v} \}, h_\mathrm{vts})$, $\mathsf{ItemVer}(b_\mathrm{v}, Y_\mathcal{X})$ and address of $b_\mathrm{v} = h_\mathrm{v}$ then: \\ [7pt]
-            $k_\mathrm{v} \gets \mathsf{DerSymKey}(x_i, Y_\mathcal{X})$, $d_\mathrm{v} \gets \mathsf{SymEnc}(k_\mathrm{v}, r_\mathrm{v} || s_\mathrm{v})$ \\
+            $k_\mathrm{v} \gets \mathsf{DerSymKey}(x_i, Y_\mathcal{X})$, $d_\mathrm{v} \gets \mathsf{SymEnc}(k_\mathrm{v}, \vec{r}_\mathrm{v} || s_\mathrm{v})$ \\
             $c_\mathrm{vco} \gets d_\mathrm{v}$, $p_\mathrm{vco} \gets$ address of $b_\mathrm{v}$ \\
             $m_\mathrm{vco} \gets$ "voter commitment opening"
             };
@@ -555,7 +590,7 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
             $(b_\mathrm{vco}, \rho_\mathrm{vco}) \gets \mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{vco}, c_\mathrm{vco}, p_\mathrm{vco})$, therefore $\boldsymbol{b}^{b_\mathrm{bc}} = \{ b_\mathrm{vts}, b_\mathrm{v}, b_\mathrm{vco} \}$
             };
         \node[block, keep_right, spaced] at (b_1.south east) (dbb_1) {
-            $k_\mathrm{d} \gets \mathsf{DerSymKey}(x_\mathcal{D}, Y_\mathcal{X})$, $d_\mathrm{d} \gets \mathsf{SymEnc}(k_\mathrm{d}, r_\mathrm{d} || s_\mathrm{d})$ \\
+            $k_\mathrm{d} \gets \mathsf{DerSymKey}(x_\mathcal{D}, Y_\mathcal{X})$, $d_\mathrm{d} \gets \mathsf{SymEnc}(k_\mathrm{d}, \vec{r}_\mathrm{d} || s_\mathrm{d})$ \\
             $c_\mathrm{sco} \gets d_\mathrm{d}$, $p_\mathrm{sco} \gets$ address of $b_\mathrm{vco}$ \\
             $m_\mathrm{sco} \gets$ "server commitment opening" \\ [7pt]
             \scriptsize perform protocol \ref{pro: write on board} to write $b_\mathrm{sco}$ as the forth item on the \\ [-2pt]
@@ -610,7 +645,7 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
         
         % internal knowledge
         \node[ik] at (v.south) (v_ik) {
-            internal knowledge: $V$
+            internal knowledge: $\vec{V}$
             };
         \node[ik] at (ev.south) (ev_ik) {
             internal knowledge: $x_\mathcal{X}$, $Y_i$, $Y_\mathcal{D}$, \\
@@ -630,19 +665,19 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
             $\mathsf{ItemVer} (b_\mathrm{vco},Y_i)$ and $\mathsf{ItemVer} (b_\mathrm{sco},Y_\mathcal{D})$ then: \\ [7pt]
             $d_\mathrm{v} = $ the content of $b_\mathrm{vco}$, $d_\mathrm{d} = $ the content of $b_\mathrm{sco}$ \\
             $c_\mathrm{v} = $ the content of $b_\mathrm{vec}$, $c_\mathrm{d} = $ the content of $b_\mathrm{sec}$ \\
-            $e = (R, C) = $ the content of $b_\mathrm{bc}$ \\
+            $\vec{e} = \{ e_1, ..., e_\ell \} = $ the content of $b_\mathrm{bc}$, with $e_i = (R_i, C_i)$ \\
             $Y_\mathrm{enc} = $ the contents of $\alpha_\mathrm{cnf}$ \\
-            $k_\mathrm{v} \gets \mathsf{DerSymKey}(x_\mathcal{X}, Y_i)$, $(r_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{SymDec}(k_\mathrm{v}, d_\mathrm{v})$ \\
-            $k_\mathrm{d} \gets \mathsf{DerSymKey}(x_\mathcal{X}, Y_\mathcal{D})$, $(r_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{SymDec}(k_\mathrm{d}, d_\mathrm{d})$ \\ [7pt]
-            verify that $\mathsf{ComVer}(c_\mathrm{v}, r_\mathrm{v}, s_\mathrm{v})$
-            and $\mathsf{ComVer}(c_\mathrm{d}, r_\mathrm{d}, s_\mathrm{d})$ then: \\ [7pt]
-            $r' \gets r_\mathrm{v} + r_\mathrm{d}$, $e' \gets (Y_\mathrm{enc}, C)$, $V' \gets \mathsf{Dec}(r', e')$
+            $k_\mathrm{v} \gets \mathsf{DerSymKey}(x_\mathcal{X}, Y_i)$, $(\vec{r}_\mathrm{v}, s_\mathrm{v}) \gets \mathsf{SymDec}(k_\mathrm{v}, d_\mathrm{v})$ \\
+            $k_\mathrm{d} \gets \mathsf{DerSymKey}(x_\mathcal{X}, Y_\mathcal{D})$, $(\vec{r}_\mathrm{d}, s_\mathrm{d}) \gets \mathsf{SymDec}(k_\mathrm{d}, d_\mathrm{d})$ \\ [7pt]
+            verify that $\mathsf{ComVer}(c_\mathrm{v}, \vec{r}_\mathrm{v}, s_\mathrm{v})$
+            and $\mathsf{ComVer}(c_\mathrm{d}, \vec{r}_\mathrm{d}, s_\mathrm{d})$ then: \\ [7pt]
+            $\vec{V}' = \{ V'_1, ..., V'_\ell \}$, with $V'_i \gets \mathsf{Dec}(r_{\mathrm{v}; i} + r_{\mathrm{d}; i}, e'_i)$, where $e'_i \gets (Y_\mathrm{enc}, C_i)$ 
             };
         \node[arrow, towards_left, between={v.center}{ev.center}] at (ev_1.south -| v.center) (a_2) {
-            $V'$
+            $\vec{V}'$
             };
         \node[block, keep_middle, spaced] at (a_2.south -| v.center) (v_1) {
-            verify that $V = V'$
+            verify that $\vec{V} = \vec{V}'$
             };
         
         % Arrows and lines
@@ -665,15 +700,15 @@ Finally, the external verifier presents to the voter, the plain text vote $V'$, 
 
 \clearpage
 \subsubsection{Vote confirmation receipt} \label{sec: vote confirmation receipt}
-After encrypting a ballot, the voter $\mathcal{V}_i$ can choose whether to test or cast it. After choosing to cast the ballot, the voter receives a receipt from the digital ballot box that confirms that the ballot has been registered as cast on the public bulletin board. 
+After encrypting a ballot, the voter $\mathcal{V}_i$ can choose whether to test or cast it. After deciding to cast the ballot, the voter receives a receipt from the digital ballot box that confirms that the ballot has been registered as cast on the public bulletin board. 
 
-The voter has to follow the protocol from \cref{fig: ballot casting protocol} where the voting application interacts with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{cr}, c_\mathrm{cr}, p_\mathrm{cr})$ (protocol \ref{pro: write on board}) in order to append the cast request item $b_\mathrm{cr}$ on the board, where $m_\mathrm{cr} =$ "cast request", the content $c_\mathrm{cr}$ is empty and the parent $p_\mathrm{cr}$ is the address of the ballot cryptograms item $b_\mathrm{bc}$.
+The voter has to follow the protocol from \cref{fig: ballot casting protocol} where the voting application interacts with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{V}_i, m_\mathrm{cr}, c_\mathrm{cr}, p_\mathrm{cr})$ (protocol \ref{pro: write on board}) to append the cast request item $b_\mathrm{cr}$ on the board, where $m_\mathrm{cr} =$ "cast request", the content $c_\mathrm{cr}$ is empty and the parent $p_\mathrm{cr}$ is the address of the ballot cryptograms item $b_\mathrm{bc}$.
 
-After publishing the cast request item on the bulletin board, the digital ballot box return to the voting app with the item $b_\mathrm{cr}$ and its receipt $\rho_\mathrm{cr}$. The voting app checks the item according to validations of protocol \ref{pro: write on board} and if valid, the voting application presents the receipt $\rho_\mathrm{cr}$ together with $\sigma_\mathrm{cr}$ and $h_\mathrm{cr}$ to the voter.
+After publishing the cast request item on the bulletin board, the digital ballot box return to the voting app with the item $b_\mathrm{cr}$ and its receipt $\rho_\mathrm{cr}$. The voting app checks the item according to validations of protocol \ref{pro: write on board}, and if valid, the voting application presents the receipt $\rho_\mathrm{cr}$ together with $\sigma_\mathrm{cr}$ and $h_\mathrm{cr}$ to the voter.
 
-The voter stores the tuple as the vote confirmation receipt (i.e. proof of the ballot being cast on the bulletin board). The voter can use it at any time to check that the vote is registered on the bulletin board as described in \cref{sec: vote is registered as cast}.
+The voter stores the tuple as the vote confirmation receipt (i.e., proof of the ballot being cast on the bulletin board). The voter can use it at any time to check that the vote is registered on the bulletin board as described in \cref{sec: vote is registered as cast}.
 
-Note that, if a voter $\mathcal{V}_i$ has a vote confirmation receipt $(\rho_\mathrm{cr}, \sigma_\mathrm{cr}, h_\mathrm{cr})$ that is valid (i.e. $\mathsf{SigVer}(Y_\mathcal{D}, \rho_\mathrm{cr}; \sigma_\mathrm{cr} || h_\mathrm{cr})$, where $Y_\mathcal{D}$ exists on the bulletin board $\boldsymbol{b}$) but does not correspond with the current state of the bulletin board (i.e. $h_\mathrm{cr}$ is not the address of any item of the bulletin board $\boldsymbol{b}$), that reveals that the integrity of the bulletin board has been broken and should be reported to the election officials.
+Note that if a voter $\mathcal{V}_i$ has a vote confirmation receipt $(\rho_\mathrm{cr}, \sigma_\mathrm{cr}, h_\mathrm{cr})$ that is valid (i.e., $\mathsf{SigVer}(Y_\mathcal{D}, \rho_\mathrm{cr}; \sigma_\mathrm{cr} || h_\mathrm{cr})$, where $Y_\mathcal{D}$ exists on the bulletin board $\boldsymbol{b}$) but does not correspond with the current state of the bulletin board (i.e., $h_\mathrm{cr}$ is not the address of any item of the bulletin board $\boldsymbol{b}$), that reveals that the integrity of the bulletin board has been broken and should be reported to the election officials.
 
 \begin{figure}[ht]
     \centering

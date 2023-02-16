@@ -24,7 +24,7 @@ The elliptic curve $E(\mathbb{F}_p)$ follows a group structure with the followin
     \]
 \end{itemize}
 
-We define the total number of points on the $E(\mathbb{F}_p)$ as $N$ and it can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$ which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup we follow:
+We define the total number of points on the $E(\mathbb{F}_p)$ as $N$, which can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$, which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup, we perform the following:
 \begin{enumerate}
     \item choose a random point $P \in E(\mathbb{F}_p)$,
     \item compute $G = [h]P$,
@@ -41,7 +41,7 @@ The \textit{Elliptic Curve Discrete Logarithm Problem} is defined in \cite{Trapp
 
 
 \subsubsection{Supported Elliptic Curves} \label{app: supported elliptic curves}
-The following elliptic curves are supported by AVX:
+There is support for the following elliptic curves:
 
 \textbf{Secp256k1(Bitcoin Curve):}
 \begin{center}
@@ -118,9 +118,9 @@ The following elliptic curves are supported by AVX:
 
 
 \subsubsection{Elliptic Curve Point Encoding}
-Each point on the curve is represented by its $x$ and $y$ coordinate. As presented in \cite{Trappe05}, the $y$ coordinate can be calculated based on the $x$ coordinate. Note that the elliptic curve equation might spawn no valid values for $y$ or two values for $y$. In case $y$ is not valid, it means $x$ is not a valid coordinate to generate a point, otherwise, the algorithm has to choose one of the two values for $y$ and continues. Thus, one extra bit of information is required specifying which of the two values is to be used.
+Each point on the curve is represented by its $x$ and $y$ coordinate. As presented in \cite{Trappe05}, the $y$ coordinate can be calculated based on the $x$ coordinate. Note that the elliptic curve equation might spawn no valid values for $y$ or two values for $y$. If $y$ is invalid, it means $x$ is not a valid coordinate to generate a point. Otherwise, the algorithm has to choose one of the two values for $y$ and continue. Thus, one extra bit of information is required specifying which of the two values is to be used.
 
-An elliptic curve point can be represented as a byte array in two ways: \textit{compressed form} or \textit{uncompressed form}. The compressed form contains the byte representation of only the $x$ coordinate to which is prepended a byte $f \in \{ 02, 03 \}$ as a flag to determine which value to choose for the $y$ coordinate. Formally, $y \gets \mathsf{RecoverY}(x, f)$ (\cref{alg: recover y}).
+An elliptic curve point can be represented as a byte array in two ways: \textit{compressed form} or \textit{uncompressed form}. The compressed form contains the byte representation of only the $x$ coordinate, which is prepended a byte $f \in \{ 02, 03 \}$ as a flag to determine which value to choose for the $y$ coordinate. Formally, $y \gets \mathsf{RecoverY}(x, f)$ (\cref{alg: recover y}).
 
 The uncompressed form contains the byte representation of both $x$ and $y$ coordinates concatenated together, to which is prepended the byte 04.
 
@@ -146,15 +146,15 @@ In our system, when an elliptic curve point has to be stored in the database, or
 
 
 \subsubsection{Mapping a message on the Elliptic Curve} \label{app: mapping a message on the elliptic curve}
-An important use case of a cryptographic system is to be able to interpret an arbitrary message (a plain text, a number, an id, or even a more complex construction). In the elliptic curve context, that means mapping a message into an elliptic curve point in a deterministic way. Additionally, this point must be able to be interpreted back as the original message. This section considers the message as an arbitrary byte array and it is up to specific use cases to convert data to a byte array (i.e. UTF-8 encoding of text, the byte representation of an integer, or even custom encoding of complex JSON object).
+An important use case of a cryptographic system is to interpret an arbitrary message (a plain text, a number, an id, or even a more complex construction). In the elliptic curve context, that means mapping a message into an elliptic curve point in a deterministic way. Additionally, this point must be able to be interpreted back as the original message. This section considers the message as an arbitrary byte array, and it is up to specific use cases to convert data to a byte array (i.e., UTF-8 encoding of text, the byte representation of an integer, or even custom encoding of complex JSON object).
 
-Mapping a message $\boldsymbol{b} \in \mathbb{B}^*$ into an elliptic curve point is done by $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}). The byte array $\boldsymbol{b}$ is prepended with an adjusting byte $b_0 = 00$ and appended (padded) with $00$ bytes such that it has a length of $\ell$, which is the elliptic curve byte size (i.e. $\ell \gets \mathsf{ByteLengthOf}(p)$ (\cref{alg: bytes length of}), where $p$ is the prime of the elliptic curve). The resulting byte array is interpreted as a field element $x \in \mathbb{F}_p$. Then, the algorithm checks whether $x$ spawns a valid point $M = (x, y)$, where $y$ is computed according to the elliptic curve equation $y \gets \mathsf{RecoverY}(x, 02)$ (\cref{alg: recover y}). If valid, then $M$ is the encoding of $\boldsymbol{b}$. Otherwise, the algorithm modifies $x$ by incrementing the adjusting byte and retries 255 times. If no valid point is found, the algorithm returns failure.
+Mapping a message $\vec{b} \in \mathbb{B}^*$ into an elliptic curve point is done by $M \gets \mathsf{Bytes2Point}(\vec{b})$ (\cref{alg: bytes to point}). The byte array $\vec{b}$ is prepended with an adjusting byte $b_0 = 00$ and appended (padded) with $00$ bytes such that it has a length of $\ell$, which is the elliptic curve byte size (i.e., $\ell \gets \mathsf{ByteLengthOf}(p)$ (\cref{alg: bytes length of}), where $p$ is the prime of the elliptic curve). The resulting byte array is interpreted as a field element $x \in \mathbb{F}_p$. Then, the algorithm checks whether $x$ spawns a valid point $M = (x, y)$, where $y$ is computed according to the elliptic curve equation $y \gets \mathsf{RecoverY}(x, 02)$ (\cref{alg: recover y}). If valid, then $M$ is the encoding of $\vec{b}$. Otherwise, the algorithm modifies $x$ by incrementing the adjusting byte and retries 255 times. If no valid point is found, the algorithm returns failure.
 
-By having one \textit{byte space} to find a valid point on the curve, \cite{Trappe05} shows that the probability of all 256 $x$ coordinates to generate invalid points is $1/2^{256}$, which is considered acceptable. Formally, $M \gets \mathsf{Bytes2Point}(\boldsymbol{b})$ (\cref{alg: bytes to point}) converts any message $\boldsymbol{b}$ of legal size (i.e. $|\boldsymbol{b}| \leq \ell - 1$, where $\ell$ is the byte size of the elliptic curve) into a valid elliptic curve point $M$ with a negligible failure rate.
+By having one \textit{byte space} to find a valid point on the curve, \cite{Trappe05} shows that the probability of all 256 $x$ coordinates to generate non-valid points is $1/2^{256}$, which is considered acceptable. Formally, $M \gets \mathsf{Bytes2Point}(\vec{b})$ (\cref{alg: bytes to point}) converts any message $\vec{b}$ of legal size (i.e., $|\vec{b}| \leq \ell - 1$, where $\ell$ is the byte size of the elliptic curve) into a valid elliptic curve point $M$ with a negligible failure rate.
 
-Recovering the message $\boldsymbol{b}$ from an elliptic curve point $M$ can be done by calling $\boldsymbol{b} \gets \mathsf{Point2Bytes}(M)$ (\cref{alg: point to bytes}). It extracts the byte representation of the $x$ coordinate, disregarding the rightmost $00$ bytes and the adjusting byte $b_0$.
+Recovering the message $\vec{b}$ from an elliptic curve point $M$ can be done by calling $\vec{b} \gets \mathsf{Point2Bytes}(M)$ (\cref{alg: point to bytes}). It extracts the byte representation of the $x$ coordinate, disregarding the rightmost $00$ bytes and the adjusting byte $b_0$.
 
-Having these two algorithms, mapping a message on the Elliptic Curve is a sound procedure as $\boldsymbol{b} = \mathsf{Point2Bytes}(\mathsf{Bytes2Point}(\boldsymbol{b}))$, for all $\boldsymbol{b} \in \mathbb{B}^*$, with $|\boldsymbol{b}| \leq \ell - 1$.
+Having these two algorithms, mapping a message on the Elliptic Curve is a sound procedure as $\vec{b} = \mathsf{Point2Bytes}(\mathsf{Bytes2Point}(\vec{b}))$, for all $\vec{b} \in \mathbb{B}^*$, with $|\vec{b}| \leq \ell - 1$.
 
 Examples of $\ell$ values, depending on elliptic curves, are:
 \begin{multicols}{2}
@@ -168,9 +168,9 @@ Examples of $\ell$ values, depending on elliptic curves, are:
 
 \begin{algorithm}[ht]
 \DontPrintSemicolon
-    \caption{$\mathsf{Bytes2Point} (\boldsymbol{b})$}
+    \caption{$\mathsf{Bytes2Point} (\vec{b})$}
     \label{alg: bytes to point}
-    \KwData{The byte array $\boldsymbol{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
+    \KwData{The byte array $\vec{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
 
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     \If{$n > \ell - 1$}{
@@ -179,8 +179,8 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     $m \gets \ell - n - 1$ \;
     \For{$i \gets 0$ \KwTo $255$ \KwBy $1$}{
         $b_0 \gets i$ \;
-        $\boldsymbol{b}' \gets \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \}$ \;
-        $x \gets \mathsf{Bytes2Field}(\boldsymbol{b}')$ \;
+        $\vec{b}\,' \gets \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \}$ \;
+        $x \gets \mathsf{Bytes2Field}(\vec{b}\,')$ \;
         $y \gets \mathsf{RecoverY}(x, 02)$ \tcp*{$y^2 = x^3 + ax + b$}
         \If{$y$ is valid}{
             $M \gets (x, y)$ \;
@@ -199,16 +199,16 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \KwData{The point $M = (x, y) \in \mathbb{P} = \mathbb{F}_p \times \mathbb{F}_p$}
 
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
-    $\boldsymbol{b}' = \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \} \gets \mathsf{Field2Bytes}(x)$ \tcp*{$\ell = m + n + 1$}
-    $\boldsymbol{b} \gets \{ b_1, ..., b_n \}$ \;
-    \Return{$\boldsymbol{b}$} \tcp*{$\boldsymbol{b} \in \mathbb{B}^*$}
+    $\vec{b}\,' = \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \} \gets \mathsf{Field2Bytes}(x)$ \tcp*{$\ell = m + n + 1$}
+    $\vec{b} \gets \{ b_1, ..., b_n \}$ \;
+    \Return{$\vec{b}$} \tcp*{$\vec{b} \in \mathbb{B}^*$}
 \end{algorithm}
 
 \begin{algorithm}[ht]
 \DontPrintSemicolon
-    \caption{$\mathsf{Bytes2Field} (\boldsymbol{b})$}
+    \caption{$\mathsf{Bytes2Field} (\vec{b})$}
     \label{alg: bytes to field}
-    \KwData{The byte array $\boldsymbol{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
+    \KwData{The byte array $\vec{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
 
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     \If{$n \neq \ell$}{
@@ -233,10 +233,10 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
     \For{$i \gets \ell$ \KwTo $1$ \KwBy $1$}{
         $b_i \gets x \mod{256}$ \;
-        $x \gets x / 256$ \;
+        $x \gets \lfloor x / 256 \rfloor$ \;
         }
-    $\boldsymbol{b} \gets \{ b_1, ..., b_\ell \}$ \;
-    \Return{$\boldsymbol{b}$} \tcp*{$\boldsymbol{b} \in \mathbb{B}^\ell$}
+    $\vec{b} \gets \{ b_1, ..., b_\ell \}$ \;
+    \Return{$\vec{b}$} \tcp*{$\vec{b} \in \mathbb{B}^\ell$}
 \end{algorithm}
 
 \begin{algorithm}[ht]
@@ -248,7 +248,7 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     $n \gets 0$ \;
     \While {$x \neq 0$}{
         $n \gets n + 1$ \;
-        $x \gets x / 256$ \;
+        $x \gets \lfloor x / 256 \rfloor$ \;
         }
     \Return{$n$} \tcp*{$n \in \mathbb{N}$}
 \end{algorithm}

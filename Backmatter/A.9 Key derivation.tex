@@ -8,7 +8,7 @@ $\mathsf{PBKDF2}$ is a standard algorithm, described in \cite{RFC8018}, that con
 
 We use $\mathsf{PBKDF2}$ as a building block for $\mathsf{Pass2Key}(m)$ (\cref{alg: pass to key}) that converts password $m$ into a key pair $(x, Y)$. This can be seen as an alternative algorithm to $\mathsf{KeyGen}()$ (\cref{alg: key gen}) that can be used to get a deterministic key pair based on some random seed.
 
-Particularly, no salt is used (i.e. salt is set to $\varnothing$), therefore only one key pair can be derived from password $m$. The amount of iterations is set to 600.000, according to recommendations from \cite{OWASP}. The password is concatenated with a counter that gets incremented until the output of the key derivation function can be interpreted as a correct private key (i.e. the output bytes are decoded as integer $x$, then checked whether $x \in \mathbb{Z}_q$).
+Particularly, no salt is used (i.e., salt is set to $\varnothing$), therefore, only one key pair can be derived from password $m$. The amount of iterations is set to 600.000, according to recommendations from \cite{OWASP}. The password is concatenated with a counter that gets incremented until the output of the key derivation function can be interpreted as a correct private key (i.e., the output bytes are decoded as integer $x$, then checked whether $x \in \mathbb{Z}_q$).
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -34,11 +34,11 @@ Particularly, no salt is used (i.e. salt is set to $\varnothing$), therefore onl
 
 \clearpage
 \subsubsection{Diffie Hellman key derivation function} \label{app: diffie hellman key derivation function}
-In order to use symmetric encryption for encrypting arbitrary amounts of data, a symmetric key needs to be derived from a private-public key environment. Algorithm $\mathsf{DerSymKey}(x_1, Y_2)$ (\cref{alg: der sym key}) deterministically computes a 256-bit symmetric key $k \in \mathbb{B}^{256}$, given a private key and a public key that are not related (i.e. $Y_2 \neq [x_1]G$).
+To use symmetric encryption for encrypting arbitrary amounts of data, a symmetric key needs to be derived from a private-public key environment. Algorithm $\mathsf{DerSymKey}(x_1, Y_2)$ (\cref{alg: der sym key}) deterministically computes a 256-bit symmetric key $k \in \mathbb{B}^{256}$, given a private key and a public key that are not related (i.e., $Y_2 \neq [x_1]G$).
 
-For two entities that have a private-public key infrastructure in place (i.e. entity 1 has key pair $(x_1, Y_1)$ and entity 2 has key pair $(x_2, Y_2)$, where $Y_1 = [x_1]G$ and $Y_2 = [x_2]G$) and that know each other (i.e. entity 1 knows $Y_2$ and entity 2 knows $Y_1$), they can both derive symmetric key $k$ by running $\mathsf{DerSymKey}(x_1, Y_2)$ as entity 1 and $\mathsf{DerSymKey}(x_2, Y_1)$ as entity 2.
+For two entities that have a private-public key infrastructure in place (i.e., entity 1 has key pair $(x_1, Y_1)$ and entity 2 has key pair $(x_2, Y_2)$, where $Y_1 = [x_1]G$ and $Y_2 = [x_2]G$) and that know each other (i.e., entity 1 knows $Y_2$ and entity 2 knows $Y_1$), they can both derive symmetric key $k$ by running $\mathsf{DerSymKey}(x_1, Y_2)$ as entity 1 and $\mathsf{DerSymKey}(x_2, Y_1)$ as entity 2.
 
-The algorithm performs a Diffie Hellman key exchange in order to reach a shared secret $S \gets [x_1]Y_2 = [x_2]Y_1 = [x_1 + x_2]G$. The resulting value is used as the keying material of a hash-based key derivation function $\mathsf{HKDF}$ (described in \cite{RFC5869}), in order to convert it to a uniform key $k$. Particularly, no salt and info arguments are used (i.e. salt and info are set to $\varnothing$), therefore only one symmetric key can be derived from two particular key pairs $(x_1, Y_1)$ and $(x_2, Y_2)$.
+The algorithm performs a Diffie Hellman key exchange to reach a shared secret $S \gets [x_1]Y_2 = [x_2]Y_1 = [x_1 + x_2]G$. The resulting value is used as the keying material of a hash-based key derivation function $\mathsf{HKDF}$ (described in \cite{RFC5869}) to convert it into a uniform key $k$. Particularly, no salt and info arguments are used (i.e., salt and info are set to $\varnothing$), therefore only one symmetric key can be derived from two particular key pairs $(x_1, Y_1)$ and $(x_2, Y_2)$.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon

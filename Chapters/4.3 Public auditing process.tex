@@ -27,32 +27,32 @@ If any verification steps mentioned above fail, then $\boldsymbol{b}$ does not r
 
 
 \subsubsection{Verification of the cleansing procedure} \label{sec: verification of the cleansing procedure}
-Given a bulletin board trace $\boldsymbol{b}$, with an extraction data item included in $\boldsymbol{b}$, any public auditor can verify the correctness of the list of cryptograms $\boldsymbol{e}_0$ present in the extraction data item. Recall from \cref{sec: cleansing procedure} that $\boldsymbol{e}_0$ lists all votes that will make up the election result.
+Given a bulletin board trace $\boldsymbol{b}$, with an extraction data item included in $\boldsymbol{b}$, any public auditor can verify the correctness of the list of cryptograms $\vec{\vec{e}}_0$ present in the extraction data item. Recall from \cref{sec: cleansing procedure} that $\vec{\vec{e}}_0$ lists all votes that will make up the election result.
 
-The auditor reruns the cleansing procedure on the bulletin board $\boldsymbol{b}$, applying all the filtering rules specified in \cref{sec: cleansing procedure} to recompute the \textit{initial mixed board} $\boldsymbol{e'}_0$. If $\boldsymbol{e'}_0$ is identical with $\boldsymbol{e}_0$, then the cleansing procedure has been performed correctly.
+The auditor reruns the cleansing procedure on the bulletin board $\boldsymbol{b}$, applying all the filtering rules specified in \cref{sec: cleansing procedure} to recompute the \textit{initial mixed board} $\vec{\vec{e}}_0^{\, \prime}$. If $\vec{\vec{e}}_0^{\, \prime}$ is identical with $\vec{\vec{e}}_0$, then the cleansing procedure has been performed correctly.
 
 
 \subsubsection{Verification of mixing procedure} \label{sec: verification of mixing procedure}
 After a result has been published via an extraction confirmation item (as described in \cref{sec: result publication}), any public auditor can verify the mixing procedure of each trustee that participated in the mixing phase. This checks that no votes have been tampered with during mixing. The data that an auditor needs to collect comes from the following sources:
 \begin{itemize}
-    \item the initial mixed board $\boldsymbol{e}_0$ is listed in the extraction data item,
-    \item the encryption keys $Y_\mathrm{enc}$ and the list of all trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$ are listed in the threshold configuration item, where $n_\mathrm{t}$ is the total number of trustees,
-    \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all the intermediate mixed boards that they produced $\boldsymbol{e}_i$, with $i \in \tau$, and their respective proofs of correct mixing $(PM_i, AS_i)$ are included in the extraction confirmation item.
+    \item the initial mixed board $\vec{\vec{e}}_0$ is listed in the extraction data item,
+    \item the encryption keys $Y_\mathrm{enc}$ and the list of trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$ are listed in the threshold configuration item, where $n_\mathrm{t}$ is the amount of trustees,
+    \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all the intermediate mixed boards that they produced $\vec{\vec{e}}_i$, with $i \in \tau$, and their respective proofs of correct mixing $(PM_i, AS_i)$ are included in the extraction confirmation item.
 \end{itemize}
 
-The auditor validates each intermediate mixed board by running \cref{alg: mix ver} $\mathsf{MixVer} (PM_i, AS_i, Y_\mathrm{enc}, \boldsymbol{e}_{i-1}, \boldsymbol{e}_i)$, for each $i \in \tau$. If any validations fail, the published result is not trustworthy.
+The auditor validates each intermediate mixed board by running \cref{alg: mix ver} $\mathsf{MixVer} (PM_i, AS_i, Y_\mathrm{enc}, \vec{\vec{e}}_{i-1}, \vec{\vec{e}}_i)$, for each $i \in \tau$. If any validations fail, the published result is not trustworthy.
 
 
 \subsubsection{Verification of the decryption} \label{sec: verification of decryption}
 After a result has been published via an extraction confirmation item (as described in \cref{sec: result publication}), any public auditor can verify the decryption procedure by checking all the partial decryptions of each trustee that participated in the decryption phase. The data that an auditor needs to collect comes from the following sources:
 \begin{itemize}
     \item the list of all trustees $\boldsymbol{\mathcal{T}} = \{ \mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}} \}$, together with their public keys $\{ Y_{\mathcal{T}_1}, ..., Y_{\mathcal{T}_{n_\mathrm{t}}} \}$ and public polynomial coefficients $\{ P_{\mathcal{T}_1, 1}, ..., P_{\mathcal{T}_{n_\mathrm{t}}, t-1} \}$, are listed in the threshold configuration item, where $t$ is the threshold value set during the threshold ceremony (see \cref{sec: threshold ceremony}), and $n_\mathrm{t}$ is the total number of trustees,
-    \item the final mixed board $\boldsymbol{e}_{n_\mathrm{t}}$ is listed in the extraction confirmation item,
-    \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all their partial decryption $\boldsymbol{S}_i$, with $i \in \tau$, and their respective proofs of correct decryption $PK_i$ are also included in the extraction confirmation item.
+    \item the final mixed board $\vec{\vec{e}}$ is listed in the extraction confirmation item,
+    \item the subset of trustees that participated in the mixing and decryption phases $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, together with all their partial decryption $\vec{\vec{S}}_i$, with $i \in \tau$, and their respective proofs of correct decryption $PK_i$ are also included in the extraction confirmation item.
 \end{itemize}
 
-The auditor validates the proof of each partial decryption by running \cref{alg: partial decryption ver} $\mathsf{PartialDecryptionVer} (\boldsymbol{e}_{n_\mathrm{t}}, \boldsymbol{S}_i, PK_i, sY_i)$, for each $i \in \tau$, where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ computed as in \cref{app: threshold cryptosystem}.
+The auditor validates the proof of each partial decryption by running \cref{alg: partial decryption ver} $\mathsf{PartialDecryptionVer} (\vec{\vec{e}}, \vec{\vec{S}}_i, PK_i, sY_i)$, for each $i \in \tau$, where $sY_i$ is the public share of the trustee $\mathcal{T}_i$ computed as in \cref{app: threshold cryptosystem}.
 
-If all partial decryptions are valid, the auditor aggregates them together to recompute the raw result $\boldsymbol{V} \gets \mathsf{FinalizeDecryption} (\boldsymbol{e}_{n_\mathrm{t}}, \{ \boldsymbol{S}_i | i \in \tau \})$ (\cref{alg: finalize decryption}). The list of decrypted votes $\boldsymbol{V}$ should be identical to the published result. If any validation step fails, the result is considered untrustworthy.
+If all partial decryptions are valid, the auditor aggregates them together to recompute the raw result $\vec{\vec{V}} \gets \mathsf{FinalizeDecryption} (\vec{\vec{e}}, \{ \vec{\vec{S}}_i | i \in \tau \})$ (\cref{alg: finalize decryption}). The list of decrypted votes $\vec{\vec{V}}$ should be identical to the published result. If any validation step fails, the result is considered untrustworthy.
 
 Counting the votes and sorting the candidates based on their vote count is considered trivial and out of scope.
