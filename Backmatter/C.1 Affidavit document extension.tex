@@ -1,30 +1,86 @@
 \subsection{Affidavit document extension} \label{app: affidavit document extension}
-The affidavit document extension is an optional feature that includes an extra authentication factor in form of an affidavit that is hand signed by the voter. The affidavit accompanies the encrypted digital ballot.
 
 
 \subsubsection{General description}
-The affidavit feature is an extra verifiability check that is implemented upon the election phase when a \textit{Voter} $\mathcal{V}_i$ wants to submit his vote as described in \cref{sec: election phase} (bullet point 3) then an additional step is required by the user which is to provide a signed affidavit to the voting application. During the election phase, after a voter has submitted his vote and an affidavit, the affidavit is manually checked by an \textit{Election Administrator} $\mathcal{E}$ who then either accept or rejects the signature. In the post-election phase only cryptograms that are accompanied by accepted affidavits will pass through the cleansing phase to be part of the mixing and decryption phases as described in \cref{sec: cleansing procedure}.
+The affidavit document extension is an optional feature that introduces an extra authentication factor for voters in the form of a document hand signed by the voter. The affidavit is submitted encrypted together with the digital ballot. Affidavits are manually checked by election officers, which can either accept or reject them. The affidavit verification process can be done continuously throughout the election phase or as a bulk process before the cleansing procedure.
 
-The file is then encrypted with the encryption key $Y_\mathrm{aff}$ that is written from the election configuration. The file is encrypted using symmetric encryption as described in (ref to symmetric algorithm) where it is also described how $Y_\mathrm{aff}$ is transformed into a symmetric key.
+During the post-election phase, ballots get included in the tally only if they have been marked as accepted after the affidavit verification process.
 
-The encrypted affidavit is then sent to the \textit{Digital Ballot Box} $\mathcal{D}$ and stored encrypted privately by the \textit{Digital Ballot Box} $\mathcal{D}$ and a fingerprint of the encrypted affidavit is posted on the bulletin board together with the vote cryptogram. This also means that the affidavit extension modifies the cast-request item described in \cref{sec: writing on the bulletin board} as the item now contains a field with this aforementioned fingerprint.
+The affidavit document comes in the form of a PDF document. It gets encrypted by the voting application and stored privately by the digital ballot box. During the affidavit verification process, the affidavit is decrypted by the election administrator service and presented to an election officer for assessment.
 
-
-The affidavit is verified as being genuine, that is generated in a appropriate voting application, by (what parameter?). After being verified the affidavit is unencrypted and the contents are manually accepted or rejected by an \textit{Election Administrator} $\mathcal{E}$.
-
-During the affi davit process an id is generated for the user $\mathcal{V}_{{F}_i}$ which the \textit{Election Administrator} $\mathcal{E}$ then uploads after the affi davit is submitted.
+A fingerprint of the encrypted affidavit is included in the ballot submission, signed by the voting application, and published on the bulletin board for trackability and integrity reasons. The encrypted affidavit is not publicly accessible on the bulletin board for privacy concerns. 
 
 
-\subsubsection{How it impacts our protocol}
-In the pre-election phase the \textit{Election Administrator} $\mathcal{E}$ has to generate an asymmetric key pair for the encryption and decryption of the affidavits. $(x_\mathrm{aff}, Y_{\mathcal{E}_f}) \leftarrow \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x_{\mathcal{E}_f}$ is the private key and will be kept private by the \textit{Election Administrator} $\mathcal{E}$, and $Y_{\mathcal{E}_f}$ is the public encryption key that the \textit{Voter} $\mathcal{V}$ will use to encrypt his affidavits. The public key is included in the election configuration so a voter can access it and use it to encrypt his affidavit.
+\subsubsection{Election protocol modification}
+In the pre-election phase, the election administrator $\mathcal{E}$ generates another key pair that is used for encrypting/decrypting the affidavit documents $(x_\mathrm{aff}, Y_\mathrm{aff}) \gets \mathsf{KeyGen}()$ (\cref{alg: key gen}), where $x_\mathrm{aff}$ is the private key used for decryption and will be kept secret by the election administrator, and $Y_\mathrm{aff}$ is the public key that voters will use to encrypt affidavits. The public key $Y_\mathrm{aff}$ is included in the election configuration item. Thus it is publicly accessible on the bulletin board.
 
-The bulletin board has additional information in form of the fingerprint of the encrypted affidavit and the \textit{Digital Ballot Box} $\mathcal{D}$ has an extra item stored. The extra item is either an acceptance item or an rejection item depending on whether or not the affidavit is accepted. The acceptance item contains nothing and the item type in itself is the proof of acceptance. The rejection item contains a rejection reason $m_i$. 
+During the election phase, a voter $\mathcal{V}_i$ must provide the affidavit document to the voting application. Before publishing the cast request item, as described in \cref{sec: vote confirmation receipt}, the voting application computes the encryption of the affidavit document $ea \gets \mathsf{SymEnc} (k_\mathrm{aff}, a)$ (\cref{alg: sym enc}), where $a \in \mathbb{B}^*$ is the byte representation of the affidavit document. The symmetric key $k_\mathrm{aff}$ is derived from the Diffie-Hellman key exchange mechanism $k_\mathrm{aff} \gets \mathsf{DerSymKey} (x_i, Y_\mathrm{aff})$ (\cref{alg: der sym key}), where $x_i$ is the voter's private key (as described in \cref{sec: voter authorization procedure}) and $Y_\mathrm{aff}$ is the affidavit public encryption key that is extracted from the election configuration item.
 
-The affidavit extension also impacts the Cleansing Procedure (\cref{sec: cleansing procedure}) as only ballots that has been marked as accepted will be included in the \textit{initial mixed board} list that is going to be mixed and decrypted. An accepted cast request item has an accepted item appended and pointing towards it. The rejected affidavits on the board are documented as discarded on the bulletin board. 
+A fingerprint of the encrypted affidavit (i.e., $\mathcal{H} (ea)$) is included in the content of the cast request item. The encrypted affidavit is submitted alongside the cast request item to the digital ballot box, which validates the request and appends the item on the bulletin board if the fingerprint matches the encrypted affidavit. Note that the digital ballot box cannot read the contents of the affidavit document, as it does not know the affidavit decryption key $x_\mathrm{aff}$.
+
+To perform the affidavit verification process (\cref{fig: affidavit verification process}), an election officer interacts with the election administrator service, which gets the encrypted affidavit $ea$ of the voter $\mathcal{V}_i$, together with the ancestry of items $\alpha_\mathrm{cr} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{cr} \}$ from the digital ballot box. The election administrator validates the ancestry by $\mathsf{AncestryVer} (\alpha_\mathrm{cr}, \varnothing)$ (\cref{alg: ancestry ver}), and checks that $c_\mathrm{cr} = \mathcal{H} (ea)$, where $c_\mathrm{cr}$ is the content of the cast request item $b_\mathrm{cr}$. If all validations succeed, it decrypts the affidavit by $a \gets \mathsf{SymDec} (k_\mathrm{aff}, ea)$ (\cref{alg: sym dec}). The symmetric key is derived by $k_\mathrm{aff} \gets \mathsf{DerSymKey} (x_\mathrm{aff}, Y_i)$, where the public key $Y_i$ is defined in the voter session item $b_\mathrm{vs}$. Value $a$ is decoded as a PDF file and rendered to the election officer for assessment.
+
+The election officer decides whether to accept or reject the affidavit. If accepted, the election administration $\mathcal{E}$ interacts with the digital ballot box to append a ballot accepted item $b_\mathrm{ba}$ on the bulletin board by running protocol \ref{pro: write on board} $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ba}, c_\mathrm{ba}, p_\mathrm{ba})$, where $m_\mathrm{ba} = $ "ballot accepted", the content is empty, and the parent is the address of the cast request item $b_\mathrm{cr}$. If rejected, the same interaction happens to append a ballot rejected item $b_\mathrm{br}$ by $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{br}, c_\mathrm{br}, p_\mathrm{br})$, where $m_\mathrm{br} = $ "ballot rejected", $c_\mathrm{br}$ contains the rejection reason, and the parent is the address of the cast request item $b_\mathrm{cr}$.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed,
+            node distance=0,
+            % every node/.style={draw}
+            ]{
+            
+        % Actors
+        \node[title, above, anchor=north east] (ea) {
+            \textbf{Election Administrator $\mathcal{E}$}};
+        \node[title, right=of ea] (dbb) {
+            \textbf{Digital Ballot Box $\mathcal{D}$}};
+        
+        % internal knowledge
+        \node[ik] at (ea.south) (ea_ik) {
+            internal knowledge: $x_\mathcal{E}$, $x_\mathrm{aff}$
+            };
+        \node[ik] at (dbb.south) (dbb_ik) {
+            internal knowledge: $\boldsymbol{b} = \{ b_1, ..., b_{k-1} \}$, \\
+            where $\alpha_\mathrm{cnf}, \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{cr} \} \subset \boldsymbol{b}$
+            };
+        
+        %All content
+        \node[arrow, towards_left, spaced, between={ea.center}{dbb.center}] at (dbb_ik.south -| ea.center) (a_1) {
+            $ea$, $\alpha_\mathrm{cr} = \alpha_\mathrm{cnf} \cup \{ b_\mathrm{vs}, b_\mathrm{vec}, b_\mathrm{sec}, b_\mathrm{bc}, b_\mathrm{cr} \}$
+            };
+        \node[block, keep_left, spaced] at (a_1.south -| ea.west) (ea_1) {
+            $h_\mathrm{cr} \gets $ the address of $b_\mathrm{cr}$, \\
+            $c_\mathrm{cr} \gets $ the content of $b_\mathrm{cr}$ \\
+            $Y \gets $ the content of $b_\mathrm{vs}$ \\ [7pt]
+            verify $\mathsf{AncestryVer}(\alpha_\mathrm{cr}, \varnothing)$ and $c_\mathrm{cr} = \mathcal{H} (ea)$ \\ [7pt]
+            $k_\mathrm{aff} \gets \mathsf{DerSymKey} (x_\mathrm{aff}, Y)$ \\
+            $a \gets \mathsf{SymDec} (k_\mathrm{aff}, ea)$ \\ [7pt]
+            Decide validity of affidavit $a$
+            };
+        \node[banner, keep_left, spaced, between={ea.west}{dbb.east}] at (ea_1.south -| ea.west) (b_1) {
+            $\mathcal{E}$ and $\mathcal{D}$ perform protocol \ref{pro: write on board} to write a ballot accepted $b_\mathrm{ba}$ or \\
+            ballot rejected item $b_\mathrm{br}$ as the $k^\mathrm{th}$ item of $\boldsymbol{b}$
+            };
+        
+        % Arrows and lines
+        \draw[dashed] (ea.south west)--(dbb.south east);    
+        \draw[dashed] (dbb_ik.south -| ea.west)--(dbb_ik.south -| dbb.east);
+
+        \draw[dotted] (b_1.north west)--(b_1.north east);
+        \draw[dotted] (b_1.south west)--(b_1.south east);
+
+        \draw[densely dotted] (dbb_ik.south -| ea.center)--(ea_1.north -| ea.center);
+        \draw[densely dotted] (ea_1.south -| ea.center)--(b_1.north -| ea.center);
+
+        \draw[densely dotted] (dbb_ik.south -| dbb.center)--(a_1.south east);
+        }
+    \end{tikzpicture}
+    \caption{Affidavit verification process}
+    \label{fig: affidavit verification process}
+\end{figure}
+
+The affidavit extension also impacts the cleansing procedure (\cref{sec: cleansing procedure}), such that only ballots that have been marked as accepted (i.e., that are followed by a ballot accepted item) will be included in the \textit{initial mixed board}.
 
 
-\subsubsection{How it impacts our election properties}
-The affidavit extension impacts the eligibility election property as a voter has the additional requirement of the affidavit which has to be approved by an official administrator. This naturally makes the \textit{Election Administrator} $\mathcal{E}$ have additional responsibilities as he verifies voters and the \textit{Election Administrator} $\mathcal{E}$ has to be trusted as the decision on the affidavit cannot be verified.
-The election property of verifiability is also affected due to the mentioned problem above that the decision on the affidavit cannot be verified.
-
-This extension adds extra dependencies between
+\subsubsection{Impact on election properties}
+The affidavit extension impacts the eligibility property of the election system. This feature acts as an extra authentication step for voters. The authentication validation is a manual process done by election officers, at a later time than the ballot submission. Moreover, the election officials' decisions to accept or reject affidavits cannot be audited. Therefore, the system achieves the eligibility property on an extra assumption that the election officials are trustworthy for the affidavit verification process.

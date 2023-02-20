@@ -189,7 +189,7 @@ The full list of item types and rules can be studied in \cref{app: bulletin boar
     
     \item The \textit{threshold configuration} is the item defining the ballot encryption key $Y_\mathrm{enc}$ and the threshold setup $t$ out-of $n_\mathrm{t}$, where $t$ is the amount of trustees needed for decryption and $n_\mathrm{t}$ is the total number of trustees. It also specifies all the trustee data, that includes: the set of trustees $\boldsymbol{\mathcal{T}} = \{\mathcal{T}_1, ..., \mathcal{T}_{n_\mathrm{t}}\}$, their public keys $Y_{\mathcal{T}_i}$ and their public polynomial coefficients $P_{\mathcal{T}_i,j}$, with $i \in \{1, ..., n_\mathrm{t}\}$ anf $j \in \{1, ..., t-1\}$. The threshold configuration cannot be updated throughout the election phase.
     
-    \item The \textit{actor config} is an item that introduces a new actor on the bulletin board. The new actor is defined by a role and a public key. The roles that actors can have are: the \textit{Voter Authorizer} $\mathcal{A}$, with its public key $Y_\mathcal{A}$ and the \textit{Ballot Adjudicator} $\mathcal{B}$ with its public key $Y_\mathcal{B}$.
+    \item The \textit{actor config} is an item that introduces a new actor on the bulletin board. The new actor is defined by a role and a public key. The roles that actors can have are: the \textit{Voter Authorizer} $\mathcal{A}$, with its public key $Y_\mathcal{A}$ (upcoming roles might be included in the next versions of the protocol).
 
     \item The \textit{voter authorization configuration} is the item describing the way voters have to authenticate in order to get authorized to vote. The item defines the \textit{voter authorization mode} and, if applicable (i.e. when \textit{voter authorization mode} is \textbf{identity-based}), the configuration of all Idenitity Providers $\{\mathcal{I}_1, ..., \mathcal{I}_{n_\mathrm{i}}\}$, where $n_\mathrm{i}$ is the number of providers.
     
@@ -210,15 +210,11 @@ The full list of item types and rules can be studied in \cref{app: bulletin boar
     \item The \textit{cast request} is the item that documents the action of casting a previously submitted vote.
     
     \item The \textit{spoil request} is the item that documents the decision of challenging a vote cryptogram that has been previously submitted. The process is described in \cref{sec: challenging a vote cryptogram}.
-    
-    \item The \textit{ballot accepted} is the item labeling a previously submitted ballot as accepted (i.e. it will be considered during the cleasing phase, see \cref{sec: cleansing procedure}) based on some post-submission processes.
-    
-    \item The \textit{ballot rejected} is the item labeling a previously submitted ballot as rejected (i.e. it will be disregarded during the cleasing phase, see \cref{sec: cleansing procedure}) based on some post-submission processes.
 \end{enumerate}
 
 \paragraph{Hidden items}
 \begin{enumerate}
-    \setcounter{enumi}{15}
+    \setcounter{enumi}{13}
     \item The \textit{verification track start} is the initial item of the hidden verification track, basically, spawning a verification track for each \textit{ballot cryptogram} item. The item is automattically written by the digital ballot box $\mathcal{D}$ after a \textit{ballot cryptograms} item has been posted.
     
     \item The \textit{verifier} is the item that defines the external verifier $\mathcal{X}$ and its public key $Y_\mathcal{X}$.
@@ -230,7 +226,7 @@ The full list of item types and rules can be studied in \cref{app: bulletin boar
 
 \paragraph{Result items}
 \begin{enumerate}
-    \setcounter{enumi}{19}
+    \setcounter{enumi}{17}
     \item The \textit{extraction intent} is the item that documents the request for a result to be computed. The request is made by the election administrator $\mathcal{E}$.
     
     \item The \textit{extraction data} is the item that lists all the ballot cryptograms that make up the \textit{initial mixed board} (see details in \cref{sec: cleansing procedure}). These cryptograms are the only ones that will count in the result of the election.
