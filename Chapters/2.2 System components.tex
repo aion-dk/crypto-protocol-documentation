@@ -1,62 +1,59 @@
 \subsection{System components} \label{sec: system components}
-Multiple parties are involved in the election process. Each party represents a human with access to a computer or simply a process/software that follows a particular protocol. All these parties can be categorized into the following 9 types: 
+This section describes all parties that are involved in the election protocol. Each party represents a computer or simply an application that follows a particular protocol. Each party is accessed and controlled by one of the stakeholders or by an organization that hosts that specific application. All these parties can be categorized into the following nine types: 
 
 
 \subsubsection{Election Administrator}
-There exists one administrator that is responsible for setting up the election event and making updates to the configurations. The Election Administrator $\mathcal{E}$ is a single service that is used by all election officers to configure the election. Election officers are humans that use an internet connected device to access the Election Administrator service based on some pre-established set of credentials.
+There exists one administrator that is responsible for setting up the election event and making updates to the configurations. The election administrator $\mathcal{E}$ is a single service that all election officers use to set up an election event, configure it and keep it updated. The election administrator service is an online application hosted by an organization. Election officers can access the service based on some pre-established set of credentials.
 
-The Election Administrator $\mathcal{E}$ owns a key pair $(x_\mathcal{E}, Y_\mathcal{E})$ used for signing the election configuration and it is responsible for privately storing its private key $x_\mathcal{E}$.
+The election administrator $\mathcal{E}$ owns a key pair $(x_\mathcal{E}, Y_\mathcal{E})$ used for signing the election configuration, and is responsible for privately storing its private key $x_\mathcal{E}$.
 
 
 \subsubsection{Trustee application}
-There is a set of trustees, each denoted as $\mathcal{T}_i$, with $i \in \{ 1, ..., n_\mathrm{t} \}$, where $n_\mathrm{t}$ is the total number of trustees. A trustee is a human controlling a computer that has the \textit{Trustee Application} installed. Trustees are responsible for preserving the privacy and the fairness of the election during the election phase by working together to build the election encryption key while safely storing their shares of the decryption key.
+There is a set of trustees, each denoted as $\mathcal{T}_i$, with $i \in \{ 1, ..., n_\mathrm{t} \}$, where $n_\mathrm{t}$ is the total number of trustees. Each trustee uses the trustee application to perform all cryptographic processes involved in the protocol. Trustees are responsible for preserving the privacy and the fairness of the election during the election phase by working together to build the election encryption key while safely storing their shares of the decryption key.
 
-The Trustee $\mathcal{T}_i$ protects its own private key $x_{\mathcal{T}_i}$ and its share of the election decryption key $sx_i$.
-
-Trustees are also responsible for preserving the anonymity of the election by shuffling the entire list of votes in an indistinguishable way before a result is computed.
+The trustee application will compute and deliver to its trustee $\mathcal{T}_i$, a key pair $(x_{\mathcal{T}_i}, Y_{\mathcal{T}_i})$ and a share of the election decryption key $sx_i$. The trustee is responsible for privately storing the keys until a result is computed. Trustees are responsible for destroying the keys after the election event has ended.
 
 
 \subsubsection{Voting application}
-There exists a list of eligible voters, each denoted $\mathcal{V}_i$, with $i \in \{ 1, ..., n_\mathrm{v} \}$, where $n_\mathrm{v}$ is the total number of voters.  A voter is a human being that is allowed to cast a valid vote in this election. A voter needs to have access to a computer that has an internet connection. Voters are the ones to generate vote cryptograms.
+There is a list of pre-defined eligible voters, each denoted $\mathcal{V}_i$, with $i \in \{ 1, ..., n_\mathrm{v} \}$, where $n_\mathrm{v}$ is the total number of voters. The voting application is the software that voters use to perform all the cryptographic operations involved in the protocol. The voting application runs locally, on the voter's device, such as an application on the phone or a web application in the browser. The voting application requires an internet connection.
 
-In \textbf{credential-based} voter authentication mode (see \cref{sec: voter authentication modes}), voters are responsible for protecting their credentials $c_{i,j}$ received from all credentials authorities. Moreover, they need to protect their private key $x_i$ while a voting session is active.
-
-In \textbf{identity-based} voter authentication mode voters are responsible for protecting their private key $x_i$ while a voting session is active.
+During the protocol, the voting application generates a key pair $(x_i, Y_i)$ that represents the cryptographic identity of voter $\mathcal{V}_i$. Apart from the private key, the voting application learns all secrets that its voter inputs, e.g., the voter's credentials and the plain-text vote.
 
 
 \subsubsection{Credentials Authority}
-The Credentials Authority role is relevant only in the \textbf{credential-based} voter authentication mode, which is described in \cref{sec: credential-based mode}.
+The Credentials Authority role is relevant only in the \textbf{credential-based} voter authentication mode, described in \cref{sec: credential-based mode}.
     
-There is a set of credentials authorities, each noted as $\mathcal{C}_i$, with $i \in \{ 1, ..., n_\mathrm{c} \}$, where $n_\mathrm{c}$ is the total number of credentials authorities. A credentials authority is an institution, consisting of humans and software processes. Each of them is responsible for generating voter credentials and distribute them privately to the voters. It is recommended that each credentials authority should use a different communication channel for distributing credentials (e.g. e-mail, post, SMS). Credentials Authorities must delete the voter credentials after they have been distributed.
+There is a set of credentials authorities, each noted as $\mathcal{C}_i$, with $i \in \{ 1, ..., n_\mathrm{c} \}$, where $n_\mathrm{c}$ is the total number of credentials authorities. A credentials authority is an institution consisting of humans and software processes. Each credentials authority is responsible for generating and privately distributing voter credentials to the voters. It is recommended that each credentials authority should use a different communication channel for distributing credentials (e.g., e-mail, post, SMS). Credentials Authorities must delete the voter credentials after they have been distributed.
 
 
 \subsubsection{Identity Provider}
-The Identity Provider role is relevant only in the \textbf{identity-based} voter authentication mode, which is described in \cref{sec: identity-based mode}.
+The Identity Provider role is relevant only in the \textbf{identity-based} voter authentication mode, described in \cref{sec: identity-based mode}.
     
-There is a set of Identity Providers $\mathcal{I}_i$, with $i \in \{ 1, ..., n_\mathrm{i} \}$, where $n_\mathrm{i}$ is the total number of identity providers. An Identity Provider is a third party application responsible for authenticating a voter $\mathcal{V}$, on the fly, during the election phase. Identity Providers must follow the OIDC protocol.
+There is a set of Identity Providers $\mathcal{I}_i$, with $i \in \{ 1, ..., n_\mathrm{i} \}$, where $n_\mathrm{i}$ is the total number of identity providers. An Identity Provider is a third-party application responsible for authenticating a voter $\mathcal{V}$ during the election phase. Identity Providers must follow the OIDC protocol.
 
 
 \subsubsection{Voter Authorizer} 
-The Voter Authorizer $\mathcal{A}$ is a service that is responsible for authorizing a Voter $\mathcal{V}$ after being authenticated. The voter authentication can be performed either by providing the correct voter credentials, or by authenticating with all Identity Providers, depending on the voter authentication mode (described in \cref{sec: voter authentication modes}).
+The Voter Authorizer $\mathcal{A}$ is a service responsible for authorizing a Voter $\mathcal{V}$ after being authenticated. The voter authentication can be performed by providing the correct voter credentials or authenticating with all Identity Providers, depending on the voter authentication mode (described in \cref{sec: voter authentication modes}).
 
-The Voter Authorizer $\mathcal{A}$ is responsible for preserving the eligibility of the election by preventing any non-eligible voters from voting.
-
-The Voter Authorizer $\mathcal{A}$ owns a key pair $(x_\mathcal{A}, Y_\mathcal{A})$ used for signing voter authorization and it is responsible for privately storing its private key $x_\mathcal{A}$.
+The Voter Authorizer $\mathcal{A}$ is responsible for preserving the election eligibility property by preventing non-eligible voters from voting. The Voter Authorizer $\mathcal{A}$ owns a key pair $(x_\mathcal{A}, Y_\mathcal{A})$ used for signing voter authorization and it is responsible for privately storing its private key $x_\mathcal{A}$.
 
 
 \subsubsection{Digital Ballot Box} 
-The Digital Ballot Box $\mathcal{D}$ is the communication central unit such that all other parties push/pull data to/from it. It is a single service, publicly accessible over the internet. The Digital Ballot Box $\mathcal{D}$ has a bulletin board that contains all the public information about an election. The data that is published on the bulletin board is thoroughly described in \cref{sec: bulletin board event types}, but is can simply be summarized under the following categories: 
+The Digital Ballot Box $\mathcal{D}$ is the central communication unit, so all other parties push/pull data to/from it. It is a single service publicly accessible over the internet. The Digital Ballot Box $\mathcal{D}$ has a bulletin board that contains all the public information about an election. The data that is published on the bulletin board is thoroughly described in \cref{sec: bulletin board event types}, but it can be summarized under the following categories: 
 \begin{itemize}
-    \item election configuration data, that has to be set up during the pre-election phase (described in \cref{sec: pre-election phase}). Most of this data is generated by the Election Administrator $\mathcal{E}$.
-    \item voting data, which is being populated during the election phase (described in \cref{sec: election phase}). Most of this data is generated by voters in collaboration with the Digital Ballot Box $\mathcal{D}$.
-    \item result data, which is collected during the post-election phase (described in \cref{sec: post-election phase}). This includes mixing and decryption files that are generated by Trustees and enable the result to be verifiable.
+    \item configuration data; This is set up during the pre-election phase (described in \cref{sec: pre-election phase}), mostly generated by the Election Administrator $\mathcal{E}$.
+    \item voting data;  This is populated during the election phase (described in \cref{sec: election phase}) and is generated by the voting application in collaboration with the Digital Ballot Box $\mathcal{D}$.
+    \item result data; This is collected during the post-election phase (described in \cref{sec: post-election phase}) and includes mixing and decryption files generated by Trustees and enable the result to be verifiable.
 \end{itemize}
 
-The Digital Ballot Box $\mathcal{D}$ owns a key pair $(x_\mathcal{D}, Y_\mathcal{D})$ used for signing data on the bulletin board and it is responsible for privately storing its private key $x_\mathcal{D}$.
+The Digital Ballot Box $\mathcal{D}$ owns a key pair $(x_\mathcal{D}, Y_\mathcal{D})$ used for signing data on the bulletin board, and it is responsible for privately storing its private key $x_\mathcal{D}$.
 
 
 \subsubsection{External Verifier}
-The External Verifier $\mathcal{X}$ is an auditing tool that is used by voters if they choose to perform the process of challenging a vote cryptogram (\cref{sec: challenging a vote cryptogram}). The External Verifier enables voters to check that their vote has been correctly encrypted and stored on the bulletin board. During this process, the External Verifier $\mathcal{X}$ will generate a new key pair $(x_\mathcal{X}, Y_\mathcal{X})$ and it has to protect its private key $x_\mathcal{X}$.
+The External Verifier $\mathcal{X}$ is an auditing tool that voters use if they choose to perform the process of challenging a vote cryptogram (\cref{sec: challenging a vote cryptogram}). The External Verifier lets voters check that their vote has been correctly encrypted and stored on the bulletin board. During this process, the External Verifier $\mathcal{X}$ will generate a new key pair $(x_\mathcal{X}, Y_\mathcal{X})$ and it has to protect its private key $x_\mathcal{X}$.
 
 
 \subsubsection{Auditing tools}
+Two auditing tools are used by different actors to perform the auditing process. The election officers use the administrative auditing tool to run all the cryptographic operations involved in the administrative auditing process. This confirms to the election officers that the election system behaved according to their configuration.
+
+Any public auditor uses public auditing tool to perform the public audit process. This verifies the integrity of all public data from the bulletin board.
