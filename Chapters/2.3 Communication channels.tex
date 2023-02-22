@@ -1,22 +1,20 @@
 \subsection{Communication channels} \label{sec: communication channels}
-In AVX there will broadly speaking be three different types of channels which data is transferred through, secure, unsecure and authentic. What type of channel is used depends on the encryption available/possible for the data being sent.
+The election protocol uses three types of communication channels to transfer data between two parties, i.e., a sender and a receiver. They are categorized as secure, authentic, or unsecured channels. Two relevant criteria differentiate the channel types, namely secrecy, and authenticity.
 
+A secret communication channel implies that any outside observer cannot read the data being transferred. The communication channel provides a way to obfuscate the data. An authentic communication channel involves some mechanism that grants the receiver a confirmation that the data has been genuinely constructed by the sender.
 
-\subsubsection{Unsecure channels}
-An unsecure channel is used when the data is already safely encrypted on the application layer. 
-
-This means that using a secure channel would add an additional layer of security but is not necessary as the data is already sufficiently protected. 
-
-An example is when transferring the encrypted ballots then a unsecure channel can be used as the ballots are sufficiently protected from any outsider interference or manipulation.
+The following sub-sections describe what criteria are provided by each of the communication channels. What type of channel is used during the election protocol depends on the cryptographic environment available at that step in the process and on the data being transferred.
 
 
 \subsubsection{Secure channels}
-A secure channel is used when the data is transferred is unencrypted and would be readable if an outsider were to gain access to the data. The channel must therefore be protected from any unwanted readers.
+A secure channel provides both secrecy and authenticity to the data being communicated. This type of channel is used when the data in transfer is confidential to the two actors communicating but also sensitive (i.e., any tampering with the data causes the protocol to break). A secure channel prevents any outsider from reading any part of the data or modifying it. Usually, secure channels are used where a cryptographic infrastructure has not been established yet.
 
-An example is when the election administrator initializes a new bulletin board on the \textit{Digital Ballot Box} $\mathcal{D}$ as there is no cryptographic keys established at this point between the two parties as this is their first communication with each other.
-
+The requirement of secure channels is seen as a weakness as it introduces external security dependencies to achieve specific properties. In general, the election protocol has been designed with the least need for secure communication channels.
 
 \subsubsection{Authentic channels}
-An authentic channel is used when the data is transferred is public but still needs to be tamper proof. 
+An authentic channel provides only the authenticity property to the data that is being communicated. This channel type is used when the data in transfer is not secret but cannot be tampered with. Therefore, the data must contain proof that it genuinely comes from the sender. An authentic channel protects against a man-in-the-middle attack but allows that man in the middle to read all the traffic.
 
-An example is when transferring public keys, these are by their name public, but needs to be received unchanged or they wont work.
+An example is when exchanging public keys. They are, as the name suggests, public, while they have to represent their owner authentically.
+
+\subsubsection{Unsecured channels}
+An unsecured channel does not provide secrecy or authenticity by itself. Instead, the data in transfer must have built-in mechanisms that ensure secrecy and authenticity. Examples of such mechanisms are encryption and digital signatures.
