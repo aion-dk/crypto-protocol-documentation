@@ -1,8 +1,207 @@
 \subsection{Overview}
+This section briefly describes the entire election protocol. A full election process is split into three main phases:
+\begin{itemize}
+    \item the pre-election phase, where the election context is created and all components are configured, as presented in \cref{sec: pre-election phase},
+    \item the election phase, where the actual votes are being generated and stored, as presented in \cref{sec: election phase},
+    \item and the post-election phase, where all collected votes are being processed into an election result, as described in \cref{sec: post-election phase}.
+\end{itemize}
+All of these phases internally consist of different processes that are triggered by specific stakeholders. A map of all processes is presented in \cref{fig: processes map}, where the leftmost label lists the process name, the circled label defines the actor that triggers the process (EO for election official, T for trustee, V for voter and PA for public auditor), and the following empty circles indicate the system components that are involved in the process.
 
-%\begin{figure}[H]
-%    \centering
-%    \includesvg{Pictures/}
-%    \caption{}
-%    \label{fig:}
-%\end{figure}
+Specifically, an entire election process is started by an election official initializing a digital ballot box, as presented in \cref{sec: digital ballot box initialization}, and setting up the election configuration as in \cref{sec: election configuration,sec: voter authorization configuration,sec: voting rounds}. Then, the trustees perform the threshold ceremony, as described in \cref{sec: threshold ceremony}. Optionally, at the end of the pre-election phase, the voter credentials distribution process occurs, as presented in \cref{sec: voter credential distribution process}.
+
+During the election phase, voters can get authorized to cast a vote as presented in \cref{sec: voter authorization procedure} and then perform the voting process as described in \cref{sec: mapping vote options on the elliptic curve,sec: vote cryptogram generation process,sec: vote confirmation receipt}. Optionally, voters can perform some verification mechanisms on their encrypted ballot, as described in \cref{sec: challenging a vote cryptogram,sec: vote confirmation receipt}. More about voter-specific auditing is presented in \cref{sec: voter-specific verifications}.
+
+In the final, post-election phase, election officials run an administration auditing process to check that the election system behaved correctly, as described in \cref{sec: administration auditing process}. Then, trustees compute the election result, as presented in \cref{sec: cleansing procedure,sec: mixing phase,sec: decryption phase}. The result is published as in \cref{sec: result publication}, so any auditor can run a public auditing process on the entire election process, as presented in \cref{sec: public auditing process}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[framed, node distance=22pt,
+        big_circle/.style={circle, draw, minimum size=12, line width=2, fill=white},
+        small_circle/.style={circle, draw, inner sep=0pt, minimum size=3, fill=black},
+        label_circle/.style={circle, draw, font=\small, inner sep=0pt, text width=20, xshift=-4pt, line width=1, align=center, fill=white},
+        component/.style={font=\small, rotate=60, align=left},
+        process/.style={font=\small, xshift=20pt, align=right},
+        spaced/.style={yshift=-10pt},
+        very_spaced/.style={yshift=-35pt}
+        ]{
+            \node[small_circle](di_ca){};
+            \node[big_circle, right=of di_ca.center, anchor=center](di_ea){};
+            \node[small_circle, right=of di_ea.center, anchor=center](di_ev){};
+            \node[big_circle, right=of di_ev.center, anchor=center](di_dbb){};
+            \node[small_circle, right=of di_dbb.center, anchor=center](di_ip){};
+            \node[small_circle, right=of di_ip.center, anchor=center](di_privas){};
+            \node[small_circle, right=of di_privas.center, anchor=center](di_pubas){};
+            \node[small_circle, right=of di_pubas.center, anchor=center](di_ta){};
+            \node[small_circle, right=of di_ta.center, anchor=center](di_va){};
+            \node[small_circle, right=of di_va.center, anchor=center](di_votea){};
+
+            \node[big_circle, spaced, below=of di_ca.center, anchor=center](ec_ca){};
+            \node[big_circle, right=of ec_ca.center, anchor=center](ec_ea){};
+            \node[small_circle, right=of ec_ea.center, anchor=center](ec_ev){};
+            \node[big_circle, right=of ec_ev.center, anchor=center](ec_dbb){};
+            \node[big_circle, right=of ec_dbb.center, anchor=center](ec_ip){};
+            \node[small_circle, right=of ec_ip.center, anchor=center](ec_privas){};
+            \node[small_circle, right=of ec_privas.center, anchor=center](ec_pubas){};
+            \node[small_circle, right=of ec_pubas.center, anchor=center](ec_ta){};
+            \node[big_circle, right=of ec_ta.center, anchor=center](ec_va){};
+            \node[small_circle, right=of ec_va.center, anchor=center](ec_votea){};
+            
+            \node[small_circle, spaced, below=of ec_ca.center, anchor=center](tc_ca){};
+            \node[big_circle, right=of tc_ca.center, anchor=center](tc_ea){};
+            \node[small_circle, right=of tc_ea.center, anchor=center](tc_ev){};
+            \node[big_circle, right=of tc_ev.center, anchor=center](tc_dbb){};
+            \node[small_circle, right=of tc_dbb.center, anchor=center](tc_ip){};
+            \node[small_circle, right=of tc_ip.center, anchor=center](tc_privas){};
+            \node[small_circle, right=of tc_privas.center, anchor=center](tc_pubas){};
+            \node[big_circle, right=of tc_pubas.center, anchor=center](tc_ta){};
+            \node[small_circle, right=of tc_ta.center, anchor=center](tc_va){};
+            \node[small_circle, right=of tc_va.center, anchor=center](tc_votea){};
+
+            \node[big_circle, spaced, below=of tc_ca.center, anchor=center](cd_ca){};
+            \node[small_circle, right=of cd_ca.center, anchor=center](cd_ea){};
+            \node[small_circle, right=of cd_ea.center, anchor=center](cd_ev){};
+            \node[small_circle, right=of cd_ev.center, anchor=center](cd_dbb){};
+            \node[small_circle, right=of cd_dbb.center, anchor=center](cd_ip){};
+            \node[small_circle, right=of cd_ip.center, anchor=center](cd_privas){};
+            \node[small_circle, right=of cd_privas.center, anchor=center](cd_pubas){};
+            \node[small_circle, right=of cd_pubas.center, anchor=center](cd_ta){};
+            \node[big_circle, right=of cd_ta.center, anchor=center](cd_va){};
+            \node[small_circle, right=of cd_va.center, anchor=center](cd_votea){};
+
+            \node[small_circle, very_spaced, below=of cd_ca.center, anchor=center](vap_ca){};
+            \node[small_circle, right=of vap_ca.center, anchor=center](vap_ea){};
+            \node[small_circle, right=of vap_ea.center, anchor=center](vap_ev){};
+            \node[big_circle, right=of vap_ev.center, anchor=center](vap_dbb){};
+            \node[big_circle, right=of vap_dbb.center, anchor=center](vap_ip){};
+            \node[small_circle, right=of vap_ip.center, anchor=center](vap_privas){};
+            \node[small_circle, right=of vap_privas.center, anchor=center](vap_pubas){};
+            \node[small_circle, right=of vap_pubas.center, anchor=center](vap_ta){};
+            \node[big_circle, right=of vap_ta.center, anchor=center](vap_va){};
+            \node[big_circle, right=of vap_va.center, anchor=center](vap_votea){};
+
+            \node[small_circle, spaced, below=of vap_ca.center, anchor=center](v_ca){};
+            \node[small_circle, right=of v_ca.center, anchor=center](v_ea){};
+            \node[small_circle, right=of v_ea.center, anchor=center](v_ev){};
+            \node[big_circle, right=of v_ev.center, anchor=center](v_dbb){};
+            \node[small_circle, right=of v_dbb.center, anchor=center](v_ip){};
+            \node[small_circle, right=of v_ip.center, anchor=center](v_privas){};
+            \node[small_circle, right=of v_privas.center, anchor=center](v_pubas){};
+            \node[small_circle, right=of v_pubas.center, anchor=center](v_ta){};
+            \node[small_circle, right=of v_ta.center, anchor=center](v_va){};
+            \node[big_circle, right=of v_va.center, anchor=center](v_votea){};
+
+            \node[small_circle, spaced, below=of v_ca.center, anchor=center](vsv_ca){};
+            \node[small_circle, right=of vsv_ca.center, anchor=center](vsv_ea){};
+            \node[big_circle, right=of vsv_ea.center, anchor=center](vsv_ev){};
+            \node[big_circle, right=of vsv_ev.center, anchor=center](vsv_dbb){};
+            \node[small_circle, right=of vsv_dbb.center, anchor=center](vsv_ip){};
+            \node[small_circle, right=of vsv_ip.center, anchor=center](vsv_privas){};
+            \node[small_circle, right=of vsv_privas.center, anchor=center](vsv_pubas){};
+            \node[small_circle, right=of vsv_pubas.center, anchor=center](vsv_ta){};
+            \node[small_circle, right=of vsv_ta.center, anchor=center](vsv_va){};
+            \node[big_circle, right=of vsv_va.center, anchor=center](vsv_votea){};
+
+            \node[small_circle, very_spaced, below=of vsv_ca.center, anchor=center](privap_ca){};
+            \node[small_circle, right=of privap_ca.center, anchor=center](privap_ea){};
+            \node[small_circle, right=of privap_ea.center, anchor=center](privap_ev){};
+            \node[big_circle, right=of privap_ev.center, anchor=center](privap_dbb){};
+            \node[small_circle, right=of privap_dbb.center, anchor=center](privap_ip){};
+            \node[big_circle, right=of privap_ip.center, anchor=center](privap_privas){};
+            \node[small_circle, right=of privap_privas.center, anchor=center](privap_pubas){};
+            \node[small_circle, right=of privap_pubas.center, anchor=center](privap_ta){};
+            \node[big_circle, right=of privap_ta.center, anchor=center](privap_va){};
+            \node[small_circle, right=of privap_va.center, anchor=center](privap_votea){};
+            
+            \node[small_circle, spaced, below=of privap_ca.center, anchor=center](rc_ca){};
+            \node[big_circle, right=of rc_ca.center, anchor=center](rc_ea){};
+            \node[small_circle, right=of rc_ea.center, anchor=center](rc_ev){};
+            \node[big_circle, right=of rc_ev.center, anchor=center](rc_dbb){};
+            \node[small_circle, right=of rc_dbb.center, anchor=center](rc_ip){};
+            \node[small_circle, right=of rc_ip.center, anchor=center](rc_privas){};
+            \node[small_circle, right=of rc_privas.center, anchor=center](rc_pubas){};
+            \node[big_circle, right=of rc_pubas.center, anchor=center](rc_ta){};
+            \node[small_circle, right=of rc_ta.center, anchor=center](rc_va){};
+            \node[small_circle, right=of rc_va.center, anchor=center](rc_votea){};
+
+            \node[small_circle, spaced, below=of rc_ca.center, anchor=center](pubap_ca){};
+            \node[small_circle, right=of pubap_ca.center, anchor=center](pubap_ea){};
+            \node[small_circle, right=of pubap_ea.center, anchor=center](pubap_ev){};
+            \node[big_circle, right=of pubap_ev.center, anchor=center](pubap_dbb){};
+            \node[small_circle, right=of pubap_dbb.center, anchor=center](pubap_ip){};
+            \node[small_circle, right=of pubap_ip.center, anchor=center](pubap_privas){};
+            \node[big_circle, right=of pubap_privas.center, anchor=center](pubap_pubas){};
+            \node[small_circle, right=of pubap_pubas.center, anchor=center](pubap_ta){};
+            \node[small_circle, right=of pubap_ta.center, anchor=center](pubap_va){};
+            \node[small_circle, right=of pubap_va.center, anchor=center](pubap_votea){};
+
+            
+            \node[label_circle, left=of di_ca.center, anchor=center](di_actor) {EO};
+            \node[label_circle, left=of ec_ca.center, anchor=center](ec_actor) {EO};
+            \node[label_circle, left=of tc_ca.center, anchor=center](tc_actor) {T};
+            \node[label_circle, left=of cd_ca.center, anchor=center](cd_actor) {EO};
+            \node[label_circle, left=of vap_ca.center, anchor=center](vap_actor) {V};
+            \node[label_circle, left=of v_ca.center, anchor=center](v_actor) {V};
+            \node[label_circle, left=of vsv_ca.center, anchor=center](vsv_actor) {V};
+            \node[label_circle, left=of privap_ca.center, anchor=center](privap_actor) {EO};
+            \node[label_circle, left=of rc_ca.center, anchor=center](rc_actor) {T};
+            \node[label_circle, left=of pubap_ca.center, anchor=center](pubap_actor) {PA};
+            
+            \node[process, left=of di_actor, anchor=east](di) {Digital Ballot \\ Box set up};
+            \node[process, left=of ec_actor, anchor=east](ec) {Election \\ configuration};
+            \node[process, left=of tc_actor, anchor=east](tc) {Treshold \\ ceremony};
+            \node[process, left=of cd_actor, anchor=east](cd) {Credentials \\ distribution};
+            \node[process, left=of vap_actor, anchor=east](vap) {Voter \\ Authorization};
+            \node[process, left=of v_actor, anchor=east](v) {Voting};
+            \node[process, left=of vsv_actor, anchor=east](vsv) {Voter-specific \\ verifications};
+            \node[process, left=of privap_actor, anchor=east](privap) {Administration \\ auditing process};
+            \node[process, left=of rc_actor, anchor=east](rc) {Result \\ ceremony};
+            \node[process, left=of pubap_actor, anchor=east](pubap) {Public auditing \\ process};
+
+            \node[component, above=of di_ca.center, anchor=south west] (ca) {Credentials Authority};
+            \node[component, above=of di_ea.center, anchor=south west] (ea) {Election Administration};
+            \node[component, above=of di_ev.center, anchor=south west] (ev) {Extrenal Verifier};
+            \node[component, above=of di_dbb.center, anchor=south west] (dbb) {Digital Ballot Box};
+            \node[component, above=of di_ip.center, anchor=south west] (ip) {Identity Provider};
+            \node[component, above=of di_privas.center, anchor=south west] (privas) {Private auditing script};
+            \node[component, above=of di_pubas.center, anchor=south west] (pubas) {Public auditing script};
+            \node[component, above=of di_ta.center, anchor=south west] (ta) {Trustee application};
+            \node[component, above=of di_va.center, anchor=south west] (va) {Voter Authorizer};
+            \node[component, above=of di_votea.center, anchor=south west] (votea) {Voting app};
+
+            \begin{scope}[on background layer]
+                \draw (di_actor.center)--(di_votea.center);
+                \draw (ec_actor.center)--(ec_votea.center);
+                \draw (tc_actor.center)--(tc_votea.center);
+                \draw (cd_actor.center)--(cd_votea.center);
+                \draw (vap_actor.center)--(vap_votea.center);
+                \draw (v_actor.center)--(v_votea.center);
+                \draw (vsv_actor.center)--(vsv_votea.center);
+                \draw (privap_actor.center)--(privap_votea.center);
+                \draw (rc_actor.center)--(rc_votea.center);
+                \draw (pubap_actor.center)--(pubap_votea.center);
+
+                \draw[loosely dotted] (ca.south west -| ec_ca.center)--(pubap_ca.center);
+                \draw[loosely dotted] (ea.south west -| ec_ea.center)--(pubap_ea.center);
+                \draw[loosely dotted] (ev.south west -| ec_ev.center)--(pubap_ev.center);
+                \draw[loosely dotted] (dbb.south west -| ec_dbb.center)--(pubap_dbb.center);
+                \draw[loosely dotted] (ip.south west -| ec_ip.center)--(pubap_ip.center);
+                \draw[loosely dotted] (privas.south west -| ec_privas.center)--(pubap_privas.center);
+                \draw[loosely dotted] (pubas.south west -| ec_pubas.center)--(pubap_pubas.center);
+                \draw[loosely dotted] (ta.south west -| ec_ta.center)--(pubap_ta.center);
+                \draw[loosely dotted] (va.south west -| ec_va.center)--(pubap_va.center);
+                \draw[loosely dotted] (votea.south west -| ec_votea.center)--(pubap_votea.center);
+
+                \draw[rounded corners, dotted] (di.north -| privap.west) rectangle (cd.south -| votea.south east);
+                \node[font=\small, anchor=south west] at (di.north -| privap.west) {\textit{pre-election phase}};
+
+                \draw[rounded corners, dotted] (vap.north -| privap.west) rectangle (vsv.south -| votea.south east);
+                \node[font=\small, anchor=south west] at (vap.north -| privap.west) {\textit{election phase}};
+
+                \draw[rounded corners, dotted] (privap.north -| privap.west) rectangle (pubap.south -| votea.south east);
+                \node[font=\small, anchor=south west] at (privap.north -| privap.west) {\textit{post-election phase}};
+            \end{scope}    
+        }
+    \end{tikzpicture}
+    \caption{Processes map}
+    \label{fig: processes map}
+\end{figure}
