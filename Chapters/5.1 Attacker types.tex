@@ -1,18 +1,7 @@
 \subsection{Attacker types} \label{sec: attacker types}
-This paper has dealt with trust-independent processes. These processes are characterized by the ability to mathematically prove the entirety of operations.
 
-An example of a trust-independent process is an actor casting a ballot encrypted by the election public key and signed by a private key. Arriving in the Digital Ballot Box, it can be proven that this ballot was indeed encrypted and signed with the aforementioned keys.
-
-Trust-independent processes must be audited to ensure integrity of the election. The result of such an audit will always be binary - either the process was successful or not. It is not conceivable that a cryptographically backed process executes in a partly successful way. Furthermore the binary characteristics of a trust-independent process signals that there are no exploits that can be mitigated. It either works by its inherent mathematical properties or it doesn’t.
-
-Trust-independent processes are often extremely narrowly defined to align with the mathematics. Consider an attempt to describe the same process as the above in layman’s terms: “The voter uses an internet connected mobile phone to cast the ballot safely to the Digital Ballot Box.”. The trust-independent process of encryption and signing is a part of this process description, but it is also clear that many trust-dependent assumptions were introduced, for example the assumption that the voter is an eligible voter, that the mobile phone is not compromised and that the communication channel (network) was available. All such trust-dependent assumptions must be dealt with in a threat model.
-
-It is important to stress that even if we say that a process supported by cryptography is trust-independent, we ultimately place trust in the deployed scientifically validated cryptographic methods, both at the level of mathematics and the actual implementation in code.
-
-The threat model will concentrate on the trust-dependent process. By trust-dependance we mean a quality/property that is not backed by cryptography and cannot be mathematically proven.
-
-Trust-dependent processes can be a lot of things. In essence they consist of actors which can be a person (like an IT-administrator, an Election Officer, etc.) or a system (like the Digital Ballot Box, The Voter Authorizer, etc.). Also actors will often communicate with each other through some sort of channel (i.e. HTTPS).
-
-Examples of trust-dependent processes are an IT-administrator (actor) who we trust will configure the system in a prescribed and honest way, or a display or keyboard (actor) which we trust will transfer (channel) the intended information to/from a user or voter.
-
-Trust-dependent processes can (and should extensively) be audited, but the bottom line is that the room for exploits will always remain more or less open no matter what level of mitigation measures that are deployed.
+\begin{itemize}
+    \item list of all stakeholders that can be malicious; what doest it mean for a stakeholder to be malicious; how many can be malicious
+    \item list of system components that can be compromised; what does it mean for one to be compromised; how many can be compomised
+    \item list of communication channels that can be breached; what it entails; 
+\end{itemize}

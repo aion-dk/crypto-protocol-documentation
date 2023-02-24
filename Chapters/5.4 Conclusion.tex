@@ -1,53 +1,5 @@
 \subsection{Conclusion} \label{sec: conclusion}
-With all trust-dependent assumptions being mapped, we can start identifying the concrete threats against them using categories of the STRIDE-model.
 
-
-\subsubsection{Pre-election Phase} 
-
-\begin{enumerate}
-  \item It is assumed that the IT administrator is installing genuine code in the hosting environment
-  \item To be finished
-  \item To be finished
-\end{enumerate}
-
-\begin{table}[H]
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-\textbf{Threat}                                                   & \textbf{Risk}                                                                                                 & \textbf{Impact}                                       & \textbf{\begin{tabular}[c]{@{}l@{}}Proba-\\ bility\end{tabular}} & \textbf{Mitigation}                                                                                                                                                                         \\ \hline
-Spoofing                                                          & IT Admin impersonation                                                                                        & Critical                                              & Low                                                              & \begin{tabular}[c]{@{}l@{}}* 2-factor authentication\\ * Admin system on \\ private network (VPN)\end{tabular}                                                                              \\ \hline
-Tampering                                                         & \begin{tabular}[c]{@{}l@{}}IT Admin can introduce \\ malware into code base \\ before deployment\end{tabular} & Critical                                              & Low                                                              & \begin{tabular}[c]{@{}l@{}}* Employee background \\ checks\\ * Trusted build\\ * Independent checksum \\ audit of deployed code\end{tabular}                                                \\ \hline
-Repudiation                                                       &                                                                                                               &                                                       &                                                                  &                                                                                                                                                                                             \\ \hline
-\begin{tabular}[c]{@{}l@{}}Information \\ disclosure\end{tabular} & \begin{tabular}[c]{@{}l@{}}Leak of IT Admin \\ credentials and/or \\ repository access\end{tabular}           & Critical                                              & Low                                                              & \begin{tabular}[c]{@{}l@{}}* 2-factor authentication\\ * Admin system on \\ private network (VPN)\end{tabular}                                                                              \\ \hline
-\begin{tabular}[c]{@{}l@{}}Denial of \\ Service\end{tabular}      & \begin{tabular}[c]{@{}l@{}}IT Admin System \\ blocked by (D)DOS \\ attack\end{tabular}                        & \begin{tabular}[c]{@{}l@{}}Medium\\ High\end{tabular} & \begin{tabular}[c]{@{}l@{}}Medium\\ High\end{tabular}            & \begin{tabular}[c]{@{}l@{}}* Admin system on \\ private network (VPN)\\ * Web Application \\ Firewall\end{tabular}                                                                          \\ \hline
-\begin{tabular}[c]{@{}l@{}}Elevation \\ of Privilege\end{tabular} & \begin{tabular}[c]{@{}l@{}}Bug allow user to \\ elevate privilege\end{tabular}                                & Critical                                              & Low                                                              & \begin{tabular}[c]{@{}l@{}}* Employee background \\ checks\\ * Independent checksum \\ audit of deployed code\\ * Use of standard \\ authentication / \\ authorization modules\end{tabular} \\ \hline
-\end{tabular}
-\end{table}
-
-
-\subsubsection{Voting Phase} 
-
-\begin{enumerate}
-  \item To be finished
-  \item To be finished
-  \item To be finished
-  \item To be finished
-  \item To be finished
-  \item It is assumed that the Benaloh Challenge is conducted on a secondary device running an uncompromised external verifier
-\end{enumerate}
-
-\begin{table}[H]
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-\textbf{Threat}                                                   & \textbf{Risk}                                                                          & \textbf{Impact}                                       & \textbf{\begin{tabular}[c]{@{}l@{}}Proba-\\ bility\end{tabular}} & \textbf{Mitigation}                                                                                                                                                                         \\ \hline
-Spoofing                                                          & \begin{tabular}[c]{@{}l@{}}External Verification \\ Site is spoofed\end{tabular}       & Low                                                   & Low                                                              & \begin{tabular}[c]{@{}l@{}}* Voter information on \\ legitimate partners / \\ URLS\end{tabular}                                                                                             \\ \hline
-Tampering                                                         & \begin{tabular}[c]{@{}l@{}}External Verification \\ Site is compromised\end{tabular}   & Critical                                              & Low                                                              & \begin{tabular}[c]{@{}l@{}}* Only use highly \\ regarded partners\\ * Code review\\ * Trusted build\\ * Independent checksum \\ audit of deployed code\end{tabular}                         \\ \hline
-Repudiation                                                       & \begin{tabular}[c]{@{}l@{}}Information \\ modified\end{tabular}                        & Low                                                   & Low                                                              & \begin{tabular}[c]{@{}l@{}}* Authenticity of \\ exchanged information\\ between Ballot Box, \\ Admin Server and \\ Verification Site \\ cryptographically secured\end{tabular}              \\ \hline
-\begin{tabular}[c]{@{}l@{}}Information \\ disclosure\end{tabular} &                                                                                        &                                                       &                                                                  &                                                                                                                                                                                             \\ \hline
-\begin{tabular}[c]{@{}l@{}}Denial of \\ Service\end{tabular}      & \begin{tabular}[c]{@{}l@{}}IT Admin System \\ blocked by (D)DOS \\ attack\end{tabular} & \begin{tabular}[c]{@{}l@{}}Medium\\ High\end{tabular} & \begin{tabular}[c]{@{}l@{}}Medium\\ High\end{tabular}            & \begin{tabular}[c]{@{}l@{}}* Web Application \\ Firewall\end{tabular}                                                                                                                       \\ \hline
-\begin{tabular}[c]{@{}l@{}}Elevation \\ of Privilege\end{tabular} & \begin{tabular}[c]{@{}l@{}}Bug allow user to \\ elevate privilege\end{tabular}         & Critical                                              & Low                                                              & \begin{tabular}[c]{@{}l@{}}* Employee background \\ checks\\ * Independent checksum \\ audit of deployed code\\ * Use of standard \\ authentication / \\ authorization modules\end{tabular} \\ \hline
-\end{tabular}
-\end{table}
-
-
-\subsubsection{Risk analysis} \label{sec:risk analysis}
-In this section the different threats identified in \cref{sec: adversary model} will be evaluated. The different threats will be listed with their estimated impact and likelihood. The impact describes how the threat are affecting the election and how impactful it would be on a scale from very low to critical. The likelihood describes how likely the threat is to occur on a scale from very low to very high. Additionally control recommendations will be listed to assess how the given likelihood can be lowered or even nullify the threat.
+\begin{itemize}
+  \item summary of what election protocol can do; under what conditions
+\end{itemize}
