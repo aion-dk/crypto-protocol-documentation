@@ -16,7 +16,7 @@ To reveal messages $\vec{m}$, the writer needs to publish values $\vec{m}$ and $
     $j \gets 0$ \\
     \Repeat{$H$ is valid}{
         $x \gets \mathcal{H}(G || i || j)$ \\
-        $y \gets \mathsf{RecoverY}(x)$ \tcp*{according to elliptic curve equation}
+        $y \gets \mathsf{RecoverY}(x, 02)$ \tcp*{\cref{alg: recover y}}
         \If{$y$ is invalid}{
             $j \gets j + 1$ \;
             \Continue \;
@@ -38,7 +38,7 @@ To reveal messages $\vec{m}$, the writer needs to publish values $\vec{m}$ and $
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
-        $G_i \gets \mathsf{BaseGen} (i)$
+        $G_i \gets \mathsf{BaseGen} (i)$ \tcp*{\cref{alg: base gen}}
     }
     $C \gets [r]G + \sum\limits_{i=1}^n [m_i]G_i$ \;
     
@@ -54,7 +54,7 @@ To reveal messages $\vec{m}$, the writer needs to publish values $\vec{m}$ and $
     \KwMoreData{The randomizer $r \in \mathbb{Z}_q$}
     
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$}{
-        $G_i \gets \mathsf{BaseGen} (i)$
+        $G_i \gets \mathsf{BaseGen} (i)$ \tcp*{\cref{alg: base gen}}
     }
     \eIf{$C = [r]G + \sum\limits_{i=1}^n [m_i]G_i$}{
         $b \gets 1$ \tcp*{commitment is valid}

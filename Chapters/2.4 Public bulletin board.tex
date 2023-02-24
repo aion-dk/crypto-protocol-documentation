@@ -20,7 +20,7 @@ In addition, we introduce a new concept to the bulletin board structure, that we
 
 As a consequence of these modifications, any $i^\mathrm{th}$ item from the bulletin board consists of the following tuple $b_i = (m_i, c_i, \mathcal{W}, \sigma_i, t_i, p_i, h'_i, h_i)$, where $m_i$ is the type of the item, $c_i$ is the content of the item that describes the event, $\mathcal{W}$ is a reference to the item writer, $\sigma_i$ is the writer's signature, $p_i$ is the address of the parent item with $p_i \in \{h_1, ..., h_{i-1}\}$, $h'_i$ is the address of the previous item in the \textit{history} (i.e. $h'_i = h_{i-1}$), $t_i$ is the registration timestamp and $h_i$ is the item address.
 
-Because of the two properties of the bulletin board, we define two auditing algorithms. Given a list of items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, an auditor runs $\mathsf{AncestryVer}(\boldsymbol{b}, h_0)$, where $h_0$ is the parent of the list (i.e. the parent of the first item of the list $b_1$) to check the \textit{ancestry} of the list. Likewise, an auditor can run $\mathsf{HistoryVer}(\boldsymbol{b}, h_0)$, where $h_0$ is the previous item of the list to check the \textit{history} property of the list.
+Because of the two properties of the bulletin board, we define two auditing algorithms. Given a list of items $\boldsymbol{b} = \{ b_1, ..., b_n \}$, an auditor runs $\mathsf{AncestryVer}(\boldsymbol{b}, h_0)$ (\cref{alg: ancestry ver}), where $h_0$ is the parent of the list (i.e. the parent of the first item of the list $b_1$) to check the \textit{ancestry} of the list. Likewise, an auditor can run $\mathsf{HistoryVer}(\boldsymbol{b}, h_0)$ (\cref{alg: history ver}), where $h_0$ is the previous item of the list to check the \textit{history} property of the list.
 
 \begin{algorithm}[ht]
     \DontPrintSemicolon
@@ -159,7 +159,7 @@ We define $\mathsf{ItemVer}(b, Y_\mathcal{W})$ (\cref{alg: item ver}) as a publi
     \KwMoreData{The public key of the writer $Y_\mathcal{W}$}
 
     \eIf{$h = \mathcal{H}(m || c || p || h' || t)$ \\ 
-    \KwAnd $\mathsf{SigVer} (Y_\mathcal{W}, \sigma; m || c || p)$}{
+    \KwAnd $\mathsf{SigVer} (Y_\mathcal{W}, \sigma; m || c || p)$ \tcp*{\cref{alg: sig ver}}}{
         \Return{1} \tcp*{item is valid}
     }{
         \Return{0} \tcp*{item is invalid}

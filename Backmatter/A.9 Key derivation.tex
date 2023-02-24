@@ -16,10 +16,10 @@ Particularly, no salt is used (i.e., salt is set to $\varnothing$), therefore, o
     \label{alg: pass to key}
     \KwData{A text $m \in \mathbb{B}^*$}
     
-    $salt \gets \varnothing$ \\
-    $iterations \gets 600.000$ \\
-    $\ell \gets \mathsf{ByteLengthOf}(q)$ \\
-    $i \gets 0$ \\
+    $salt \gets \varnothing$ \;
+    $iterations \gets 600.000$ \;
+    $\ell \gets \mathsf{ByteLengthOf}(q)$ \tcp*{\cref{alg: bytes length of}}
+    $i \gets 0$ \;
     \Repeat{$x < q$}{
         $x \gets \mathsf{PBKDF2}(\mathcal{H}, m || i, salt, iterations, \ell)$ \\
         \If{$x \geq q$}{
@@ -27,7 +27,7 @@ Particularly, no salt is used (i.e., salt is set to $\varnothing$), therefore, o
             \Continue \;
         }
     }
-    $Y \gets [x]G$ \\
+    $Y \gets [x]G$ \;
     \Return{$(x, Y)$} \tcp*{$(x, Y) \in \mathbb{Z}_q \times \mathbb{P}$}
 \end{algorithm}
 
@@ -47,10 +47,10 @@ The algorithm performs a Diffie Hellman key exchange to reach a shared secret $S
     \KwData{A private key $x \in \mathbb{Z}_q$}
     \KwMoreData{A public key $Y \in \mathbb{P}$}
     
-    $salt \gets \varnothing$ \\
-    $info \gets \varnothing$ \\
-    $length \gets 256$ \\
-    $S \gets [x]Y$ \\
-    $k \gets \mathsf{HKDF}(S, salt, info, length)$ \\
+    $salt \gets \varnothing$ \;
+    $info \gets \varnothing$ \;
+    $length \gets 256$ \;
+    $S \gets [x]Y$ \;
+    $k \gets \mathsf{HKDF}(S, salt, info, length)$ \;
     \Return{$k$} \tcp*{$k \in \mathbb{B}^{256}$}
 \end{algorithm}
