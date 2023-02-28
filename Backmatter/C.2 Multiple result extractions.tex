@@ -1,0 +1,81 @@
+\subsection{Multiple result extractions} \label{app: multiple result extractions}
+
+
+\subsubsection{General description}
+The multiple result extractions is an optional feature that gives the election officers the ability to extract partial results during the election phase. The extracted votes follow the same processes described in \cref{sec: post-election phase} i.e., cleansing, mixing, and decryption. The publication of each partial result is postponed until after the election phase is closed.
+
+
+\subsubsection{Election protocol modification}
+The multiple result extractions feature introduces an extra parameter in the election configuration item, called the \textit{extraction threshold} $t_\mathrm{e}$. This allows an extraction to happen only of more than $t_\mathrm{e}$ ballots. This is important because the anonymity property of a result is bound to the number of votes being mixed and decrypted together.
+
+When an election officer requests a partial result to be computed, the following process is followed:
+\begin{itemize}
+    \item the election administrator requests a partial result to be computed by interacting with the digital ballot box in $\mathtt{WriteOnBoard}(\mathcal{E}, m_\mathrm{ei}, c_\mathrm{ei}, p_\mathrm{ei})$ (protocol \ref{pro: write on board}) to publish an extraction intent item $b_\mathrm{ei}$ on the bulletin board, according to the rules from \cref{app: bulletin board item types},
+    \item the digital ballot box identifies all the valid ballots that have not been extracted in a previous extraction $\vec{\vec{e'}} = \{ \vec{e}_1, ..., \vec{e}_{n'_\mathrm{e}} \}$, according to \cref{sec: cleansing procedure}. Then, it checks whether the amount of valid ballots is at least double the extraction threshold, i.e., $n'_\mathrm{e} \geq 2 \cdot t_\mathrm{e}$. Otherwise, the extraction is aborted,
+    \item the digital ballot box extracts as the initial mixed board the cryptograms $\vec{\vec{e}}_0 = \{ \vec{e}_1, ..., \vec{e}_{n_\mathrm{e}} \}$, where $n_\mathrm{e} = n'_\mathrm{e} - t_\mathrm{e}$, such that there are $t_\mathrm{e}$ ballots left unextracted,
+    \item a subset of all trustees $\mathcal{T}_i$, with $i \in \tau$ and $\tau \subset \{ 1, ..., n_\mathrm{t} \}$, collaborate in the mixing process to anonymize the encrypted ballots, as described in \cref{sec: mixing phase}, where $n_\mathrm{t}$ is the total number of trustees and $t \leq |\tau| \leq n_\mathrm{t}$ (recall from \cref{sec: threshold ceremony} that $t$ is threshold decryption value),
+    \item the same subset of trustees collaborate in the decryption process (\cref{sec: decryption phase}) of the anonymized votes,
+    \item finally, the election administrator publishes a modified extraction confirmation item as described in \cref{sec: result publication}, that contains fingerprints of the mixed boards of cryptograms, proofs, partial decryptions, and proofs of correct decryption. The item does not include the actual values, so the partial result is not publicly released.
+\end{itemize}
+
+After the election phase, an election officer can request the final partial result to be computed. This follows the same process as above, only that, this time, all remaining valid ballots are extracted.
+
+
+\subsubsection{Impact on election properties}
+Two properties are affected by the multiple result extractions feature, namely privacy, and anonymity. Their definitions are listed in \cref{sec: security requirements}.
+
+The privacy property is affected because partial results are computed before the election is closed. That means votes submitted after a partial result has been extracted might be influenced based on the knowledge of the result. Even though results are not publicly released, trustees and election officials do know the outcome of each partial result, which is enough. The more partial results are computed, the more election privacy is affected.
+
+The anonymity property is affected as ballots are anonymous in regards to how many are mixed together, which happens during each extraction. The most anonymity is reached when all ballots are mixed together (i.e., there is a single result extraction at the end of the election phase). However, anonymity is still bound by the number of ballots in the mix. For example, assuming there is only one result extraction at the end of the election, but there are only two ballots in the ballot box, and both contain a vote for the same candidate, the anonymity is reduced to nothing, as both ballots are identifiable.
+
+For that reason, it is essential to allow result extractions to happen only on a list with a substantial amount of ballots. Therefore we introduce the extraction threshold $t_\mathrm{e}$ as a configuration value.
+
+
+\subsubsection{Analysis on extraction threshold}
+As discussed in the previous section, the strength of the anonymity property is related to how many ballots are mixed together and how identifiable a ballot could be. In this section, we describe how a ballot could be identified and give recommendations for the extraction threshold $t_\mathrm{e}$ for a reasonable anonymity level. We consider three scenarios that could lead to a ballot being identifiable.
+
+The analysis is also based on how many unique vote options exist on a particular ballot. For example, in a referendum, there are two vote options (i.e., any valid vote can be either a 'yes/for' or a 'no/against'). In a candidate election, there are as many vote options as there are candidates. In multiple-choice and ranked elections, the amount of unique vote options is a combination of the amount of allowed choices from the number of candidates. We consider a ballot that allows a write-in vote to have an infinite amount of vote options. Therefore, we exclude it from the analysis. The analysis assumes that each vote option has an equal probability of appearing (i.e., voters vote randomly).
+
+\paragraph{All ballots are identical} is the scenario where we consider all voters voting on the same option. By doing so, anonymity is broken as it is visible that each voter voted for that option. The probability of this scenario happening is
+\[ \left( \frac{1}{x} \right)^n \]
+where $x$ is the number of vote options, and $n$ is the number of ballots. As this vulnerability is critical because it would affect all voters included in that result, it is recommended that the chance of this scenario to happen to be maximum one in a million (i.e., the probability should be lower than 0.0001\%).
+
+\begin{center}
+    \begin{tabular}{|l|l|l|} \hline
+        Voting options & Amount of ballots & Scenario probability \\ \hline
+
+        2 & 20 & 0.00009\% \\ \hline
+        5 & 9 & 0.00005\% \\ \hline
+        10 & 6 & 0.00010\% \\ \hline
+        100 & 3 & 0.00010\% \\ \hline
+        1000 & 2 & 0.00010\% \\ \hline
+    \end{tabular}    
+\end{center} 
+
+\paragraph{One unique ballot} is the scenario where a voter submits a ballot uniquely identifiable/distinguishable from the other ballots. We see this scenario as a malicious intent of the voter to bypass the receipt freeness property of the system, such that the voter can identify the ballot after it has been mixed and decrypted. This kind of attack is also known as the Sicilian attack.
+
+A ballot that supports write-in votes specifically introduces this vulnerability, as a voter could use the write-in vote as a marking mechanism for the ballot. Therefore, the following analysis covers only ballots without write-in possibilities.
+
+The probability of this scenario happening is
+\[ \left( \frac{x-1}{x} \right) ^{n-1} \]
+where $x$ is the number of vote options, and $n$ is the number of ballots. As this vulnerability would affect one single ballot in case of successful performance, it is recommended that the probability of this scenario to happen to be lower than 1\%.
+
+\begin{center}
+    \begin{tabular}{|l|l|l|} \hline
+        Voting options & Amount of ballots & Scenario probability \\ \hline
+
+        2 & 8 & 0.78\% \\ \hline
+        5 & 22 & 0.92\% \\ \hline
+        10 & 45 & 0.97\% \\ \hline
+        100 & 460 & 0.99\% \\ \hline
+        1000 & 4600 & 1.00\% \\ \hline
+    \end{tabular}    
+\end{center}
+
+\paragraph{All ballots are unique} is the extreme scenario where all ballots included in an extraction are distinctly identifiable. This scenario can happen only if the amount of extracted ballots is less than the number of voting options. Assuming recommendations from the previous scenario are met, this scenario is also protected against. 
+
+Considering all scenarios described above, we conclude that the extraction threshold $t_\mathrm{e}$ is dependent on the amount of unique vote options of a ballot, therefore, it should be configurable. Nevertheless, we recommend $t_\mathrm{e} \geq 300$.
+
+
+\subsubsection{Multiple voting anomaly}
+The multiple result extractions feature is incompatible with the feature of overwriting your vote. After an extraction has happened and a partial result has been computed, voters that have ballots included in that result are not allowed to cast a vote any longer. This measure prevents double voting.
