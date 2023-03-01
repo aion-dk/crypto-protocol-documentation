@@ -1,10 +1,14 @@
 \subsection{Document outline}
-\Cref{sec:solution entities} lists the various elections roles actively involved in elections and the communication channels that they use.
+\Cref{sec: solution entities} lists all the key parts of the election system, including the stakeholders, system components, and the communication channels they use in the protocol. Then, it presents the implications of having a public bulletin board that collects all election data. Next, it describes the voter authentication modes that are supported. The section ends with a list of requirements the election system must fulfill.
 
-\Cref{sec: election protocol} discusses the cryptographic algorithms and the entities involved in the life cycle of an election, from pre-election, over election, to the post-election processes.
+\Cref{sec: election protocol} presents the cryptographic algorithms and processes that the election entities must follow in the life cycle of an election. The section is split into pre-election, election, and post-election processes. The section ends by listing the election properties and explaining how they are achieved.
 
-\Cref{sec: auditing} discusses the individual, public and private auditing processes, including the actors participating, that all together facilitates the  end-to-end verifiability of the entire election.
+\Cref{sec: auditing} presents all the auditing processes. It describes who can perform each particular audit process, when it can happen, and what inputs are needed.
 
-\Cref{sec: threat model} discusses the trust assumptions outside of the cryptographic algorithms, the threats arising from them, and how they are mitigated.
+\Cref{sec: threat model} presents the adversary model that the system is designed to handle. It lists all trust assumptions the system relies on, the threats arising from them, and how they are mitigated.
 
 \Cref{app: theoretical background} lists the applied cryptographic algorithms and their mathematical principles.
+
+\Cref{app: bulletin board item types} contains a comprehensive list of all items that appear on the public bulletin board. It defines the rules and structure for each item type.
+
+\Cref{app: extra features} presents a list of additional optional features that are not considered as the core product. Each feature is described in terms of how it modifies the election protocol and how it impacts the election properties.
