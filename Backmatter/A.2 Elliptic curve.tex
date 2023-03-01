@@ -25,11 +25,11 @@ The elliptic curve $E(\mathbb{F}_p)$ follows a group structure with the followin
 \end{itemize}
 
 We define the total number of points on the $E(\mathbb{F}_p)$ as $N$, which can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$, which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup, we perform the following:
-\begin{enumerate}
+\begin{itemize}
     \item choose a random point $P \in E(\mathbb{F}_p)$,
     \item compute $G = [h]P$,
     \item if $G = \mathcal{O}$, repeat the process. Otherwise, $G$ is a generator.
-\end{enumerate}
+\end{itemize}
 
 In conclusion, we can define our cryptographic cyclic subgroup as:
 \[ \mathbb{P} = \{ P \in E(\mathbb{F}_p) \mid P = [k]G, k \in \mathbb{Z}_q \} \]
