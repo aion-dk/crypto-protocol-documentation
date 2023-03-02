@@ -1,9 +1,9 @@
 \subsection{Requirements} \label{sec: requirements}
-The requirements that Assembly Voting X must fulfill are split into the following three categories: functional, non-functional, and security requirements.
+The requirements that the election protocol must fulfill are split into the following three categories: functional, non-functional, and security requirements.
 
 
 \subsubsection{Functional Requirements} \label{sec: functional requirements}
-Functional requirements relate to properties of the election system that voters, or users in general (including election officials, candidates or auditors), can actively choose to perform. These properties are in some way measurable. Assembly Voting X has the following functional requirements:
+Functional requirements relate to properties of the election system that voters, or users in general (including election officials, candidates, or auditors), can actively choose to perform. These properties are, in some way, measurable. The protocol has the following functional requirements:
 
 \begin{itemize}
     \item election types supported:
@@ -17,7 +17,7 @@ Functional requirements relate to properties of the election system that voters,
     \item verification mechanisms for voters to check that the encrypted ballot contains what they expect,
     \item possibility to confirm selected options after voting by an overview of the complete ballot,
     \item possibility to correct mistakes before submitting an encrypted ballot,
-    \item ability for overwrite your vote, i.e. a voter can vote multiple times while only the latest submitted vote will be counted in the final tally,
+    \item ability for overwrite your vote, i.e., a voter can vote multiple times while only the latest submitted vote will be counted in the final tally,
     \item ability to check the status of your ballot after submission,
     \item public auditability of the election process throughout the election period.
 \end{itemize}
@@ -26,26 +26,26 @@ Functional requirements relate to properties of the election system that voters,
 \subsubsection{Non-functional Requirements} \label{sec: non-functional requirements}
 Non-functional requirements describe properties of the election system that impact the user experience while interacting with the system. 
 
-\paragraph{Mobility} is the property that enables voters to use any device (PC, laptop, tablet, smart phone) in their possession, to connect to the election system. They do not need to be in a special location (e.g. polling station) in order to vote. Instead, they can participate in the voting process being located in any place, that they consider private, and that has an internet connection.
+\paragraph{Mobility} is the property that enables voters to use any device (PC, laptop, tablet, smartphone) to connect to the election system. They do not need to vote from a particular location (e.g., a polling station). Instead, they can participate in the voting process from any place they consider private and with an internet connection.
 
-\paragraph{Vote \& go} entails that voters are only required to be present during voting phase. Results can be computed without the presence of voters.
+\paragraph{Vote \& go} entails that voters are only required to be present during the voting phase. Results can be computed without the presence of voters.
 
 \paragraph{Transparency} implies that election data is available for auditing through a public bulletin board.
 
-\paragraph{Multiple voting rounds} enable election officials to reuse most of the election configuration for multiple sub-elections where different ballots need to be voted on by the same set of voters. A distinct election result is computed for each voting round. 
+\paragraph{Multiple voting rounds} enable election officials to reuse most of the election configuration for multiple sub-elections where the same set of voters must vote on different ballots. A separate election result is computed for each voting round. 
 
 
 \subsubsection{Security Requirements} \label{sec: security requirements}
-Security requirements describe properties of the election system that contribute to the quality and reliability of an election result. This section briefly describes the properties, while the explanation of how these propeties are achieved is presented in \cref{sec: election properties}.
+Security requirements describe properties of the election system that contribute to the quality and reliability of an election result. This section briefly describes the properties, while the explanation of how these properties are achieved is presented in \cref{sec: election properties}.
 
-\paragraph{Eligibility} property is defined as the fact that only a limited number of predefined voters are allowed to cast a valid vote. 
+\paragraph{Eligibility} property is defined as the fact that only a limited number of predefined voters can cast a valid vote. 
 
-\paragraph{Privacy} property implies that no entity can read a partial result or any votes before it is intended. This is to prevent influencing of the subsequent voters throughout the election period. Voters could be swayed to vote differently than their initial decision if the current results were publicized.
+\paragraph{Privacy} property implies that no entity can read a partial result or any votes before it is intended. This is to prevent influencing the subsequent voters throughout the election period. Voters could be swayed to vote differently than their initial decision if the current results were publicized.
 
-\paragraph{Anonymity} property implies that no single entity can determine the way a particular voter voted.
+\paragraph{Anonymity} property implies that no single entity can determine how a particular voter voted.
 
 \paragraph{Integrity of voting data} is the property that implies detection mechanisms of whether any votes recorded on the bulletin board during the election phase have been modified or deleted.
 
 \paragraph{Verifiability} property describes that all steps of the election protocol are verifiable by following some auditing process.
 
-\paragraph{Receipt-freeness} property is defined as the fact that voters are not able to prove to a third party the way they voted, after they submitted the encrypted ballot.
+\paragraph{Receipt-freeness} property is defined as the fact that voters cannot prove to a third party how they voted after they submitted the encrypted ballot.

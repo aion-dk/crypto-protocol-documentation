@@ -25,11 +25,11 @@ The elliptic curve $E(\mathbb{F}_p)$ follows a group structure with the followin
 \end{itemize}
 
 We define the total number of points on the $E(\mathbb{F}_p)$ as $N$, which can be calculated using \textit{Schoof's algorithm} \cite{Schoof85}. Any subgroup of $E(\mathbb{F}_p)$ has an order $q$, which is a divisor of $N$. In such a case, we define the \textit{cofactor} of the subgroup as $h = \frac{N}{q}$. To find any generator of the subgroup, we perform the following:
-\begin{enumerate}
+\begin{itemize}
     \item choose a random point $P \in E(\mathbb{F}_p)$,
     \item compute $G = [h]P$,
     \item if $G = \mathcal{O}$, repeat the process. Otherwise, $G$ is a generator.
-\end{enumerate}
+\end{itemize}
 
 In conclusion, we can define our cryptographic cyclic subgroup as:
 \[ \mathbb{P} = \{ P \in E(\mathbb{F}_p) \mid P = [k]G, k \in \mathbb{Z}_q \} \]
@@ -180,8 +180,8 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \For{$i \gets 0$ \KwTo $255$ \KwBy $1$}{
         $b_0 \gets i$ \;
         $\vec{b}\,' \gets \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \}$ \;
-        $x \gets \mathsf{Bytes2Field}(\vec{b}\,')$ \;
-        $y \gets \mathsf{RecoverY}(x, 02)$ \tcp*{$y^2 = x^3 + ax + b$}
+        $x \gets \mathsf{Bytes2Field}(\vec{b}\,')$ \tcp*{\cref{alg: bytes to field}}
+        $y \gets \mathsf{RecoverY}(x, 02)$ \tcp*{\cref{alg: recover y}}
         \If{$y$ is valid}{
             $M \gets (x, y)$ \;
             \If{$M$ is valid}{
@@ -198,9 +198,9 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \label{alg: point to bytes}
     \KwData{The point $M = (x, y) \in \mathbb{P} = \mathbb{F}_p \times \mathbb{F}_p$}
 
-    $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
-    $\vec{b}\,' = \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \} \gets \mathsf{Field2Bytes}(x)$ \tcp*{$\ell = m + n + 1$}
-    $\vec{b} \gets \{ b_1, ..., b_n \}$ \;
+    $\ell \gets \mathsf{ByteLengthOf}(p)$ \tcp*{\cref{alg: bytes length of}}
+    $\vec{b}\,' = \{ b_0, b_1, ..., b_n, \underbrace{00, ..., 00}_\text{$m$ times} \} \gets \mathsf{Field2Bytes}(x)$ \tcp*{\cref{alg: field to bytes}}
+    $\vec{b} \gets \{ b_1, ..., b_n \}$ \tcp*{$\ell = m + n + 1$}
     \Return{$\vec{b}$} \tcp*{$\vec{b} \in \mathbb{B}^*$}
 \end{algorithm}
 
@@ -210,7 +210,7 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \label{alg: bytes to field}
     \KwData{The byte array $\vec{b} = \{ b_1, ..., b_n \} \in \mathbb{B}^n$}
 
-    $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
+    $\ell \gets \mathsf{ByteLengthOf}(p)$ \tcp*{\cref{alg: bytes length of}}
     \If{$n \neq \ell$}{
         \Return{failure}
         }
@@ -230,7 +230,7 @@ Examples of $\ell$ values, depending on elliptic curves, are:
     \label{alg: field to bytes}
     \KwData{The field element $x \in \mathbb{F}_p$}
 
-    $\ell \gets \mathsf{ByteLengthOf}(p)$ \;
+    $\ell \gets \mathsf{ByteLengthOf}(p)$ \tcp*{\cref{alg: bytes length of}}
     \For{$i \gets \ell$ \KwTo $1$ \KwBy $1$}{
         $b_i \gets x \mod{256}$ \;
         $x \gets \lfloor x / 256 \rfloor$ \;

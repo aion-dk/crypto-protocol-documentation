@@ -26,7 +26,7 @@ The protocol for the Argument of Shuffle of Known Contents is presented in \cref
 
 The protocol for proving the correctness of a shuffle is illustrated in \cref{fig: argument of shuffle of cryptograms protocol}. The \textit{Prover} convinces the \textit{Verifier} that the matrix of mixed cryptograms $\vec{\vec{e}}\,' = \{ e'_{1, 1}, ..., e'_{n, \ell} \}$ is equivalent to the initial cryptograms matrix $\vec{\vec{e}} = \{ e_{1, 1}, ..., e_{n, \ell} \}$, where each cryptogram is re-encrypted, and rows of the initial matrix are shuffled amongst each other. Note that, during mixing, the integrity of each row is preserved, i.e., all columns of the matrix are shuffled by the same permutation. The protocol uses, as a building block, the protocol for the Argument of Shuffle of Known Contents, presented in \cref{fig: argument of shuffle of known contents protocol}.
 
-Note that, in the description of the protocols, we abuse notation and define $\sum_{i=1}^n e_i = \mathsf{HomAdd}(e_1; \mathsf{HomAdd}(e_2; ... \mathsf{HomAdd}(e_{n-1}; e_n) ... ))$ as the homomorphic addition of multiple cryptograms, with each $e_i \in \mathbb{E}$.
+Note that, in the description of the protocols, we abuse notation and define $\sum_{i=1}^n e_i = \mathsf{HomAdd}(e_1; \mathsf{HomAdd}(e_2; ... \mathsf{HomAdd}(e_{n-1}; e_n) ... ))$ (\cref{alg: hom add}) as the homomorphic addition of multiple cryptograms, with each $e_i \in \mathbb{E}$.
 
 \begin{figure}[ht]
     \centering
@@ -231,7 +231,7 @@ Explicitly, to prove the correct mixing of cryptograms $\vec{\vec{e}} = \{ e_{1,
         $v_i \gets \delta_{i+1} - (m_{\psi(i+1)} - x) \cdot \delta_i - a_{i} \cdot d_{i+1} \pmod q$
         }
     $\vec{d} \gets \{ d_1, ..., d_n \}$, $\vec{u} \gets \{ u_1, ..., u_{n-1} \}$, $\vec{v} \gets \{ v_1, ..., v_{n-1} \}$ \;
-    $C_\mathrm{d} \gets \mathsf{Com} (\vec{d}; r_\mathrm{d})$, $C_\delta \gets \mathsf{Com} (\vec{u}; r_\delta)$, $C_\mathrm{a} \gets \mathsf{Com} (\vec{v}; r_\mathrm{a})$ \;
+    $C_\mathrm{d} \gets \mathsf{Com} (\vec{d}; r_\mathrm{d})$, $C_\delta \gets \mathsf{Com} (\vec{u}; r_\delta)$, $C_\mathrm{a} \gets \mathsf{Com} (\vec{v}; r_\mathrm{a})$ \tcp*{\cref{alg: com}}
     $e \gets \mathcal{H}(\vec{m} || C || C_\mathrm{d} || C_\delta || C_\mathrm{a})$ \;
     $z \gets e \cdot r + r_\mathrm{d} \pmod q$, $z_\delta \gets e \cdot r_\mathrm{a} + r_\delta \pmod q$ \;
     \For{$i \gets 1$ \KwTo $n$ \KwBy $1$ }{
@@ -259,9 +259,9 @@ Explicitly, to prove the correct mixing of cryptograms $\vec{\vec{e}} = \{ e_{1,
         }
     \eIf{$x = \mathcal{H}(\vec{m} || C)$
     \KwAnd $e = \mathcal{H}(\vec{m} || C || C_\mathrm{d} || C_\delta || C_\mathrm{a})$ \\
+    \KwAnd $\phi_n = e \cdot \prod\limits_{i=1}^n (m_i - x) \pmod q$ \\
     \KwAnd $[e]C + C_\mathrm{d} = \mathsf{Com}(\vec{f}; z)$
-    \KwAnd $[e]C_\mathrm{a} + C_\delta = \mathsf{Com}(\vec{f}\,'; z_\delta)$ \\
-    \KwAnd $\phi_n = e \cdot \prod\limits_{i=1}^n (m_i - x) \pmod q$}{
+    \KwAnd $[e]C_\mathrm{a} + C_\delta = \mathsf{Com}(\vec{f}\,'; z_\delta)$ \tcp*{\cref{alg: com}}}{
         $b \gets 1$ \tcp*{argument is valid}
         }{
         $b \gets 0$ \tcp*{argument is invalid}
@@ -339,12 +339,12 @@ Explicitly, to prove the correct mixing of cryptograms $\vec{\vec{e}} = \{ e_{1,
         $\tilde{e}_j^{\, +} \gets \sum\limits_{i=1}^n \tilde{e}_{i, j}$ \;
         $\tilde{e}_j^{\, \prime +} \gets \sum\limits_{i=1}^n \tilde{e}_{i, j}^{\, \prime}$ \;
         }
-    $C' \gets [\lambda]C + C_\mathrm{d} + \mathsf{Com}(\vec{f}; 0)$ \;
-    $\vec{m} \gets \{ m_1, ..., m_n \}$ \tcp*{\cref{alg: com}}
+    $C' \gets [\lambda]C + C_\mathrm{d} + \mathsf{Com}(\vec{f}; 0)$ \tcp*{\cref{alg: com}}
+    $\vec{m} \gets \{ m_1, ..., m_n \}$ \;
     \eIf{$t_i = \mathcal{H}(\vec{\vec{e}}\, || \vec{\vec{e}}\,' || C || C_\mathrm{d} || \vec{e}_\mathrm{d} || i)$, where $i \in \{ 1, ..., n \}$ \\
     \KwAnd $\lambda = \mathcal{H}(\vec{\vec{e}}\, || \vec{\vec{e}}\,' || C || C_\mathrm{d} || \vec{e}_\mathrm{d} || \vec{f}\, || \vec{z}\,)$ \\
     \KwAnd $\mathsf{HomAdd}(\tilde{e}_j^{\, \prime +}; e_{\mathrm{d}, j}) = \mathsf{ReEnc}(Y, \tilde{e}_j^{\, +}; z_j)$, where $j \in \{ 1, ..., \ell \}$ \\
-    \KwAnd $\mathsf{ASKCVer}(AS; \vec{m}; C')$ \tcp*{\cref{alg: askc ver}}}{
+    \KwAnd $\mathsf{ASKCVer}(AS; \vec{m}; C')$ \tcp*{\cref{alg: hom add,alg: re enc,alg: askc ver}}}{
         $b \gets 1$ \tcp*{proof is valid}
         }{
         $b \gets 0$ \tcp*{proof is invalid}
