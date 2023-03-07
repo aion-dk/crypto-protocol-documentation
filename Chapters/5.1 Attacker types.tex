@@ -1,7 +1,46 @@
 \subsection{Attacker types} \label{sec: attacker types}
+The election system is designed to protect against the following types of attackers. We categorize attacker types based on what they can control and what private information they can access. 
 
+\subsubsection{Malicious users} \label{sec: malicious users}
+The first category describes users that behave maliciously or have been compromised and impersonated by malicious actors. Therefore, we consider each stakeholder listed in \cref{sec: voter-specific verifications} potentially malicious.
+
+\paragraph{A malicious election officer} can try to alter the election configuration in any imaginable way, either for destructive purposes or for modifying a candidate's appearance. A malicious election officer can also try to gain prohibited information, such as a partial result. 
+
+\paragraph{A malicious voter} can try to cast multiple ballots that get counted in the tally. A voter can also try to disrupt an election by submitting an invalid vote. Additionally, a voter can try to get cryptographic evidence that, at a later point, will convince a third party of the content of the previously submitted vote. 
+
+\paragraph{A malicious trustee} may try to gain sensitive information, such as compute a partial result, read a particular voter's vote, or even compute the main decryption key. As a destructive action, a malicious trustee can try to prevent a result from being calculated by refusing to participate in the post-election phase protocol.
+
+\paragraph{A malicious auditor} may falsely claim the status of an election. For example, a malicious auditor might try to convince the public that the integrity property of an election is broken when it is not, or the other way around.
+
+
+\subsubsection{Compromised componenets} \label{sec: compromised components}
+The second category of attackers relates to system components that get compromised due to successful hacking attempts or malicious system administrators.
+
+\paragraph{A compromised trustee application} can leak all the private data that belongs to that particular trustee. This includes the trustee's share of the decryption and mixing coefficients. It can also tamper with the output of the protocol it is supposed to perform.
+
+\paragraph{A compromised voting application} can tamper with the output of the protocol it is supposed to perform.
+
+\paragraph{A compromised credentials authority} can leak all voter credentials generated in \cref{sec: voter credential distribution process}. As a disruptive action, it can distribute wrong credentials to the voters, i.e., credentials that do not correspond to the public authentication keys sent to the voter authorizer, as in \cref{sec: voter credential distribution process}.
+
+\paragraph{A compromised identity provider} can generate fraudulent identity tokens for voters, i.e., without successful authentication.
+
+\paragraph{Compromised voter authorizer} can leak its internal secrets including its private key $x_\mathcal{A}$. Can generate fraudulent voter session items on the bulletin board granting unauthorized voting access.
+
+\paragraph{Compromised external verifier} can display fake values to its user during the protocol described in \cref{sec: challenging a vote cryptogram}. 
+
+
+\subsubsection{Compromised communication channels} \label{sec: compromised communication channels}
+The last category of attackers describes breaches that happen to communication channels. Recall from \cref{sec: communication channels} that authentic channels can leak the data it transports, and compromising unsecured channels can read and even tamper with the data being transported.
+
+The following list contains all the authentic communication channels that are used throughout the protocol:
 \begin{itemize}
-    \item list of all stakeholders that can be malicious; what doest it mean for a stakeholder to be malicious; how many can be malicious
-    \item list of system components that can be compromised; what does it mean for one to be compromised; how many can be compomised
-    \item list of communication channels that can be breached; what it entails; 
+    \item the channel used between the election administration service and all the other services that need to get their public key authorized for their role, as described in \cref{sec: election configuration}. 
+\end{itemize}
+
+The following list contains all the unsecured communication channels that are used throughout the protocol:
+\begin{itemize}
+    \item the channels used by the election administration service and the voter authorizer to communicate with the digital ballot box
+    \item the channel used by the voting application to the digital ballot box during the vote cryptogram generation process \cref{sec: vote cryptogram generation process}
+    \item the channel used by the voting application to the voter authorizer during the voter authorization procedure \cref{sec: voter authorization procedure}
+    \item the channel used between the trustee application and the election administration service in the threshold ceremony (\cref{sec: threshold ceremony}) and post-election phase (\cref{sec: post-election phase})
 \end{itemize}
