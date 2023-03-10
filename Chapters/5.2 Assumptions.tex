@@ -1,6 +1,47 @@
 \subsection{Assumptions} \label{sec: assumptions}
+Our election protocol assumes the following limitations about a potential attacker. The first category describes assumptions necessary for the election system to work correctly. The second category describes the assumptions required to fulfill the security properties described in \cref{sec: election properties}.
 
+\paragraph{Assumptions related to the well-functioning of the election protocol:}
 \begin{itemize}
-    \item list of general assumptions that any attacker cannot do; for exmaple, the ECDLP is hard
-    \item list of assumptions per election property
+    \item An attacker's computation power is assumed to be polynomially bound. 
+    \item The elliptic curve discrete logarithm problem is assumed to be infeasible to break, as described in \cref{app: elliptic curve discrete logarithm problem}.
+    \item All the secure communication channels are assumed to be private and tamper-resistant. The full list of secure communication channels used in the protocol consists of the following:
+    \begin{itemize}
+        \item generally, users are assumed to interact genuinely with their devices,
+        \item the voting application assumes to receive correct inputs from voters,
+        \item voters are not observed while interacting with their devices,
+        \item the trustee application is assumed to correctly and secretly receive trustee inputs, including the share of the decryption key in the post-election phase \cref{sec: post-election phase},
+        \item election officials can interact genuinely and privately with a browser to access the election administration service and voter authorizer,
+        \item election officials can interact genuinely and privately with the auditing scripts during the administration auditing process (\cref{sec: administration auditing process}),
+        \item credential authorities are assumed to secretly and correctly receive voter contact information from an election official during the voter credential distribution process (\cref{sec: voter credential distribution process}),
+        \item credential authorities are assumed to secretly and correctly distribute voter credentials to the voters during the voter credential distribution process (\cref{sec: voter credential distribution process}),
+        \item the voting application is assumed to genuinely and privately interact with all third-party identity providers.
+    \end{itemize}
+    \item All the authentic communication channels are assumed to be tamper-resistant. The full list of authentic communication channels used in the protocol consists of the following:
+    \begin{itemize}
+        \item the channel used between the election administration service and all the other services that need to get their public key authorized for their role, as described in \cref{sec: election configuration}. 
+    \end{itemize}
+    % \item The election administration service is assumed to be trustworthy, i.e., it secretly stores its private key $x_\mathcal{E}$ and acts according to the protocol only when triggered by an authorized election official.
+    % \item The digital ballot box is assumed to be trustworthy, i.e., it secretly stores its private key $x_\mathcal{D}$ and acts according to the protocol.
+\end{itemize}
+
+\paragraph{Assumptions related to security properties:}
+\begin{itemize}
+    \item For achieving the eligibility property, we assume:
+    \begin{itemize}
+        \item when voter authorization mode is \textbf{credential-based}, there is at least one honest credential authority that generates and distributes correct voter credentials,
+        \item when voter authorization mode is \textbf{identity-based}, there is at least one honest third-party identity provider that generates genuine identity tokens on successful voter authentication,
+        \item the administration auditing process (\cref{sec: administration auditing process}) is trustworthy, i.e., an honest election official runs genuine auditing tools against real election data.
+    \end{itemize}
+    \item For achieving the privacy and anonymity properties, we assume:
+    \begin{itemize}
+        \item there are no more than $t$ malicious trustees or compromised trustee applications, where $t$ is the decryption threshold configured during the threshold ceremony (\cref{sec: threshold ceremony}),
+        \item the voting application does not leak voter secret information.
+    \end{itemize}
+    \item For achieving verifiability, we assume:
+    \begin{itemize}
+        \item A voter uses at least one honest device, e.g., either the voting application device or the external verifier device,
+        \item There are multiple external verifier deployments, out of which at least one is considered trustworthy by the voter.
+    \end{itemize}
+    \item For preserving the integrity, we assume that the integrity audit (\cref{sec: integrity of the bulletin board}) is trustworthy, i.e., an honest election official runs genuine auditing tools against real election data.
 \end{itemize}
