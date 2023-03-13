@@ -1,23 +1,24 @@
 \subsection{Attack scenarios} \label{sec: attack scenarios}
+Here, we present an extensive list of attacks that we considered and might happen to an election. We also describe how the attack is detected and how the system responds. Finally, in \cref{sec: disruptive attacks}, we describe some attacks that the protocol only provides a way to detect. If they successfully happen, it is up to election officials to assess the damage and decide on a resolution, e.g., repeat the election event.
 
 
-\paragraph{A corrupt election oficer maliciouslly changes the election configuration} \mbox{} \\
+\paragraph{A corrupt election officer maliciously changes the configuration} \mbox{} \\
 description goes here.
 
 
-\paragraph{A corrupt election oficer attempts to read an unauthorized partial result} \mbox{} \\
+\paragraph{A corrupt election officer attempts to read an unauthorized result} \mbox{} \\
 description goes here.
 
 
-\paragraph{A malicious voter submits multiple ballots in attempt to ballot stuffing} \mbox{} \\
+\paragraph{A malicious voter submits multiple ballots; ballot stuffing attempt} \mbox{} \\
 description goes here.
 
 
-\paragraph{A corrupt trustee attempts to decrypt the vote of a particular voter} \mbox{} \\
+\paragraph{A corrupt trustee attempts to decrypt the vote of a particular voter}
 description goes here.
 
 
-\paragraph{A corrupt trustee attempts to prevent a result form being computed} \mbox{} \\
+\paragraph{A corrupt trustee attempts to prevent a result from being computed}
 description goes here.
 
 
@@ -29,33 +30,33 @@ description goes here.
 description goes here.
 
 
-\paragraph{A trustee uses a forged trustee application that does not follow the protocol} \mbox{} \\
+\paragraph{A forged trustee application is used that does not follow the protocol}
 description goes here.
 be explicit.
 consider each line of the protocol.
 
 
-\paragraph{A voter uses a forged voting application that does not follow the protocol} \mbox{} \\
+\paragraph{A forged voting application is used that does not follow the protocol}
 description goes here.
 be explicit.
 consider each line of the protocol.
 
 
-\paragraph{A voter uses a forged voting application that changes the voter's vote} \mbox{} \\
+\paragraph{A forged voting application is used that changes the voter's vote} \mbox{} \\
 description goes here.
 
 
-\paragraph{A voter uses a forged external verifier that does not follow the protocol} \mbox{} \\
+\paragraph{A forged external verifier is used that does not follow the protocol} \mbox{} \\
 description goes here.
-be explicit. (there shouldn't be that many)
-consider each line of the protocol.
+be explicit.
+consider each line of the protocol (there shouldn't be that many).
 
 
-\paragraph{A compromised credentials authority leaks all voter credentials it generated} \mbox{} \\
+\paragraph{A compromised credentials authority leaks all its voter credentials}
 description goes here.
 
 
-\paragraph{A malicious credentials authority distributes wrong credentials to voters} \mbox{} \\
+\paragraph{A malicious credentials authority distributes wrong voter credentials}
 description goes here.
 
 
@@ -63,11 +64,11 @@ description goes here.
 description goes here.
 
 
-\paragraph{The voter authorizer service gets compromised and its private key gets leaked} \mbox{} \\
+\paragraph{The voter authorizer gets compromised, and its private key gets leaked}
 description goes here.
 
 
-\paragraph{The voter authorizer service gets compromised and authorizes voters without a successfull authentication} \mbox{} \\
+\paragraph{The voter authorizer gets compromised and authorizes voters without a successful authentication} \mbox{} \\
 description goes here.
 
 
@@ -75,47 +76,51 @@ description goes here.
 description goes here.
 
 
-\paragraph{An attacker eavesdrops on the communication during the configuration processes} \mbox{} \\
+\paragraph{An attacker eavesdrops on the data of the configuration processes} \mbox{} \\
 description goes here.
 
 
-\paragraph{An attacker tampers with the communication during the configuration processes} \mbox{} \\
+\paragraph{An attacker tampers with the data of the configuration processes} \mbox{} \\
 description goes here.
 
 
-\paragraph{An attacker eavesdrops on the communication during the voter authorization processes} \mbox{} \\
+\paragraph{An attacker eavesdrops on the data of the voter authorization process}
 description goes here.
 
 
-\paragraph{An attacker tampers with the communication during the voter authorization processes} \mbox{} \\
+\paragraph{An attacker tampers with the data of the voter authorization process}
 description goes here.
 
 
-\paragraph{An attacker eavesdrops on the communication during the voting processes} \mbox{} \\
-description goes here.
-be explicit.
-consider each line of the protocol.
-
-
-\paragraph{An attacker tampers with the communication during the voting processes} \mbox{} \\
+\paragraph{An attacker eavesdrops on the data of the voting process} \mbox{} \\
 description goes here.
 be explicit.
 consider each line of the protocol.
 
 
-\paragraph{An attacker eavesdrops on the communication during the threshold and result ceremonies} \mbox{} \\
+\paragraph{An attacker tampers with the data during the voting process} \mbox{} \\
+description goes here.
+be explicit.
+consider each line of the protocol.
+
+
+\paragraph{An attacker eavesdrops on the data of the threshold ceremony and result ceremony} \mbox{} \\
 description goes here.
 
 
-\paragraph{An attacker tampers with the communication during the threshold and result ceremonies} \mbox{} \\
+\paragraph{An attacker tampers with the data of the threshold ceremony and result ceremony} \mbox{} \\
 description goes here.
 
 
-\subsubsection{Detect fatalities}
+\subsubsection{Disruptive attacks} \label{sec: disruptive attacks}
 
-\paragraph{The election administrator service gets compromised and its private key gets leaked} \mbox{} \\
+\paragraph{The election administrator service gets compromised, and its private key gets leaked} \mbox{} \\
 description goes here.
 
 
-\paragraph{The digital ballot box gets compromised and its private key gets leaked} \mbox{} \\
+\paragraph{The digital ballot box gets compromised, and its private key gets leaked} \mbox{} \\
+description goes here.
+
+
+\paragraph{The digital ballot box gets compromised and tampers with the bulletin board items} \mbox{} \\
 description goes here.
